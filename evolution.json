@@ -1,0 +1,227 @@
+{
+    "client_1761405694424": {
+        "name": "Cezar Dinca",
+        "evaluations": {
+            "Portrige - Motricitate fina": {
+                "2025-10-30": 4,
+                "2025-12-30": 16
+            },
+            "Portrige - Motricitate grosieră": {
+                "2025-10-30": 0,
+                "2025-12-30": 17
+            },
+            "Portrige - Limbaj receptiv": {
+                "2025-10-30": 0,
+                "2025-12-30": 22
+            },
+            "Portrige - Limbaj expresiv": {
+                "2025-10-30": 0,
+                "2025-12-30": 13
+            },
+            "Portrige - Socializare": {
+                "2025-10-30": 0,
+                "2025-12-30": 11
+            },
+            "Portrige - Autonomie personală": {
+                "2025-10-30": 0,
+                "2025-12-30": 33
+            }
+        },
+        "programHistory": []
+    },
+    "client_1761643441294": {
+        "name": "Tudor",
+        "evaluations": [],
+        "programHistory": [
+            {
+                "date": "2025-12-22",
+                "programId": "prog_1",
+                "programTitle": "Imitare orala",
+                "score": "0",
+                "eventId": "evt1761680729478_n8d69iie4"
+            },
+            {
+                "date": "2025-12-22",
+                "programId": "prog_3",
+                "programTitle": "Instrucțiuni functionale",
+                "score": "P",
+                "eventId": "evt1761680729478_n8d69iie4"
+            },
+            {
+                "date": "2025-12-22",
+                "programId": "prog_11",
+                "programTitle": "Imitare verbală",
+                "score": "-",
+                "eventId": "evt1761680729478_n8d69iie4"
+            },
+            {
+                "date": "2025-12-22",
+                "programId": "prog_4",
+                "programTitle": "Imitare motorie cu și fără obiect",
+                "score": "+",
+                "eventId": "evt1761680729478_n8d69iie4"
+            },
+            {
+                "date": "2025-12-22",
+                "programId": "prog_7",
+                "programTitle": "Răspuns la nume",
+                "score": "+",
+                "eventId": "evt1761680729478_n8d69iie4"
+            },
+            {
+                "date": "2025-12-22",
+                "programId": "prog_6",
+                "programTitle": "Motricitate",
+                "score": "+",
+                "eventId": "evt1761680729478_n8d69iie4"
+            },
+            {
+                "date": "2025-12-22",
+                "programId": "prog_12",
+                "programTitle": "Joc și mișcare",
+                "score": "+",
+                "eventId": "evt1761680729478_n8d69iie4"
+            },
+            {
+                "date": "2025-12-22",
+                "programId": "prog_8",
+                "programTitle": "Așteaptă",
+                "score": "+",
+                "eventId": "evt1761680729478_n8d69iie4"
+            },
+            {
+                "date": "2025-12-22",
+                "programId": "prog_13",
+                "programTitle": "Atenție",
+                "score": "+",
+                "eventId": "evt1761680729478_n8d69iie4"
+            },
+            {
+                "date": "2025-12-15",
+                "programId": "prog_1",
+                "programTitle": "Imitare orala",
+                "score": "0",
+                "eventId": "evt1761680729478_xci1kyk0w"
+            },
+            {
+                "date": "2025-12-15",
+                "programId": "prog_3",
+                "programTitle": "Instrucțiuni functionale",
+                "score": "P",
+                "eventId": "evt1761680729478_xci1kyk0w"
+            },
+            {
+                "date": "2025-12-15",
+                "programId": "prog_11",
+                "programTitle": "Imitare verbală",
+                "score": "-",
+                "eventId": "evt1761680729478_xci1kyk0w"
+            },
+            {
+                "date": "2025-12-15",
+                "programId": "prog_4",
+                "programTitle": "Imitare motorie cu și fără obiect",
+                "score": "+",
+                "eventId": "evt1761680729478_xci1kyk0w"
+            },
+            {
+                "date": "2025-12-15",
+                "programId": "prog_6",
+                "programTitle": "Motricitate",
+                "score": "+",
+                "eventId": "evt1761680729478_xci1kyk0w"
+            },
+            {
+                "date": "2025-12-15",
+                "programId": "prog_7",
+                "programTitle": "Răspuns la nume",
+                "score": "-",
+                "eventId": "evt1761680729478_xci1kyk0w"
+            },
+            {
+                "date": "2025-12-15",
+                "programId": "prog_12",
+                "programTitle": "Joc și mișcare",
+                "score": "-",
+                "eventId": "evt1761680729478_xci1kyk0w"
+            },
+            {
+                "date": "2025-12-15",
+                "programId": "prog_8",
+                "programTitle": "Așteaptă",
+                "score": "0",
+                "eventId": "evt1761680729478_xci1kyk0w"
+            },
+            {
+                "date": "2025-12-15",
+                "programId": "prog_13",
+                "programTitle": "Atenție",
+                "score": "-",
+                "eventId": "evt1761680729478_xci1kyk0w"
+            },
+            {
+                "date": "2025-11-03",
+                "programId": "prog_1",
+                "programTitle": "Imitare orala",
+                "score": "0",
+                "eventId": "evt1761645434697_x1ze0vy0h"
+            },
+            {
+                "date": "2025-11-03",
+                "programId": "prog_3",
+                "programTitle": "Instrucțiuni functionale",
+                "score": "-",
+                "eventId": "evt1761645434697_x1ze0vy0h"
+            },
+            {
+                "date": "2025-11-03",
+                "programId": "prog_11",
+                "programTitle": "Imitare verbală",
+                "score": "P",
+                "eventId": "evt1761645434697_x1ze0vy0h"
+            },
+            {
+                "date": "2025-11-03",
+                "programId": "prog_4",
+                "programTitle": "Imitare motorie cu și fără obiect",
+                "score": "-",
+                "eventId": "evt1761645434697_x1ze0vy0h"
+            },
+            {
+                "date": "2025-11-03",
+                "programId": "prog_7",
+                "programTitle": "Răspuns la nume",
+                "score": "P",
+                "eventId": "evt1761645434697_x1ze0vy0h"
+            },
+            {
+                "date": "2025-11-03",
+                "programId": "prog_6",
+                "programTitle": "Motricitate",
+                "score": "+",
+                "eventId": "evt1761645434697_x1ze0vy0h"
+            },
+            {
+                "date": "2025-11-03",
+                "programId": "prog_12",
+                "programTitle": "Joc și mișcare",
+                "score": "P",
+                "eventId": "evt1761645434697_x1ze0vy0h"
+            },
+            {
+                "date": "2025-11-03",
+                "programId": "prog_8",
+                "programTitle": "Așteaptă",
+                "score": "-",
+                "eventId": "evt1761645434697_x1ze0vy0h"
+            },
+            {
+                "date": "2025-11-03",
+                "programId": "prog_13",
+                "programTitle": "Atenție",
+                "score": "P",
+                "eventId": "evt1761645434697_x1ze0vy0h"
+            }
+        ]
+    }
+}

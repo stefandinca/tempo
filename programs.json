@@ -1,0 +1,70 @@
+{
+  "programs": [
+    {
+      "id": "prog_1",
+      "title": "Imitare orala",
+      "description": "Reproduce mișcările gurii și sunetele produse de terapeut (ex: suflat, deschis gura, pronunțat silabe)."
+    },
+    {
+      "id": "prog_2",
+      "title": "Stimulare de limbaj",
+      "description": "Activități pentru a crește dorința și capacitatea copilului de a comunica verbal."
+    },
+    {
+      "id": "prog_3",
+      "title": "Instrucțiuni functionale",
+      "description": "Urmează comenzi simple din viața de zi cu zi („adu mingea”, „pune cana pe masă”)."
+    },
+    {
+      "id": "prog_4",
+      "title": "Imitare motorie cu și fără obiect",
+      "description": "Copiază acțiuni ale adultului care implică obiecte (ex: bate toba, împinge o mașinuță)."
+    },
+    {
+      "id": "prog_5",
+      "title": "Receptiv obiecte",
+      "description": "Copilul învață să recunoască și să indice obiecte atunci când sunt denumite („arată scaunul”)."
+    },
+    {
+      "id": "prog_6",
+      "title": "Motricitate",
+      "description": "Exerciții pentru dezvoltarea mișcărilor fine și grosiere (ex: apucare, sărituri, tras linii)."
+    },
+    {
+      "id": "prog_7",
+      "title": "Răspuns la nume",
+      "description": "Învață să se întoarcă sau să răspundă când își aude numele."
+    },
+    {
+      "id": "prog_8",
+      "title": "Așteaptă",
+      "description": "Învață să aștepte pe rând, să amâne o dorință sau o acțiune."
+    },
+    {
+      "id": "prog_9",
+      "title": "Joc social",
+      "description": "Exerciții de interacțiune și schimb reciproc în joc (ex: „dă-mi mingea”, „hai să construim împreună”)."
+    },
+    {
+      "id": "prog_10",
+      "title": "Gesturi și limbaj functional",
+      "description": "Copilul folosește gesturi sau cuvinte pentru a cere, a refuza sau a comunica nevoi („vreau apă”, „gata”)."
+    },
+    {
+      "id": "prog_11",
+      "title": "Imitare verbală",
+      "description": "Repetă cuvinte sau propoziții după adult („spune mama”, „spune apă”)."
+    },
+    {
+      "id": "prog_12",
+      "title": "Joc și mișcare",
+      "description": "Activități care combină jocul cu exercițiile fizice pentru coordonare și socializare."
+    },
+    {
+      "id": "prog_13",
+      "title": "Atenție",
+      "description": "Exerciții pentru a crește capacitatea de concentrare pe o sarcină sau pe interlocutor."
+    }
+    
+  ]
+}
