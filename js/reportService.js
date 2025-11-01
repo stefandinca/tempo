@@ -10,26 +10,44 @@ import { calendarState } from './calendarState.js';
 import { showCustomAlert } from './uiService.js';
 
 /**
- * Generează și descarcă un raport PDF pentru un client.
+ * Generează și descarcă un raport HTML pentru un client.
+ * (Modificat pentru a genera HTML cu date de evoluție)
  * @param {string} clientId
  */
-export function downloadClientReport(clientId) {
-    const { clients } = calendarState.getState();
+export async function downloadClientReport(clientId) { // <-- Add async
     const client = calendarState.getClientById(clientId);
     if (!client) {
         showCustomAlert('Clientul nu a fost găsit.', 'Eroare');
         return;
     }
 
-    const reportData = generateClientReportData(clientId);
+    const reportData = generateClientReportData(clientId); // This is now modified
     if (!reportData) {
-        showCustomAlert('Nu s-au găsit date pentru acest client în luna curentă.', 'Eroare');
+        showCustomAlert('Nu s-au găsit date (sesiuni sau evoluție) pentru acest client.', 'Eroare'); // Modified message
         return;
     }
 
-    const htmlReport = generateClientHTML(reportData);
-    generatePdfFromHtml(htmlReport, `Raport_${client.name.replace(/\s+/g, '_')}`);
+    // MODIFIED: Generate async HTML, then download as HTML
+    try {
+        const htmlContent = await generateClientHTML(reportData); // <-- Add await
+        
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Raport_${client.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showCustomAlert('Raportul HTML a fost descărcat.\nÎl puteți deschide în browser (graficul este inclus).', 'Descărcare finalizată'); // Modified message
+    } catch (error) {
+        console.error('Eroare la generarea raportului client HTML:', error);
+        showCustomAlert('A apărut o eroare la generarea raportului.', 'Eroare');
+    }
 }
+
 
 /**
  * Generează și descarcă un raport HTML pentru un membru al echipei.
@@ -82,9 +100,9 @@ export function emailClientReport(clientId) {
 
     showCustomAlert(
         `Funcționalitate Email (Placeholder):\n\n` +
-        `Într-o implementare completă, raportul PDF ar fi generat și trimis la:\n${client.email}\n\n` +
+        `Într-o implementare completă, raportul HTML (sau un PDF generat pe server) ar fi trimis la:\n${client.email}\n\n` +
         `Acest lucru necesită un API de backend (ex: api.php) configurat cu un serviciu de trimitere email (SMTP, SendGrid, etc.).\n\n` +
-        `Deocamdată, folosiți butonul "Descarcă Raport" pentru a salva PDF-ul manual.`,
+        `Deocamdată, folosiți butonul "Descarcă Raport" pentru a salva HTML-ul manual.`,
         'Funcționalitate Neimplementată'
     );
 }
@@ -92,10 +110,20 @@ export function emailClientReport(clientId) {
 // --- LOGICA INTERNĂ DE GENERARE RAPORT CLIENT ---
 
 function generateClientReportData(clientId) {
-    const { events, teamMembers, clients, currentDate } = calendarState.getState();
+    const { events, teamMembers, clients, currentDate, evolutionData } = calendarState.getState(); // <-- Add evolutionData
     const client = calendarState.getClientById(clientId);
     if (!client) return null;
 
+    // --- Get Evolution Data ---
+    const clientEvolution = evolutionData[clientId] || 
+                          evolutionData[`client_${clientId}`] || 
+                          { name: client.name, evaluations: {}, programHistory: [] };
+    const hasEvolution = clientEvolution && (
+        (clientEvolution.evaluations && Object.keys(clientEvolution.evaluations).length > 0) || 
+        (clientEvolution.programHistory && clientEvolution.programHistory.length > 0)
+    );
+
+    // --- Get Event Data (current month) ---
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth();
 
@@ -109,7 +137,10 @@ function generateClientReportData(clientId) {
                eventDate.getMonth() === currentMonth;
     });
 
-    if (clientEvents.length === 0) return null;
+    const hasEvents = clientEvents.length > 0;
+    
+    // --- Check if any data exists ---
+    if (!hasEvents && !hasEvolution) return null; // <-- Modified check
 
     const billableEvents = clientEvents.filter(e => e.isBillable !== false);
     const nonBillableEvents = clientEvents.filter(e => e.isBillable === false);
@@ -117,8 +148,9 @@ function generateClientReportData(clientId) {
     const billableData = processEventsForClientReport(billableEvents, clientId);
     const nonBillableData = processEventsForClientReport(nonBillableEvents, clientId);
 
-    return { client, billable: billableData, nonBillable: nonBillableData, currentDate };
+    return { client, billable: billableData, nonBillable: nonBillableData, currentDate, clientEvolution }; // <-- Add clientEvolution
 }
+
 
 function processEventsForClientReport(events, clientId) {
     const { teamMembers } = calendarState.getState();
@@ -157,10 +189,11 @@ function processEventsForClientReport(events, clientId) {
     return { therapistTotals, grandTotal: totalHours, presentTotal: presentHours, absentTotal: absentHours };
 }
 
-function generateClientHTML(reportData) {
-    const { client, billable, nonBillable, currentDate } = reportData;
+async function generateClientHTML(reportData) { // <-- Add async
+    const { client, billable, nonBillable, currentDate, clientEvolution } = reportData; // <-- Add clientEvolution
     const monthName = currentDate.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
 
+    // --- Generate sections ---
     const createSummaryTable = (title, data, color) => {
         if (data.grandTotal === 0) return '';
         
@@ -183,7 +216,7 @@ function generateClientHTML(reportData) {
                 <h3 style="color: ${color};">${title}</h3>
                 <table>
                     <thead>
-                        <tr>
+                        <tr style="background: ${color}; color: white;">
                             <th>Terapeut</th>
                             <th style="text-align: right;">Total Ore</th>
                             <th style="text-align: right;">Ore Prezent</th>
@@ -205,14 +238,35 @@ function generateClientHTML(reportData) {
             </div>
         `;
     };
-
-    const billableSection = createSummaryTable('Sesiuni Facturabile', billable, '#3b82f6');
-    const nonBillableSection = createSummaryTable('Sesiuni Non-Facturabile (Gratuite/Admin)', nonBillable, '#6b7280');
-
+    
+    const billableSection = createSummaryTable('Sesiuni Facturabile (Luna Curentă)', billable, '#3b82f6');
+    const nonBillableSection = createSummaryTable('Sesiuni Non-Facturabile (Luna Curentă)', nonBillable, '#6b7280');
     const combinedTotal = billable.grandTotal + nonBillable.grandTotal;
     const combinedPresent = billable.presentTotal + nonBillable.presentTotal;
     const combinedAbsent = billable.absentTotal + nonBillable.absentTotal;
 
+    // --- Generate NEW sections ---
+    let evolutionChartHTML = '';
+    try {
+        const chartImageBase64 = await generateChartImage(clientEvolution);
+        if (chartImageBase64) {
+            evolutionChartHTML = `
+                <h2 style="color: #10b981; border-bottom-color: #10b98150;">Evoluție Portage (Grafic)</h2>
+                <div class="summary-box" style="padding: 10px; text-align: center; border-left-color: #10b981; background: #f0fdf4;">
+                    <img src="${chartImageBase64}" alt="Grafic Evoluție" style="max-width: 100%; height: auto; border-radius: 8px;">
+                </div>
+            `;
+        }
+    } catch (err) {
+        console.error("Eroare la generarea imaginii graficului:", err);
+        evolutionChartHTML = '<h2 style="color: #dc2626;">Graficul nu a putut fi generat.</h2>';
+    }
+
+    const portageSummaryHTML = generatePortageSummaryHTML(clientEvolution, client);
+    const programHistoryHTML = generateProgramHistoryHTML(clientEvolution.programHistory);
+
+
+    // --- Build Final HTML (using team member report style as base) ---
     return `
         <!DOCTYPE html>
         <html>
@@ -223,7 +277,7 @@ function generateClientHTML(reportData) {
                 body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 40px; color: #1f2937; line-height: 1.6; }
                 .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 3px solid #4A90E2; }
                 h1 { color: #4A90E2; margin: 0; font-size: 28px; }
-                h2 { color: #1f2937; margin: 20px 0 10px 0; font-size: 22px; }
+                h2 { margin: 30px 0 15px 0; font-size: 20px; border-bottom: 2px solid; padding-bottom: 8px; }
                 .client-info { background: #f9fafb; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #4A90E2; }
                 .client-info p { margin: 5px 0; font-size: 14px; }
                 table { width: 100%; border-collapse: collapse; margin: 20px 0; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
@@ -231,27 +285,38 @@ function generateClientHTML(reportData) {
                 td { padding: 12px; border-bottom: 1px solid #e5e7eb; }
                 tbody tr:nth-child(even) { background: #f9fafb; }
                 tbody tr:hover { background: #f3f4f6; }
-                .total-row td { font-weight: bold; font-size: 16px; padding: 15px 12px; }
+                .total-row td { font-weight: bold; font-size: 16px; padding: 15px 12px; border-top-width: 2px; border-top-style: solid; }
                 .summary-box { padding: 20px; margin: 20px 0; border-radius: 8px; border-left-width: 4px; border-left-style: solid; }
                 .summary-box h3 { margin: 0 0 15px 0; }
+                .summary-box table { box-shadow: none; }
                 .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12px; }
+                /* Specific for program history */
+                .program-history-score { display: inline-flex; align-items: center; justify-content: center; font-weight: 600; width: 28px; height: 28px; border-radius: 0.25rem; border: 2px solid; }
+                .program-history-score[data-score="0"] { color: #ef4444; border-color: #ef4444; }
+                .program-history-score[data-score="-"] { color: #f59e0b; border-color: #f59e0b; }
+                .program-history-score[data-score="P"] { color: #3b82f6; border-color: #3b82f6; }
+                .program-history-score[data-score="+"] { color: #10b981; border-color: #10b981; }
+                .program-history-empty { color: #6b7280; text-align: center; padding: 2rem; }
             </style>
         </head>
         <body>
             <div class="header">
-                <div><h1>Raport Terapie</h1><p style="margin: 0; font-size: 16px;">${monthName}</p></div>
+                <div><h1>Raport Terapie</h1></div>
                 <div style="text-align: right;"><p style="margin: 0; color: #6b7280;">Generat: ${new Date().toLocaleDateString('ro-RO')}</p></div>
             </div>
             <div class="client-info">
-                <h2 style="margin-top: 0;">Informații Client</h2>
+                <h2 style="margin-top: 0; color: #4A90E2; border-bottom: none;">Informații Client</h2>
                 <p><strong>Nume:</strong> ${client.name}</p>
                 ${client.email ? `<p><strong>Email:</strong> ${client.email}</p>` : ''}
                 ${client.phone ? `<p><strong>Telefon:</strong> ${client.phone}</p>` : ''}
                 ${client.birthDate ? `<p><strong>Data nașterii:</strong> ${new Date(client.birthDate).toLocaleDateString('ro-RO')}</p>` : ''}
             </div>
+
+            <h2 style="color: #3b82f6; border-bottom-color: #3b82f650;">Rezumat Sesiuni (${monthName})</h2>
             ${billableSection}
             ${nonBillableSection}
-            <div class="summary-box" style="border-left-color: #10b981; background: #f0fdf4;">
+            ${ (billable.grandTotal > 0 || nonBillable.grandTotal > 0) ?
+            `<div class="summary-box" style="border-left-color: #10b981; background: #f0fdf4;">
                 <h3 style="color: #065f46;">Total General (${monthName})</h3>
                 <table style="box-shadow: none;">
                     <tbody>
@@ -269,12 +334,20 @@ function generateClientHTML(reportData) {
                         </tr>
                     </tbody>
                 </table>
-            </div>
+            </div>` : '<p style="text-align: center; color: #6b7280;">Nu există sesiuni programate pentru luna curentă.</p>'}
+            
+            ${evolutionChartHTML}
+            
+            ${portageSummaryHTML}
+            
+            ${programHistoryHTML}
+
             <div class="footer"><p>Raport generat automat - Tempo</p></div>
         </body>
         </html>
     `;
 }
+
 
 // --- LOGICA INTERNĂ DE GENERARE RAPORT ECHIPĂ ---
 
@@ -467,6 +540,219 @@ function generateTeamMemberHTML(reportData) {
     `;
 }
 
+// --- NEW HELPERS FOR CLIENT HTML REPORT ---
+
+/**
+ * Renders the evolution chart to an offscreen canvas and returns a Base64 image.
+ */
+async function generateChartImage(clientData) {
+    if (!clientData || !clientData.evaluations || Object.keys(clientData.evaluations).length === 0) {
+        return null; // No data to chart
+    }
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 400;
+    const ctx = canvas.getContext('2d');
+
+    const colors = ['#4A90E2', '#FF6B6B', '#12C4D9', '#9B59B6', '#1DD75B', '#FFA500', '#E91E63'];
+    const datasets = [];
+    const allDates = new Set();
+    
+    Object.values(clientData.evaluations).forEach(values => {
+        Object.keys(values).forEach(date => allDates.add(date));
+    });
+    const sortedDates = Array.from(allDates).sort((a, b) => new Date(a) - new Date(b));
+
+    Object.entries(clientData.evaluations).forEach(([test, values], i) => {
+        const color = colors[i % colors.length];
+        datasets.push({
+            label: test,
+            data: sortedDates.map(date => values[date] ?? null),
+            borderColor: color,
+            backgroundColor: color,
+            borderWidth: 2,
+            fill: false,
+            tension: 0.3,
+            pointRadius: 4,
+            pointHoverRadius: 6
+        });
+    });
+
+    return new Promise((resolve) => {
+        // Asigură-te că Chart.js este disponibil în scope-ul global (este încărcat în admin.html)
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js nu este încărcat. Nu se poate genera graficul.');
+            resolve(null);
+            return;
+        }
+
+        const chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: { labels: sortedDates, datasets },
+            options: {
+                responsive: false, // Important for offscreen canvas
+                animation: {
+                    duration: 0, // No animation
+                },
+                events: [], // Dezactivează evenimentele pentru randare statică
+                plugins: {
+                    legend: { display: true, position: 'bottom', labels: { padding: 20 } },
+                    title: { display: true, text: `Evoluție Scoruri Portage`, font: { size: 16 } }
+                },
+                scales: {
+                    y: { beginAtZero: true, max: 100 }
+                }
+            }
+        });
+
+        // Este posibil ca graficul să nu fie randat instantaneu, deși am dezactivat animațiile.
+        // Folosim un mic timeout pentru a ne asigura că randarea s-a finalizat.
+        setTimeout(() => {
+            const dataUrl = canvas.toDataURL('image/png');
+            chartInstance.destroy(); // Clean up
+            resolve(dataUrl);
+        }, 250); // Un sfert de secundă ar trebui să fie suficient
+    });
+}
+
+
+/**
+ * Generates HTML for the Portage DQ summary table.
+ * Copied and modified from evolutionService.js
+ */
+function generatePortageSummaryHTML(clientData, client) {
+    if (!client.birthDate || !clientData.evaluations || Object.keys(clientData.evaluations).length === 0) {
+        return '';
+    }
+
+    const birthDate = new Date(client.birthDate);
+    const allDates = new Set();
+    Object.values(clientData.evaluations).forEach(domain => {
+        Object.keys(domain).forEach(date => allDates.add(date));
+    });
+    const sortedDates = Array.from(allDates).sort((a, b) => new Date(a) - new Date(b));
+    
+    const results = [];
+    sortedDates.forEach(date => {
+        const evalValues = Object.values(clientData.evaluations)
+            .map(domain => domain[date])
+            .filter(v => typeof v === 'number' && !isNaN(v));
+        if (evalValues.length === 0) return;
+
+        const avgDevAge = evalValues.reduce((a, b) => a + b, 0) / evalValues.length;
+        const chronoAge = getAgeInMonths(birthDate, date); // Use helper
+        if (chronoAge === 0) return; // Avoid division by zero
+        const dq = (avgDevAge / chronoAge) * 100;
+        results.push({ date, avgDevAge, chronoAge, dq });
+    });
+
+    if (results.length === 0) {
+        return '';
+    }
+
+    const tableRows = results.map(r => {
+        const color = r.dq < 70 ? '#e74c3c' : r.dq < 85 ? '#f39c12' : '#27ae60';
+        return `<tr>
+            <td>${new Date(r.date).toLocaleDateString('ro-RO')}</td>
+            <td>${r.chronoAge.toFixed(1)} luni</td>
+            <td>${r.avgDevAge.toFixed(1)} luni</td>
+            <td style="font-weight:600;color:${color};">${r.dq.toFixed(1)}</td>
+        </tr>`;
+    }).join('');
+
+    return `
+        <h2 style="color: #9B59B6; border-bottom-color: #9B59B650;">Evoluție Generală Portage (DQ)</h2>
+        <div class="summary-box" style="border-left-color: #9B59B6; background: #fdf4ff;">
+            <table style="box-shadow: none;">
+                <thead><tr style="background: #e9d5ff; color: #581c87;"><th>Data</th><th>Vârstă cronologică</th><th>Vârstă mentală</th><th>Indice dezvoltare (DQ)</th></tr></thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+/**
+ * Generates HTML for the program history table.
+ * Copied and modified from evolutionService.js
+ */
+function generateProgramHistoryHTML(programHistory) {
+    if (!programHistory || programHistory.length === 0) {
+        return `
+            <h2 style="color: #FF6B6B; border-bottom-color: #FF6B6B50;">Istoric Programe Recente</h2>
+            <div class="program-history-empty">Nu există istoric de programe pentru acest client.</div>
+        `;
+    }
+
+    // Sortare și grupare
+    programHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const grouped = {};
+    programHistory.forEach(entry => {
+        if (!grouped[entry.programTitle]) grouped[entry.programTitle] = [];
+        grouped[entry.programTitle].push(entry);
+    });
+
+    let tableRows = '';
+    Object.entries(grouped).forEach(([programTitle, entries]) => {
+        entries.slice(0, 10).forEach((entry, index) => { // Limitează la ultimele 10
+            const formattedDate = new Date(entry.date).toLocaleDateString('ro-RO');
+            tableRows += `<tr>`;
+            if (index === 0) {
+                tableRows += `<td rowspan="${Math.min(entries.length, 10)}">${programTitle}</td>`;
+            }
+            tableRows += `<td>${formattedDate}</td>`;
+            tableRows += `<td style="text-align: center;"><span class="program-history-score" data-score="${entry.score}">${entry.score}</span></td>`;
+            tableRows += `</tr>`;
+        });
+    });
+    
+    return `
+        <h2 style="color: #FF6B6B; border-bottom-color: #FF6B6B50;">Istoric Programe Recente</h2>
+        <div class="summary-box" style="border-left-color: #FF6B6B; background: #fff5f5;">
+            <table style="box-shadow: none;">
+                <thead><tr style="background: #fee2e2; color: #991b1b;"><th>Program</th><th>Data</th><th style="text-align: center;">Scor</th></tr></thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+// --- Helpers copiate din evolutionService.js ---
+
+function getAgeInMonths(birthDate, evalDate) {
+    const birth = new Date(birthDate);
+    const evalD = evalDate ? new Date(evalDate) : new Date();
+    let months = (evalD.getFullYear() - birth.getFullYear()) * 12;
+    months -= birth.getMonth();
+    months += evalD.getMonth();
+    return months <= 0 ? 0 : months;
+}
+
+function formatYearsMonths(years, months) {
+    if (years === 0) {
+        return `${months} ${months === 1 ? 'luna' : 'luni'}`;
+    }
+    if (months === 0) {
+        return `${years} ${years === 1 ? 'an' : 'ani'}`;
+    }
+    const yearText = years === 1 ? 'an' : 'ani';
+    const monthText = months === 1 ? 'luna' : 'luni';
+    return `${years} ${yearText} si ${months} ${monthText}`;
+}
+
+function formatAgeInYearsMonths(totalMonths) {
+    const years = Math.floor(totalMonths / 12);
+    const months = totalMonths % 12;
+    return formatYearsMonths(years, months);
+}
+
+// --- END NEW HELPERS ---
+
+
 // --- HELPERS ---
 
 function getRoleLabel(role) {
@@ -484,51 +770,4 @@ function getEventTypeLabel(type) {
         'sedinta': 'Ședință'
     };
     return types[type] || type;
-}
-
-function generatePdfFromHtml(htmlContent, filename) {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = htmlContent;
-    tempDiv.style.position = 'absolute';
-    tempDiv.style.left = '-9999px';
-    tempDiv.style.width = '210mm'; // A4 width
-    document.body.appendChild(tempDiv);
-    
-    const content = tempDiv.querySelector('body') || tempDiv;
-    
-    html2canvas(content, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        width: 794, // A4 width in pixels
-        windowWidth: 794
-    }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        
-        const imgWidth = 210;
-        const pageHeight = 297;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        let heightLeft = imgHeight;
-        let position = 0;
-        
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-        
-        while (heightLeft > 0) {
-            position = heightLeft - imgHeight;
-            pdf.addPage();
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-        }
-        
-        pdf.save(`${filename}.pdf`);
-        document.body.removeChild(tempDiv);
-        showCustomAlert('Raportul PDF a fost descărcat!', 'Succes');
-    }).catch(error => {
-        console.error('Eroare la generarea PDF-ului:', error);
-        document.body.removeChild(tempDiv);
-        showCustomAlert('Eroare la generarea PDF-ului. Vă rugăm încercați din nou.', 'Eroare');
-    });
 }
