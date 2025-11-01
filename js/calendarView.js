@@ -338,7 +338,7 @@ function renderEventsInGrid(days, viewElement, onEventClick) {
                 
                 if (isAdminView) {
                     const publicBadge = event.isPublic ? '<span class="event-badge public">PUBLIC</span>' : '';
-                    const billableBadge = event.isBillable === false ? '<span class="event-badge non-billable" title="Non-billable">â‚</span>' : ''; // Simbol $ sau â‚
+                    const billableBadge = event.isBillable === false ? '<span class="event-badge non-billable" title="Non-billable"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bluesky" viewBox="0 0 16 16"><path d="M3.468 1.948C5.303 3.325 7.276 6.118 8 7.616c.725-1.498 2.698-4.29 4.532-5.668C13.855.955 16 .186 16 2.632c0 .489-.28 4.105-.444 4.692-.572 2.04-2.653 2.561-4.504 2.246 3.236.551 4.06 2.375 2.281 4.2-3.376 3.464-4.852-.87-5.23-1.98-.07-.204-.103-.3-.103-.218 0-.081-.033.014-.102.218-.379 1.11-1.855 5.444-5.231 1.98-1.778-1.825-.955-3.65 2.28-4.2-1.85.315-3.932-.205-4.503-2.246C.28 6.737 0 3.12 0 2.632 0 .186 2.145.955 3.468 1.948"/></svg></span>' : ''; // Simbol $ sau â‚
                     
                     eventBlock.innerHTML = `
                         <div class="event-initials-container">${initialsHtml}</div>
@@ -380,34 +380,54 @@ function renderEventsInGrid(days, viewElement, onEventClick) {
  * @returns {object[][]} - Un array de grupuri (array-uri) de evenimente
  */
 function groupOverlappingEvents(events) {
-    if (events.length === 0) return [];
-    
-    const sortedEvents = [...events].sort((a, b) => a.startTime.localeCompare(b.startTime));
-    
+    if (!events || events.length === 0) return [];
+
+    // Helper to get end time in minutes from 00:00
+    const getEndMinutes = (event) => {
+        if (!event.startTime || !event.duration) return 0;
+        const [startH, startM] = event.startTime.split(':').map(Number);
+        return (startH * 60 + startM) + (event.duration || 0);
+    };
+
+    // Helper to get start time in minutes
+    const getStartMinutes = (event) => {
+        if (!event.startTime) return 0;
+        const [startH, startM] = event.startTime.split(':').map(Number);
+        return (startH * 60 + startM);
+    };
+
+    // Sortează evenimentele după ora de început
+    const sortedEvents = [...events].sort((a, b) => getStartMinutes(a) - getStartMinutes(b));
+
     const groups = [];
-    let currentGroup = [sortedEvents[0]];
+    if (sortedEvents.length === 0) return [];
 
-    for (let i = 1; i < sortedEvents.length; i++) {
-        const currentEvent = sortedEvents[i];
-        const lastEventInGroup = currentGroup[currentGroup.length - 1];
+    let currentGroup = [];
+    let maxEndInGroup = 0; // Urmărește cea mai recentă oră de sfârșit din grupul curent
 
-        const [lastStartH, lastStartM] = lastEventInGroup.startTime.split(':').map(Number);
-        const lastEndMinutes = (lastStartH * 60 + lastStartM) + lastEventInGroup.duration;
+    sortedEvents.forEach(event => {
+        const startMinutes = getStartMinutes(event);
         
-        const [currStartH, currStartM] = currentEvent.startTime.split(':').map(Number);
-        const currStartMinutes = currStartH * 60 + currStartM;
-
-        if (currStartMinutes < lastEndMinutes) {
-            // Se suprapun
-            currentGroup.push(currentEvent);
+        // Verifică dacă evenimentul începe înainte de sfârșitul maxim al grupului curent
+        if (currentGroup.length === 0 || startMinutes < maxEndInGroup) {
+            // Evenimentul se suprapune cu grupul curent (sau e primul event)
+            currentGroup.push(event);
+            // Actualizează ora de sfârșit maximă a grupului
+            maxEndInGroup = Math.max(maxEndInGroup, getEndMinutes(event));
         } else {
-            // Nu se suprapun, începe un grup nou
+            // Evenimentul NU se suprapune, deci grupul anterior e gata
             groups.push(currentGroup);
-            currentGroup = [currentEvent];
+            // Începe un grup nou cu acest eveniment
+            currentGroup = [event];
+            maxEndInGroup = getEndMinutes(event);
         }
+    });
+
+    // Adaugă ultimul grup
+    if (currentGroup.length > 0) {
+        groups.push(currentGroup);
     }
-    
-    groups.push(currentGroup); // Adaugă ultimul grup
+
     return groups;
 }
 

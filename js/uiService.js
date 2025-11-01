@@ -252,9 +252,15 @@ export function closeEventDetailsModal() {
  * Functii apelate de main.js la click pe butoanele din modalul de detalii
  */
 export function editEventFromDetails() {
-    if(currentDetailsEventId) {
+    // Salvează ID-ul într-o variabilă locală ÎNAINTE de a închide modalul.
+    const eventIdToEdit = currentDetailsEventId;
+
+    if(eventIdToEdit) {
+        // Acum închide modalul de detalii (care va seta currentDetailsEventId la null)
         closeEventDetailsModal();
-        openEventModal(currentDetailsEventId);
+        
+        // Deschide modalul de editare folosind variabila locală salvată.
+        openEventModal(eventIdToEdit);
     }
 }
 
@@ -262,8 +268,9 @@ export function deleteEventFromDetails() {
     if(currentDetailsEventId) {
         // Setează ID-ul în state pentru ca main.js să știe ce să șteargă
         calendarState.openEventModal(currentDetailsEventId);
-        // Apelează funcția de ștergere (care e în main.js și conține logica de confirmare)
-        $('deleteEventBtn').click(); // Simulează click pe butonul de ștergere
+        
+        // CORECȚIE: ID-ul corect este 'deleteBtn', nu 'deleteEventBtn'
+        $('deleteBtn').click(); // Simulează click pe butonul de ștergere
     }
 }
 
