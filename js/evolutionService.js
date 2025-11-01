@@ -26,26 +26,31 @@ export async function showEvolutionModal(clientId) {
     currentClientId = clientId;
     const { clients, evolutionData } = calendarState.getState();
     const client = calendarState.getClientById(clientId);
-    const clientData = evolutionData[clientId] || evolutionData[`client_${clientId}`]; // Compatibilitate
 
-    if (!client || !clientData) {
-        showCustomAlert('Nu există date de evoluție pentru acest client.', 'Evoluție');
+    // 1. Verificăm DOAR dacă clientul există
+    if (!client) {
+        showCustomAlert('Clientul nu a fost găsit.', 'Eroare');
         return;
     }
 
-    // Configurează modalul principal
+    // 2. Creăm un obiect gol dacă nu există date, ÎN LOC SĂ AFIȘĂM ALERTA
+    const clientData = evolutionData[clientId] || 
+                     evolutionData[`client_${clientId}`] || 
+                     { name: client.name, evaluations: {}, programHistory: [] };
+
+    // Continuăm cu deschiderea modalului
     $('evolutionTitle').textContent = `Evoluție - ${client.name}`;
     evolutionModal.style.display = 'flex';
     
     // Asigură-te că primul tab este activ
     activateTab('tabGrafice');
 
-    // Randează componentele
+    // Randează componentele (acestea vor gestiona starea goală)
     renderEvolutionChart(clientData);
     renderPortageSummary(clientData, client);
     renderProgramHistory(clientData);
     
-    // Pregătește modalul de evaluare (ascuns)
+    // Pregătește modalul de evaluare
     await setupEvaluationTab(client);
 }
 

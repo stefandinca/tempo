@@ -578,6 +578,26 @@ async function init() {
     // Randează listele o singură dată la încărcare
     ui.renderClientsList('');
     ui.renderTeamMembersList();
+
+    // --- Adaugă ascultători pentru sincronizarea culorilor ---
+    const memberColorPicker = $('memberColor');
+    const memberColorHex = $('memberColorHex');
+
+    if (memberColorPicker && memberColorHex) {
+        // Sincronizează HEX când se schimbă culoarea din picker
+        memberColorPicker.addEventListener('input', (e) => {
+            memberColorHex.value = e.target.value.toUpperCase();
+        });
+
+        // Sincronizează picker-ul când se tastează în HEX
+        memberColorHex.addEventListener('input', (e) => {
+            // Verifică sumar dacă e un cod hex valid pentru a nu strica picker-ul
+            if (/^#[0-9A-F]{6}$/i.test(e.target.value)) {
+                memberColorPicker.value = e.target.value;
+            }
+        });
+    }
+    // --- Sfârșitul codului adăugat ---
 }
 
 // --- Pornirea Aplicației ---

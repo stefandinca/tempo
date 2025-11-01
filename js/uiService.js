@@ -406,33 +406,138 @@ function addAttendanceListeners(eventId) {
     });
 }
 
+
 function addProgramScoreListeners(eventId) {
     $('eventDetailsContent').querySelectorAll('.program-score-buttons').forEach(container => {
         container.addEventListener('click', async (e) => {
             if (e.target.tagName !== 'BUTTON') return;
-            const button = e.target;
-            const score = button.dataset.score;
-            const programId = container.dataset.programId;
-            
-            const event = calendarState.getEventById(eventId);
-            if (!event.programScores) event.programScores = {};
 
-            let newScore = score;
-            if (event.programScores[programId] === score) {
-                delete event.programScores[programId];
-                newScore = null;
-            } else {
-                event.programScores[programId] = score;
+            // Blochează butoanele temporar pentru a preveni click-uri duble
+            container.style.pointerEvents = 'none';
+            
+            try {
+                const button = e.target;
+                const score = button.dataset.score;
+                const programId = container.dataset.programId;
+                
+                const event = calendarState.getEventById(eventId);
+                if (!event) throw new Error("Eveniment negăsit");
+
+                if (!event.programScores) event.programScores = {};
+
+                let newScore = score;
+                if (event.programScores[programId] === score) {
+                    // Utilizatorul a dat click pe același scor (vrea să-l șteargă)
+                    delete event.programScores[programId];
+                    newScore = null;
+                } else {
+                    // Scor nou sau schimbat
+                    event.programScores[programId] = score;
+                }
+                
+                // 1. Salvează în data.json (cum era și înainte)
+                calendarState.saveEvent(event);
+                await api.saveData(calendarState.getState());
+                
+                // 2. APELEAZĂ FUNCȚIA NOUĂ PENTRU A SALVA ÎN evolution.json
+                await updateProgramHistory(event, programId, newScore);
+                
+                // 3. Actualizează UI-ul
+                container.querySelectorAll('.score-btn').forEach(b => b.classList.remove('active'));
+                if (newScore) button.classList.add('active');
+
+            } catch (err) {
+                console.error("Eroare la salvarea scorului:", err);
+                showCustomAlert("A apărut o eroare la salvarea scorului. Vă rugăm reîncercați.", "Eroare");
+            } finally {
+                // Reactivează butoanele
+                container.style.pointerEvents = 'auto';
             }
-            
-            calendarState.saveEvent(event);
-            await api.saveData(calendarState.getState());
-            // TODO: Salvează și în evolutionData
-            
-            container.querySelectorAll('.score-btn').forEach(b => b.classList.remove('active'));
-            if (newScore) button.classList.add('active');
         });
     });
+}
+
+/**
+ * Actualizează (adaugă/modifică/șterge) o intrare în programHistory
+ * pentru toți clienții din eveniment și o salvează în evolution.json.
+ */
+async function updateProgramHistory(event, programId, newScore) {
+    const { evolutionData } = calendarState.getState();
+    
+    // Găsește toți clienții asociați cu evenimentul
+    const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
+    if (clientIds.length === 0) return; // Fără client, fără istoric
+
+    const program = calendarState.getProgramById(programId);
+    if (!program) {
+        console.error(`Programul cu ID ${programId} nu a fost găsit.`);
+        return; 
+    }
+
+    let dataWasChanged = false;
+
+    clientIds.forEach(clientId => {
+        // Asigură-te că există o intrare pentru client în evolutionData
+        if (!evolutionData[clientId]) {
+            const client = calendarState.getClientById(clientId);
+            evolutionData[clientId] = {
+                name: client ? client.name : "Client Necunoscut",
+                evaluations: {},
+                programHistory: []
+            };
+        }
+
+        // Asigură-te că programHistory este un array
+        if (!Array.isArray(evolutionData[clientId].programHistory)) {
+            evolutionData[clientId].programHistory = [];
+        }
+        
+        const history = evolutionData[clientId].programHistory;
+        
+        // Caută o intrare existentă pentru acest eveniment ȘI acest program
+        const existingEntryIndex = history.findIndex(entry => 
+            entry.eventId === event.id && entry.programId === programId
+        );
+
+        if (newScore) {
+            // Adaugă sau actualizează
+            const historyEntry = {
+                date: event.date,
+                programId: programId,
+                programTitle: program.title,
+                score: newScore,
+                eventId: event.id
+            };
+            
+            if (existingEntryIndex > -1) {
+                // Actualizează intrarea existentă
+                history[existingEntryIndex] = historyEntry;
+            } else {
+                // Adaugă o intrare nouă
+                history.push(historyEntry);
+            }
+            dataWasChanged = true;
+
+        } else if (existingEntryIndex > -1) {
+            // Șterge (dacă newScore e null/gol și intrarea există)
+            history.splice(existingEntryIndex, 1);
+            dataWasChanged = true;
+        }
+    });
+
+    // Dacă s-a schimbat ceva, actualizează starea și salvează pe server
+    if (dataWasChanged) {
+        calendarState.setEvolutionData(evolutionData);
+        try {
+            await api.saveEvolutionData(evolutionData);
+        } catch (err) {
+            console.error("Eroare la salvarea istoricului de programe:", err);
+            // Afișează o eroare utilizatorului
+            showCustomAlert("Eroare la salvarea datelor de evoluție (istoric programe) pe server.", "Eroare Salvare");
+            // Aruncă eroarea pentru a opri funcția apelantă (addProgramScoreListeners)
+            throw new Error("Nu s-a putut salva istoricul programului.");
+        }
+    }
 }
 
 function saveEventComments() {
