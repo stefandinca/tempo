@@ -1,6 +1,6 @@
 /*
  * ==========================================================
- * OPTIMIZED & REORGANIZED STYLES.CSS
+ * OPTIMIZED & REORGANIZED STYLES.CSS - IMPROVED EVENT MODAL
  * ==========================================================
  *
  * TABLE OF CONTENTS
@@ -1108,16 +1108,16 @@ body.public-view {
   width: 100%;
   max-width: 500px;
   margin-top: 5vh;
-  margin-bottom: 5vh; /* Added for safety on small screens */
+  margin-bottom: 5vh;
   background-color: var(--bg-card);
   border-radius: 0.75rem;
   box-shadow: var(--shadow-hover);
   animation: modalFadeIn 0.3s ease;
-  overflow: hidden; /* Clips the footer radius */
+  overflow: hidden;
 }
 
 .modal-lg { max-width: 800px; }
-.modal-xl { max-width: 1200px; }
+.modal-xl { max-width: 1400px; } /* Increased for better event modal layout */
 .modal-small { max-width: 450px; }
 
 .modal-header {
@@ -1126,6 +1126,7 @@ body.public-view {
   align-items: center;
   padding: 1.5rem 2rem;
   border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(to bottom, var(--bg-card) 0%, var(--bg-hover) 100%);
 }
 
 .modal-title {
@@ -1135,7 +1136,7 @@ body.public-view {
 
 .modal-body {
   padding: 2rem;
-  max-height: 70vh; /* Allow body to scroll */
+  max-height: 70vh;
   overflow-y: auto;
 }
 
@@ -1172,26 +1173,107 @@ body.public-view {
 .modal.active {
   display: flex;
 }
-/* Public modal uses admin .modal-content styles for consistency */
 #eventDetailsModal .modal-content {
   max-width: 600px;
 }
 
 
-/* --- Modal Grid Layout (Event Modal) --- */
+/* --- IMPROVED Modal Grid Layout (Event Modal) --- */
 .modal-body.modal-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 2rem;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  gap: 2.5rem;
+  padding: 2rem 2.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
 }
+
 .modal-col {
   display: flex;
   flex-direction: column;
+  position: relative;
+  min-height: 0;
 }
+
+/* Visual separator between columns */
+.modal-col:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: -1.25rem;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(to bottom, 
+    transparent 0%, 
+    var(--border-color) 5%, 
+    var(--border-color) 95%, 
+    transparent 100%);
+  opacity: 0.5;
+}
+
+[data-theme="dark"] .modal-col:not(:last-child)::after {
+  opacity: 0.3;
+}
+
+/* Section headers with better styling */
 .modal-col h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 2px solid var(--border-color);
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  position: sticky;
+  top: 0;
+  background: var(--bg-card);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-col h3::before {
+  content: '';
+  width: 3px;
+  height: 1em;
+  background: var(--accent-primary);
+  border-radius: 2px;
+}
+
+/* First column (event details) specific styling */
+.modal-col:first-child {
+  padding-right: 0.5rem;
+}
+
+.modal-col:first-child .form-group {
+  margin-bottom: 1.5rem;
+}
+
+/* Enhanced form input styling within modal */
+.modal-body.modal-grid .form-input {
+  background: var(--bg-hover);
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.modal-body.modal-grid .form-input:hover {
+  border-color: var(--border-color);
+}
+
+.modal-body.modal-grid .form-input:focus {
+  background: var(--bg-card);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+}
+
+[data-theme="dark"] .modal-body.modal-grid .form-input {
+  background: var(--bg-main);
+}
+
+[data-theme="dark"] .modal-body.modal-grid .form-input:focus {
+  background: var(--bg-hover);
 }
 
 
@@ -1527,7 +1609,7 @@ textarea.form-input {
   gap: 0.5rem;
   border-bottom: 2px solid var(--border-color);
   margin-bottom: 1rem;
-  padding: 0 1rem; /* Padding from modal edge */
+  padding: 0 1rem;
 }
 
 .tab-button {
@@ -1555,7 +1637,7 @@ textarea.form-input {
 
 .tab-content {
   display: none;
-  padding: 0 1rem 1rem 1rem; /* Padding from modal edge */
+  padding: 0 1rem 1rem 1rem;
   animation: fadeIn 0.3s ease;
 }
 .tab-content.active {
@@ -1759,22 +1841,22 @@ textarea.form-input {
 /* Stil pentru noul tag [fin] */
 .portage-fin-tag {
   display: inline-block;
-  font-size: 0.7rem; /* Mai mic */
+  font-size: 0.7rem;
   font-weight: 600;
   padding: 0.1rem 0.4rem;
   margin-left: 0.25rem;
   border-radius: 0.25rem;
   background-color: var(--accent-primary);
   color: white;
-  font-style: normal; /* Anulează stilul italic al părintelui */
+  font-style: normal;
   vertical-align: middle;
 }
 
-/* Stil pentru a evidenția vizual item-ul selectat (pentru cerința 2) */
+/* Stil pentru a evidenția vizual item-ul selectat */
 .portage-item.checked {
   background: linear-gradient(to right, #dbeafe 0%, transparent 100%);
   border-left: 3px solid #60a5fa;
-  padding-left: calc(1.25rem - 3px); /* Compensează border-left */
+  padding-left: calc(1.25rem - 3px);
 }
 
 [data-theme="dark"] .portage-item.checked {
@@ -2062,6 +2144,10 @@ textarea.form-input {
     }
     .modal-body.modal-grid {
         grid-template-columns: 1fr; 
+        gap: 1.5rem;
+    }
+    .modal-col:not(:last-child)::after {
+        display: none;
     }
     .checkbox-list {
         max-height: 200px;
@@ -2156,13 +2242,13 @@ textarea.form-input {
        font-size: 1.25rem;
     }
     .header-actions .view-toggle {
-       display: none; /* Hide view toggle */
+       display: none;
     }
     .main-header .btn span {
-       display: none; /* Hide "Add" text */
+       display: none;
     }
     .main-header .btn {
-       width: 44px; /* Button becomes square */
+       width: 44px;
     }
 }
 
