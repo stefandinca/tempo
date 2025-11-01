@@ -90,14 +90,8 @@ function handleMainViewNavigation(e) {
         section.classList.add('active');
         menuItem.classList.add('active');
     }
-
-    // 3. (Opțional) Încarcă datele pentru secțiune dacă e prima dată
-    if (viewName === 'client' && dom.clientsList.innerHTML.includes("Lista este randată de JS")) {
-        ui.renderClientsList('');
-    }
-    if (viewName === 'team' && dom.teamMembersList.innerHTML.includes("Lista este randată de JS")) {
-        ui.renderTeamMembersList();
-    }
+    
+    // 3. Logica de lazy-loading a fost eliminată. Listele sunt acum randate la inițializare.
 }
 
 
@@ -555,6 +549,11 @@ async function init() {
     // --- Randare Inițială ---
     renderFilters();
     render();
+    
+    // **CORECTIA ESTE AICI:**
+    // Randează listele o singură dată la încărcare
+    ui.renderClientsList('');
+    ui.renderTeamMembersList();
 }
 
 // --- Pornirea Aplicației ---

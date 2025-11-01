@@ -2033,12 +2033,10 @@ textarea:focus {
 }
 
 
-/* === Container Calendar Admin === */
-.calendar-container {
-  flex-grow: 1;
-  overflow: auto;
-  padding: 1.5rem 2rem;
-}
+/* === Container Calendar Admin (Doar padding-ul vechi) === */
+/* Am scos regula #calendarView .calendar-container */
+/* Stilurile de scroll și padding sunt acum în SECȚIUNEA 11 */
+
 
 /* === FIX MODALE (cea mai importantă parte) === */
 .modal-backdrop {
@@ -2264,7 +2262,7 @@ textarea:focus {
 }
 
 /* ==========================================================
-   SECȚIUNEA 10 — STILURI PAGINI ADMIN (Clienti/Echipa)
+   SECȚIUNEA 10 & 11 CONSOLIDATĂ — STILURI PAGINI ADMIN
    ========================================================== */
 
 /* === Managementul Secțiunilor Principale === */
@@ -2273,6 +2271,7 @@ textarea:focus {
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  flex-grow: 1; 
 }
 
 .main-section.active {
@@ -2307,13 +2306,14 @@ textarea:focus {
   gap: 1.5rem;
   padding: 1.5rem 2rem;
   flex-grow: 1;
-  overflow: hidden;
+  overflow: hidden; /* Previne scroll-ul pe întregul grid */
 }
 
 .section-col-list {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  height: 100%;
 }
 
 .section-col-form {
@@ -2322,20 +2322,16 @@ textarea:focus {
   background-color: var(--bg-card);
   border-radius: 0.75rem;
   padding: 1.5rem;
-  overflow-y: auto;
+  overflow-y: auto; /* Permite scroll pe formular */
   border: 1px solid var(--border-color);
-}
-
-.section-col-list .form-group {
-  flex-shrink: 0;
-  margin-bottom: 1rem;
+  height: 100%;
 }
 
 /* Lista de clienți/echipă (fostul .modal-list) */
 .modal-list {
   flex-grow: 1;
-  overflow-y: auto;
-  padding-right: 0.5rem; /* Spațiu pentru scrollbar */
+  overflow-y: auto; /* Permite scroll pe listă */
+  padding-right: 0.5rem;
 }
 
 /* Stiluri carduri (client/echipă) */
@@ -2409,72 +2405,19 @@ textarea:focus {
   gap: 0.5rem;
 }
 
-/* Ajustare pentru .calendar-container */
-#calendarSection {
-  display: flex; /* Asigură-te că secțiunea calendarului se afișează corect */
-  flex-direction: column;
-  height: 100%;
-}
+/* === Ajustări specifice secțiunii Calendar === */
+
+/* (CORECTIE) Aplicăm padding-ul și scroll-ul 
+   pe .calendar-container, NU pe #calendarSection */
 .calendar-container {
   flex-grow: 1;
-  overflow-y: auto; /* Permite scroll doar pe calendar */
+  overflow-y: auto; 
+  padding: 1.5rem 2rem;
 }
 
-/* ==========================================================
-   SECȚIUNEA 11 — CORECȚIE LAYOUT ADMIN (v2)
-   ========================================================== */
-
-/* 1. Asigură-te că .main-content este un container flexibil 
-      care își umple tot spațiul vertical */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* Foarte important! */
-}
-
-/* 2. Ascunde toate secțiunile din interiorul .main-content */
-.main-section {
-  display: none;
-  flex-direction: column;
-  overflow: hidden;
-  flex-grow: 1; 
-}
-
-/* 3. Afișează DOAR secțiunea care are clasa '.active' */
-.main-section.active {
-  display: flex;
-}
-
-/* 4. Asigură-te că lista și formularul din 
-      secțiunile 'Clienti' și 'Echipa' pot face scroll independent */
-.section-content-grid {
-  flex-grow: 1;
-  overflow: hidden; /* Previne scroll-ul pe întregul grid */
-}
-
-.section-col-list,
-.section-col-form {
-  overflow-y: auto; /* Adaugă scroll individual */
-  height: 100%;
-}
-
-/* 5. (CORECTIA) Aplicăm stilul de scroll DOAR 
-      pe containerul grilei calendarului, nu pe toată secțiunea */
-.calendar-container {
-  flex-grow: 1;
-  overflow-y: auto; /* Permite scroll doar pe calendar */
-  padding: 1.5rem 2rem; /* Am mutat padding-ul aici */
-}
-
-/* 6. (CORECTIE) Asigurăm că header-ul secțiunii calendar 
-      NU are înălțime 100% */
-#calendarSection .main-header {
-  flex-shrink: 0;
-}
-
-/* 7. (CORECTIE) Asigurăm că filtrele 
-      NU au înălțime 100% */
+/* (CORECTIE) Ne asigurăm că header-ul și filtrele 
+   secțiunii calendar nu ocupă înălțime inutilă */
+#calendarSection .main-header,
 #calendarSection .filters-container {
   flex-shrink: 0;
 }
