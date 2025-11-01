@@ -8,14 +8,16 @@
 
 import { calendarState } from './calendarState.js';
 import * as api from './apiService.js';
+import * as evolutionService from './evolutionService.js';
+import * as reportService from './reportService.js';
 
 // --- Helpers pentru a găsi elemente DOM ---
 const $ = (id) => document.getElementById(id);
 
 // --- Stocare ID Eveniment Curent (pentru detalii) ---
-let currentDetailsEventId = null;
+export let currentDetailsEventId = null;
 
-// --- Modale de Alertă/Confirmare (luate direct din calendar.js) ---
+// --- Modale de Alertă/Confirmare ---
 
 export function showCustomAlert(message, title = 'Notificare') {
     return new Promise((resolve) => {
@@ -203,26 +205,19 @@ export function closeEventModal() {
 
 // --- Management Modal Detalii Eveniment ---
 
-/**
- * Deschide modalul de DETALII pentru un eveniment.
- * @param {string} eventId
- */
 export function showEventDetails(eventId) {
     const { isAdminView } = calendarState.getState();
     const event = calendarState.getEventById(eventId);
     if (!event) return;
 
-    currentDetailsEventId = eventId; // Salvează ID-ul curent
+    currentDetailsEventId = eventId;
     const modal = $('eventDetailsModal');
     const content = $('eventDetailsContent');
     const commentsArea = $('eventComments');
 
     commentsArea.value = event.comments || '';
-
-    // Populează conținutul
     content.innerHTML = buildEventDetailsHTML(event);
     
-    // Ascunde/arată butoanele admin
     const editBtn = $('editEventFromDetails');
     const deleteBtn = $('deleteEventFromDetails');
     const commentsSection = commentsArea.closest('.event-details-section');
@@ -232,7 +227,6 @@ export function showEventDetails(eventId) {
         deleteBtn.style.display = 'inline-block';
         commentsSection.style.display = 'block';
         commentsArea.disabled = false;
-        // Adaugă listeners pentru butoanele de prezență și scor
         addAttendanceListeners(event.id);
         addProgramScoreListeners(event.id);
     } else {
@@ -245,24 +239,36 @@ export function showEventDetails(eventId) {
     modal.classList.add('active');
 }
 
-/**
- * Închide modalul de detalii și salvează comentariile.
- */
 export function closeEventDetailsModal() {
     const { isAdminView } = calendarState.getState();
     if (isAdminView && currentDetailsEventId) {
-        saveEventComments(); // Salvează comentariile la închidere
+        saveEventComments();
     }
     $('eventDetailsModal').classList.remove('active');
     currentDetailsEventId = null;
 }
 
 /**
- * Construiește HTML-ul intern pentru modalul de detalii.
+ * Functii apelate de main.js la click pe butoanele din modalul de detalii
  */
-function buildEventDetailsHTML(event) {
-    const { teamMembers, clients, programs } = calendarState.getState();
+export function editEventFromDetails() {
+    if(currentDetailsEventId) {
+        closeEventDetailsModal();
+        openEventModal(currentDetailsEventId);
+    }
+}
 
+export function deleteEventFromDetails() {
+    if(currentDetailsEventId) {
+        // Setează ID-ul în state pentru ca main.js să știe ce să șteargă
+        calendarState.openEventModal(currentDetailsEventId);
+        // Apelează funcția de ștergere (care e în main.js și conține logica de confirmare)
+        $('deleteEventBtn').click(); // Simulează click pe butonul de ștergere
+    }
+}
+
+
+function buildEventDetailsHTML(event) {
     // Obține membrii
     const memberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
     const eventMembers = memberIds.map(id => calendarState.getTeamMemberById(id)).filter(Boolean);
@@ -274,13 +280,12 @@ function buildEventDetailsHTML(event) {
     // Obține programele
     const eventPrograms = (event.programIds || []).map(id => calendarState.getProgramById(id)).filter(Boolean);
 
-    const eventDate = new Date(event.date + 'T00:00:00'); // Asigură data corectă
+    const eventDate = new Date(event.date + 'T00:00:00');
     const formattedDate = eventDate.toLocaleDateString('ro-RO', { 
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
     });
     const endTime = calculateEndTime(event.startTime, event.duration);
 
-    // Secțiunea Informații Generale
     let html = `
         <div class="event-details-section">
             <h3>Informații generale</h3>
@@ -293,7 +298,6 @@ function buildEventDetailsHTML(event) {
         </div>
     `;
 
-    // Secțiunea Terapeuți
     if (eventMembers.length > 0) {
         html += `
             <div class="event-details-section">
@@ -305,7 +309,6 @@ function buildEventDetailsHTML(event) {
         `;
     }
 
-    // Secțiunea Clienți și Prezență
     if (eventClients.length > 0) {
         html += `
             <div class="event-details-section">
@@ -328,7 +331,6 @@ function buildEventDetailsHTML(event) {
         `;
     }
 
-    // Secțiunea Programe și Scor
     if (eventPrograms.length > 0) {
         html += `
             <div class="event-details-section">
@@ -353,11 +355,9 @@ function buildEventDetailsHTML(event) {
         `;
     }
     
-    // Secțiunea Detalii Suplimentare
     const additionalInfo = [];
     if (event.isPublic && event.details) additionalInfo.push(`<b>Detalii:</b> ${event.details}`);
     else if (event.details) additionalInfo.push(`<b>Detalii (private):</b> ${event.details}`);
-    
     if (event.isPublic) additionalInfo.push('Eveniment public');
     if (event.isBillable === false) additionalInfo.push('Non-facturabil');
     if (event.repeating && event.repeating.length > 0) {
@@ -373,51 +373,44 @@ function buildEventDetailsHTML(event) {
             </div>
         `;
     }
-
     return html;
 }
 
 // --- Handlers pentru Modalul de Detalii ---
 
-function addAttendanceListeners() {
+function addAttendanceListeners(eventId) {
     $('eventDetailsContent').querySelectorAll('.attendance-toggle').forEach(toggle => {
-        toggle.addEventListener('click', (e) => {
+        toggle.addEventListener('click', async (e) => {
             if (e.target.tagName !== 'BUTTON') return;
-            
             const button = e.target;
             const status = button.dataset.status;
             const clientId = toggle.dataset.clientId;
-            const eventId = toggle.dataset.eventId;
             
-            // Actualizează starea
             const event = calendarState.getEventById(eventId);
             if (!event.attendance) event.attendance = {};
             event.attendance[clientId] = status;
-            calendarState.saveEvent(event); // Salvează în starea locală
-            api.saveData(calendarState.getState()); // Salvează pe server (fără await)
+            
+            calendarState.saveEvent(event);
+            await api.saveData(calendarState.getState());
 
-            // Actualizează UI
             toggle.querySelectorAll('.attendance-btn').forEach(b => b.classList.remove('active'));
             button.classList.add('active');
         });
     });
 }
 
-function addProgramScoreListeners() {
+function addProgramScoreListeners(eventId) {
     $('eventDetailsContent').querySelectorAll('.program-score-buttons').forEach(container => {
-        container.addEventListener('click', (e) => {
+        container.addEventListener('click', async (e) => {
             if (e.target.tagName !== 'BUTTON') return;
-
             const button = e.target;
             const score = button.dataset.score;
             const programId = container.dataset.programId;
-            const eventId = container.dataset.eventId;
             
             const event = calendarState.getEventById(eventId);
             if (!event.programScores) event.programScores = {};
 
             let newScore = score;
-            // Toggle: dacă se apasă pe același scor, se anulează
             if (event.programScores[programId] === score) {
                 delete event.programScores[programId];
                 newScore = null;
@@ -425,14 +418,10 @@ function addProgramScoreListeners() {
                 event.programScores[programId] = score;
             }
             
-            // Salvare locală și pe server
             calendarState.saveEvent(event);
-            api.saveData(calendarState.getState()); // Salvează evenimentul actualizat
+            await api.saveData(calendarState.getState());
+            // TODO: Salvează și în evolutionData
             
-            // Actualizează istoricul programului (fără await)
-            api.saveEvolutionData(calendarState.getState().evolutionData); 
-
-            // Actualizează UI
             container.querySelectorAll('.score-btn').forEach(b => b.classList.remove('active'));
             if (newScore) button.classList.add('active');
         });
@@ -448,23 +437,11 @@ function saveEventComments() {
     if (event.comments !== comments) {
         event.comments = comments;
         calendarState.saveEvent(event);
-        api.saveData(calendarState.getState()); // Salvează pe server
+        api.saveData(calendarState.getState());
     }
 }
 
-// --- Management Modale Admin (Client/Echipă) ---
-
-// --- Client Management ---
-export function openClientModal() {
-    renderClientsList('');
-    $('clientSearchBar').value = '';
-    $('clientModal').style.display = 'flex';
-    resetClientForm(); // Asigură-te că formularul e gol
-}
-
-export function closeClientModal() {
-    $('clientModal').style.display = 'none';
-}
+// --- Management Secțiuni Admin (Client/Echipă) ---
 
 export function renderClientsList(searchTerm = '') {
     const { clients, events, currentDate } = calendarState.getState();
@@ -498,11 +475,21 @@ export function renderClientsList(searchTerm = '') {
                 <div class="client-hours-label">ore luna aceasta</div>
             </div>
             <div class="client-actions" data-client-id="${client.id}">
-                <button class="btn-icon btn-action" data-action="evolutie" title="Evoluție"><svg...></svg></button>
-                <button class="btn-icon btn-action" data-action="raport" title="Descarcă Raport"><svg...></svg></button>
-                <button class="btn-icon btn-action" data-action="email" title="Trimite Raport"><svg...></svg></button>
-                <button class="btn-icon btn-action" data-action="editeaza" title="Editează"><svg...></svg></button>
-                <button class="btn-icon btn-action btn-delete" data-action="sterge" title="Șterge"><svg...></svg></button>
+                <button class="btn-icon btn-action" data-action="evolutie" title="Evoluție">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9l-5 5-4-4-6 6"/></svg>
+                </button>
+                <button class="btn-icon btn-action" data-action="raport" title="Descarcă Raport">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+                <button class="btn-icon btn-action" data-action="email" title="Trimite Raport">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </button>
+                <button class="btn-icon btn-action" data-action="editeaza" title="Editează">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="btn-icon btn-action btn-delete" data-action="sterge" title="Șterge">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                </button>
             </div>
         `;
         container.appendChild(card);
@@ -531,17 +518,6 @@ export function editClientInModal(clientId) {
     $('clientForm').scrollIntoView({ behavior: 'smooth' });
 }
 
-// --- Team Management ---
-export function openTeamModal() {
-    renderTeamMembersList();
-    $('teamModal').style.display = 'flex';
-    resetTeamForm();
-}
-
-export function closeTeamModal() {
-    $('teamModal').style.display = 'none';
-}
-
 export function renderTeamMembersList() {
     const { teamMembers } = calendarState.getState();
     const container = $('teamMembersList');
@@ -559,9 +535,15 @@ export function renderTeamMembersList() {
                 </div>
             </div>
             <div class="team-member-actions" data-member-id="${member.id}">
-                <button class="btn-icon btn-action" data-action="raport" title="Descarcă Raport"><svg...></svg></button>
-                <button class="btn-icon btn-action" data-action="editeaza" title="Editează"><svg...></svg></button>
-                <button class="btn-icon btn-action btn-delete" data-action="sterge" title="Șterge"><svg...></svg></button>
+                <button class="btn-icon btn-action" data-action="raport" title="Descarcă Raport">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+                <button class="btn-icon btn-action" data-action="editeaza" title="Editează">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="btn-icon btn-action btn-delete" data-action="sterge" title="Șterge">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                </button>
             </div>
         `;
         container.appendChild(card);
@@ -756,25 +738,24 @@ export function updateEventTitle() {
 export function updateEventTypeDependencies(eventType) {
     const startTimeField = $('startTime');
     const durationField = $('duration');
-    const isDayOff = eventType === 'day-off';
     
-    if (isDayOff) {
-        startTimeField.removeAttribute('required');
-        durationField.removeAttribute('required');
-        startTimeField.style.opacity = '0.7';
-        durationField.style.opacity = '0.7';
-    } else {
-        startTimeField.setAttribute('required', 'required');
-        durationField.setAttribute('required', 'required');
-        startTimeField.style.opacity = '1';
-        durationField.style.opacity = '1';
-    }
+    const isRequired = !(eventType === 'day-off');
+
+    [startTimeField, durationField].forEach(field => {
+        if(field) {
+            if (isRequired) {
+                field.setAttribute('required', 'required');
+                field.style.opacity = '1';
+            } else {
+                field.removeAttribute('required');
+                field.style.opacity = '0.7';
+            }
+        }
+    });
     
     const isBillableCheckbox = $('isBillable');
-    if (eventType === 'pauza-masa' || eventType === 'sedinta' || eventType === 'day-off') {
-        if (isBillableCheckbox) isBillableCheckbox.checked = false;
-    } else {
-        if (isBillableCheckbox) isBillableCheckbox.checked = true;
+    if (isBillableCheckbox) {
+        isBillableCheckbox.checked = !(eventType === 'pauza-masa' || eventType === 'sedinta' || eventType === 'day-off');
     }
 }
 
@@ -792,7 +773,7 @@ function calculateClientHours(clientId, events, currentDate) {
         return eventDate.getFullYear() === year && eventDate.getMonth() === month;
     });
     
-    const totalMinutes = monthEvents.reduce((sum, event) => sum + event.duration, 0);
+    const totalMinutes = monthEvents.reduce((sum, event) => sum + (event.duration || 0), 0);
     return (totalMinutes / 60).toFixed(1);
 }
 
@@ -801,6 +782,7 @@ function formatDateISO(date) {
 }
 
 function calculateEndTime(startTime, durationMinutes) {
+    if (!startTime) return "N/A";
     const [hours, minutes] = startTime.split(':').map(Number);
     const totalMinutes = (hours * 60) + minutes + durationMinutes;
     const endHours = Math.floor(totalMinutes / 60) % 24;

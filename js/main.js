@@ -1,8 +1,6 @@
 /**
  * js/main.js
- *
  * Punctul principal de intrare (entry point) al aplicației.
- * Conectează toate modulele și gestionează fluxul principal de date și evenimente.
  */
 
 // --- Importarea Modulelor ---
@@ -16,59 +14,95 @@ import * as evolutionService from './evolutionService.js';
 // --- Variabile DOM Globale ---
 const $ = (id) => document.getElementById(id);
 const dom = {
+    // Navigare Sidebar
+    sidebarLinks: document.querySelectorAll('.sidebar-menu .menu-item'),
+    
+    // Secțiuni Principale
+    calendarSection: $('calendarSection'),
+    clientSection: $('clientSection'),
+    teamSection: $('teamSection'),
+    
+    // Calendar
     currentPeriod: $('currentPeriod'),
     prevBtn: $('prevBtn'),
     nextBtn: $('nextBtn'),
     todayBtn: $('todayBtn'),
     viewBtns: document.querySelectorAll('.view-btn'),
     filtersContainer: $('filters'),
-    
-    // Modale și Butoane
     addEventBtn: $('addEventBtn'),
+    
+    // Modal Evenimente (Adăugare/Editare)
     closeModalBtn: $('closeModal'),
     cancelModalBtn: $('cancelBtn'),
     eventForm: $('eventForm'),
     deleteEventBtn: $('deleteBtn'),
-    
-    // Câmpuri din Modalul de Evenimente
     eventTypeSelect: $('eventType'),
     clientSearch: $('clientSearch'),
     programSearch: $('programSearch'),
     
-    // Butoane Admin
-    manageTeamBtn: $('manageTeamBtn'),
-    manageClientsBtn: $('manageClientsBtn'),
-    
-    // Detalii Eveniment
+    // Modal Detalii Eveniment
     closeEventDetailsModalBtn: $('closeEventDetailsModal'),
     closeEventDetailsBtn: $('closeEventDetails'),
     editEventFromDetailsBtn: $('editEventFromDetails'),
     deleteEventFromDetailsBtn: $('deleteEventFromDetails'),
     
-    // Modale Admin
-    teamModal: $('teamModal'),
-    closeTeamModalBtn: $('closeTeamModal'),
+    // Secțiune Echipă
     teamMemberForm: $('teamMemberForm'),
     deleteMemberBtn: $('deleteMemberBtn'),
     cancelMemberBtn: $('cancelMemberBtn'),
+    teamMembersList: $('teamMembersList'),
+    addNewTeamMemberBtn: $('addNewTeamMemberBtn'),
     
-    clientModal: $('clientModal'),
-    closeClientModalBtn: $('closeClientModal'),
+    // Secțiune Client
     clientForm: $('clientForm'),
     deleteClientBtn: $('deleteClientBtn'),
     cancelClientBtn: $('cancelClientBtn'),
     addNewClientBtn: $('addNewClientBtn'),
+    clientsList: $('clientsList'),
+    clientSearchBar: $('clientSearchBar'),
 
-    // Butoane de UI (Theme/Fullscreen)
+    // Butoane UI
     themeToggle: $('themeToggle'),
     fullscreenToggle: $('fullscreenToggle'),
 };
 
-// --- Funcția Principală de Randare ---
+// --- Navigare Principală (Tab-uri) ---
 
 /**
- * Funcția centrală de randare.
+ * Gestionează comutarea între secțiunile principale: Calendar, Clienti, Echipa.
+ * @param {Event} e Evenimentul de click de la link-ul din sidebar.
  */
+function handleMainViewNavigation(e) {
+    e.preventDefault();
+    const menuItem = e.currentTarget.closest('.menu-item');
+    if (!menuItem) return;
+
+    const viewName = menuItem.dataset.view;
+    if (!viewName) return;
+
+    // 1. Ascunde toate secțiunile și butoanele
+    document.querySelectorAll('.main-section').forEach(s => s.classList.remove('active'));
+    dom.sidebarLinks.forEach(link => link.classList.remove('active'));
+
+    // 2. Arată secțiunea și butonul corect
+    const section = $(`${viewName}Section`);
+    if (section) {
+        section.classList.add('active');
+        menuItem.classList.add('active');
+    }
+
+    // 3. (Opțional) Încarcă datele pentru secțiune dacă e prima dată
+    if (viewName === 'client' && dom.clientsList.innerHTML.includes("Lista este randată de JS")) {
+        ui.renderClientsList('');
+    }
+    if (viewName === 'team' && dom.teamMembersList.innerHTML.includes("Lista este randată de JS")) {
+        ui.renderTeamMembersList();
+    }
+}
+
+
+// --- Funcția Principală de Randare (Calendar) ---
+
 function render() {
     const { currentDate, currentView } = calendarState.getState();
     updateCurrentPeriodLabel(currentDate, currentView);
@@ -98,9 +132,6 @@ function updateCurrentPeriodLabel(date, view) {
     if (dom.currentPeriod) dom.currentPeriod.textContent = label;
 }
 
-/**
- * Randează chip-urile de filtrare.
- */
 function renderFilters() {
     const { teamMembers, activeFilters } = calendarState.getState();
     if (!dom.filtersContainer) return;
@@ -125,17 +156,10 @@ function renderFilters() {
 
 // --- Inițializare UI (Theme & Fullscreen) ---
 
-/**
- * Atașează logica pentru butonul de light/dark mode.
- */
 function initThemeToggle() {
     if (!dom.themeToggle) return;
-
-    // 1. Aplică tema salvată la încărcare
     const savedTheme = localStorage.getItem('calendar-theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
-
-    // 2. Adaugă event listener
     dom.themeToggle.addEventListener('click', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
@@ -144,36 +168,27 @@ function initThemeToggle() {
     });
 }
 
-/**
- * Atașează logica pentru butonul de fullscreen.
- */
 function initFullscreenToggle() {
     if (!dom.fullscreenToggle) return;
-
     dom.fullscreenToggle.addEventListener('click', () => {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch(err => {
                 console.warn(`Eroare la activarea ecranului complet: ${err.message}`);
             });
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            }
+        } else if (document.exitFullscreen) {
+            document.exitFullscreen();
         }
     });
 }
 
-
-// --- Gestionarea Evenimentelor (Handlers) ---
+// --- Handlers Navigare Calendar ---
 
 function handleNavigation(direction) {
     const { currentDate, currentView } = calendarState.getState();
     const newDate = new Date(currentDate);
-
     if (currentView === 'month') newDate.setMonth(newDate.getMonth() + direction);
     else if (currentView === 'week') newDate.setDate(newDate.getDate() + (7 * direction));
     else if (currentView === 'day') newDate.setDate(newDate.getDate() + direction);
-    
     calendarState.setCurrentDate(newDate);
     render();
 }
@@ -201,9 +216,6 @@ function handleDayClick(date) {
     render();
 }
 
-/**
- * Apelat la click pe un eveniment. Deschide modalul de DETALII.
- */
 function handleEventClick(eventId) {
     ui.showEventDetails(eventId);
 }
@@ -258,14 +270,10 @@ async function handleSaveEvent(e) {
     };
 
     if (editingEventId) {
-        // Editare
         const existingEvent = calendarState.getEventById(editingEventId);
         const updatedEvent = { ...existingEvent, ...eventBase, id: editingEventId };
         calendarState.saveEvent(updatedEvent);
-        // TODO: Adaugă logica de actualizare a evenimentelor recurente
-        
     } else {
-        // Adăugare Nouă
         if (repeatingDays.length > 0) {
             const newEvents = createRecurringEvents(eventBase);
             calendarState.saveEvent(newEvents);
@@ -312,13 +320,12 @@ async function handleDeleteEvent() {
     await api.saveData(calendarState.getState());
     
     ui.closeEventModal();
-    ui.closeEventDetailsModal(); // Închide și modalul de detalii dacă era deschis
+    ui.closeEventDetailsModal();
     render();
 }
 
-// --- Handlers Modale Admin ---
+// --- Handlers Secțiuni Admin (Client/Echipă) ---
 
-// Client Management
 async function handleSaveClient(e) {
     e.preventDefault();
     const { editingClientId } = calendarState.getState();
@@ -335,7 +342,7 @@ async function handleSaveClient(e) {
     calendarState.saveClient(clientData);
     await api.saveData(calendarState.getState());
     
-    ui.renderClientsList($('clientSearchBar').value); // Re-randează lista
+    ui.renderClientsList(dom.clientSearchBar.value);
     ui.resetClientForm();
 }
 
@@ -347,12 +354,11 @@ async function handleDeleteClient() {
     if (confirmed) {
         calendarState.deleteClient(editingClientId);
         await api.saveData(calendarState.getState());
-        ui.renderClientsList($('clientSearchBar').value);
+        ui.renderClientsList(dom.clientSearchBar.value);
         ui.resetClientForm();
     }
 }
 
-// Team Management
 async function handleSaveTeamMember(e) {
     e.preventDefault();
     const { editingMemberId } = calendarState.getState();
@@ -371,7 +377,7 @@ async function handleSaveTeamMember(e) {
     
     ui.renderTeamMembersList();
     ui.resetTeamForm();
-    renderFilters(); // Actualizează filtrele de pe pagina principală
+    renderFilters();
 }
 
 async function handleDeleteTeamMember() {
@@ -385,20 +391,20 @@ async function handleDeleteTeamMember() {
         ui.renderTeamMembersList();
         ui.resetTeamForm();
         renderFilters();
-        render(); // Re-randează calendarul (evenimentele au fost șterse)
+        render();
     }
 }
 
 // --- Handlers pentru Acțiuni pe Carduri (Event Delegation) ---
 
 function setupAdminListeners() {
-    // Modal Client
-    dom.clientModal?.addEventListener('click', (e) => {
-        const action = e.target.closest('.btn-action')?.dataset.action;
-        if (!action) return;
+    // Secțiunea Client
+    dom.clientsList.addEventListener('click', (e) => {
+        const actionBtn = e.target.closest('.btn-action');
+        if (!actionBtn) return;
         
-        const card = e.target.closest('.client-card');
-        const clientId = card?.querySelector('.client-actions')?.dataset.clientId;
+        const action = actionBtn.dataset.action;
+        const clientId = actionBtn.closest('.client-actions').dataset.clientId;
         if (!clientId) return;
 
         switch (action) {
@@ -407,26 +413,26 @@ function setupAdminListeners() {
             case 'email': reportService.emailClientReport(clientId); break;
             case 'editeaza': ui.editClientInModal(clientId); break;
             case 'sterge': 
-                calendarState.setEditingId({ clientId }); // Setează ID-ul pentru handler
+                calendarState.setEditingId({ clientId });
                 handleDeleteClient();
                 break;
         }
     });
     
-    // Modal Echipă
-    dom.teamModal?.addEventListener('click', (e) => {
-        const action = e.target.closest('.btn-action')?.dataset.action;
-        if (!action) return;
+    // Secțiunea Echipă
+    dom.teamMembersList.addEventListener('click', (e) => {
+        const actionBtn = e.target.closest('.btn-action');
+        if (!actionBtn) return;
 
-        const card = e.target.closest('.team-member-card');
-        const memberId = card?.querySelector('.team-member-actions')?.dataset.memberId;
+        const action = actionBtn.dataset.action;
+        const memberId = actionBtn.closest('.team-member-actions').dataset.memberId;
         if (!memberId) return;
 
         switch (action) {
             case 'raport': reportService.downloadTeamMemberReport(memberId); break;
             case 'editeaza': ui.editTeamMemberInModal(memberId); break;
             case 'sterge':
-                calendarState.setEditingId({ memberId }); // Setează ID-ul pentru handler
+                calendarState.setEditingId({ memberId });
                 handleDeleteTeamMember();
                 break;
         }
@@ -440,20 +446,13 @@ function createRecurringEvents(eventBase) {
     const events = [];
     const parts = eventBase.date.split('-');
     const startDate = new Date(parts[0], parts[1] - 1, parts[2]);
-    
     const endOfMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
     let currentDate = new Date(startDate);
-
     while (currentDate <= endOfMonth) {
         const dayOfWeek = currentDate.getDay();
         const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek;
-        
         if (eventBase.repeating.includes(adjustedDay)) {
-            events.push({
-                ...eventBase,
-                id: generateEventId(),
-                date: formatDate(currentDate, 'iso')
-            });
+            events.push({ ...eventBase, id: generateEventId(), date: formatDate(currentDate, 'iso') });
         }
         currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -486,10 +485,8 @@ function formatDate(date, format = 'short') {
 async function init() {
     console.log('Inițializare aplicație Tempo (modular)...');
     
-    const isAdmin = true;
-    calendarState.setIsAdminView(isAdmin);
+    calendarState.setIsAdminView(true);
 
-    // --- Start Încărcare Date ---
     try {
         const data = await api.loadData();
         calendarState.initializeData(data);
@@ -499,23 +496,27 @@ async function init() {
         calendarState.setEvolutionData(evolutionData);
     } catch (error) {
         console.error('Eroare critică la încărcarea datelor:', error);
-        ui.showCustomAlert('Nu s-au putut încărca datele. Te rog verifică conexiunea și reîmprospătează pagina.', 'Eroare fatală');
+        ui.showCustomAlert('Nu s-au putut încărca datele.', 'Eroare fatală');
         return;
     }
-    // --- Sfârșit Încărcare Date ---
 
-    // --- Start Atașare Listeners ---
+    // --- Atașare Listeners ---
     
-    // UI Principal
+    // Navigare Principală
+    dom.sidebarLinks.forEach(link => link.addEventListener('click', handleMainViewNavigation));
+    
+    // UI (Temă & Fullscreen)
+    initThemeToggle();
+    initFullscreenToggle();
+
+    // Navigare Calendar
     dom.prevBtn.addEventListener('click', () => handleNavigation(-1));
     dom.nextBtn.addEventListener('click', () => handleNavigation(1));
     dom.todayBtn.addEventListener('click', navigateToToday);
     dom.viewBtns.forEach(btn => btn.addEventListener('click', handleViewChange));
-    initThemeToggle(); // <- APEL NOU
-    initFullscreenToggle(); // <- APEL NOU
+    dom.addEventBtn.addEventListener('click', () => ui.openEventModal(null));
 
     // Modal Evenimente (Adăugare/Editare)
-    dom.addEventBtn.addEventListener('click', () => ui.openEventModal(null));
     dom.closeModalBtn.addEventListener('click', ui.closeEventModal);
     dom.cancelModalBtn.addEventListener('click', ui.closeEventModal);
     dom.eventForm.addEventListener('submit', handleSaveEvent);
@@ -524,38 +525,23 @@ async function init() {
     // Modal Detalii Eveniment
     dom.closeEventDetailsModalBtn.addEventListener('click', ui.closeEventDetailsModal);
     dom.closeEventDetailsBtn.addEventListener('click', ui.closeEventDetailsModal);
-    dom.editEventFromDetailsBtn.addEventListener('click', () => {
-        // Obține ID-ul din uiService (care este setat la handleEventClick)
-        const eventId = ui.currentDetailsEventId; 
-        if(eventId) {
-            ui.closeEventDetailsModal();
-            ui.openEventModal(eventId);
-        }
-    });
-    dom.deleteEventFromDetailsBtn.addEventListener('click', () => {
-        // Setează ID-ul de editare în state pentru ca handleDeleteEvent să știe ce să șteargă
-        const eventId = ui.currentDetailsEventId;
-        if(eventId) {
-            calendarState.openEventModal(eventId); // Setează editingEventId
-            handleDeleteEvent();
-        }
-    });
+    dom.editEventFromDetailsBtn.addEventListener('click', () => ui.editEventFromDetails());
+    dom.deleteEventFromDetailsBtn.addEventListener('click', () => ui.deleteEventFromDetails());
 
-    // Modale Client/Echipă
-    dom.manageTeamBtn.addEventListener('click', ui.openTeamModal);
-    dom.closeTeamModalBtn.addEventListener('click', ui.closeTeamModal);
+    // Secțiunea Echipă
     dom.teamMemberForm.addEventListener('submit', handleSaveTeamMember);
     dom.deleteMemberBtn.addEventListener('click', handleDeleteTeamMember);
     dom.cancelMemberBtn.addEventListener('click', ui.resetTeamForm);
+    dom.addNewTeamMemberBtn.addEventListener('click', () => dom.teamMemberForm.scrollIntoView({ behavior: 'smooth' }));
 
-    dom.manageClientsBtn.addEventListener('click', ui.openClientModal);
-    dom.closeClientModalBtn.addEventListener('click', ui.closeClientModal);
+    // Secțiunea Client
     dom.clientForm.addEventListener('submit', handleSaveClient);
     dom.deleteClientBtn.addEventListener('click', handleDeleteClient);
     dom.cancelClientBtn.addEventListener('click', ui.resetClientForm);
-    dom.addNewClientBtn.addEventListener('click', () => $('clientForm').scrollIntoView({ behavior: 'smooth' }));
+    dom.addNewClientBtn.addEventListener('click', () => dom.clientForm.scrollIntoView({ behavior: 'smooth' }));
+    dom.clientSearchBar.addEventListener('input', (e) => ui.renderClientsList(e.target.value));
 
-    // Listeners pentru câmpurile din modalul de evenimente
+    // Câmpuri Modal Evenimente
     dom.clientSearch.addEventListener('input', (e) => ui.filterClientsInModal(e.target.value));
     dom.programSearch.addEventListener('input', (e) => ui.filterProgramsInModal(e.target.value));
     dom.eventTypeSelect.addEventListener('change', (e) => {
@@ -563,11 +549,10 @@ async function init() {
         ui.updateEventTitle();
     });
     
-    // Atașează listenerii delegați pentru acțiunile de pe carduri
+    // Acțiuni pe carduri (Clienti/Echipa)
     setupAdminListeners();
-    // --- Sfârșit Atașare Listeners ---
     
-    // Randează starea inițială
+    // --- Randare Inițială ---
     renderFilters();
     render();
 }

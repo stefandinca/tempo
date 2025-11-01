@@ -16,25 +16,25 @@
                 <img src="tempo-logo-small.png" alt="Tempo Logo" class="logo-small">
             </div>
             <ul class="sidebar-menu">
-                <li class="menu-item active">
-                    <a href="admin.html">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
-                        <span>Calendar</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#" id="manageClientsBtn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                        <span>Clienti</span>
-                    </a>
-                </li>
-                <li class="menu-item">
-                    <a href="#" id="manageTeamBtn">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                        <span>Echipa</span>
-                    </a>
-                </li>
-            </ul>
+                  <li class="menu-item active" data-view="calendar">
+                      <a href="#">
+                          <svg>...</svg>
+                          <span>Calendar</span>
+                      </a>
+                  </li>
+                  <li class="menu-item" data-view="client">
+                      <a href="#">
+                          <svg>...</svg>
+                          <span>Clienti</span>
+                      </a>
+                  </li>
+                  <li class="menu-item" data-view="team">
+                      <a href="#">
+                          <svg>...</svg>
+                          <span>Echipa</span>
+                      </a>
+                  </li>
+              </ul>
             <div class="sidebar-footer">
                 <button id="themeToggle" class="btn-icon" title="Schimba tema">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
@@ -47,40 +47,140 @@
         
         <main class="main-content">
             
-            <header class="main-header">
-                <div class="period-navigation">
-                    <h1 id="currentPeriod">Loading...</h1>
-                    <div class="nav-buttons">
-                        <button id="prevBtn" class="btn-icon" title="Perioada precedenta">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                        </button>
-                        <button id="todayBtn" class="btn btn-secondary">Azi</button>
-                        <button id="nextBtn" class="btn-icon" title="Perioada urmatoare">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="header-actions">
-                    <div class="view-toggle">
-                        <button class="view-btn active" data-view="month">Luna</button>
-                        <button class="view-btn" data-view="week">Saptamana</button>
-                        <button class="view-btn" data-view="day">Zi</button>
-                    </div>
-                    <button id="addEventBtn" class="btn btn-primary">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                        <span>Adauga</span>
+    <section id="calendarSection" class="main-section active">
+        <header class="main-header">
+            <div class="period-navigation">
+                <h1 id="currentPeriod">Loading...</h1>
+                <div class="nav-buttons">
+                    <button id="prevBtn" class="btn-icon" title="Perioada precedenta">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                    </button>
+                    <button id="todayBtn" class="btn btn-secondary">Azi</button>
+                    <button id="nextBtn" class="btn-icon" title="Perioada urmatoare">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
                     </button>
                 </div>
-            </header>
+            </div>
             
-            <div id="filters" class="filters-container">
+            <div class="header-actions">
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="month">Luna</button>
+                    <button class="view-btn" data-view="week">Saptamana</button>
+                    <button class="view-btn" data-view="day">Zi</button>
                 </div>
-            
-            <div id="calendarView" class="calendar-container">
-                </div>
-            
-        </main>
+                <button id="addEventBtn" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                    <span>Adauga</span>
+                </button>
+            </div>
+        </header>
+        
+        <div id="filters" class="filters-container">
+            </div>
+        
+        <div id="calendarView" class="calendar-container">
+            </div>
+    </section>
+
+    <section id="clientSection" class="main-section">
+        <header class="section-header">
+            <h1>Management Clienti</h1>
+            <div class="header-actions">
+                <input type="search" id="clientSearchBar" class="form-input" placeholder="Cauta client dupa nume, email...">
+                <button id="addNewClientBtn" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                    <span>Adauga Client Nou</span>
+                </button>
+            </div>
+        </header>
+        
+        <div class="section-content-grid">
+            <div class="section-col-list">
+                <div id="clientsList" class="modal-list">
+                    </div>
+            </div>
+            <div class="section-col-form">
+                <form id="clientForm">
+                    <h3 id="clientFormTitle">Adauga Client Nou</h3>
+                    <div class="form-group">
+                        <label for="clientFullName">Nume Complet</label>
+                        <input type="text" id="clientFullName" name="clientFullName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="clientEmail">Email</label>
+                        <input type="email" id="clientEmail" name="clientEmail" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientPhone">Telefon</label>
+                        <input type="tel" id="clientPhone" name="clientPhone" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="clientBirthdayInput">Data Nasterii</label>
+                        <input type="date" id="clientBirthdayInput" name="clientBirthdayInput" class="form-input">
+                    </div>
+                    <div class="modal-footer-form">
+                        <button id="deleteClientBtn" type="button" class="btn btn-danger-outline">Sterge</button>
+                        <button id="cancelClientBtn" type="button" class="btn btn-secondary">Anuleaza</button>
+                        <button type="submit" class="btn btn-primary">Salveaza</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section id="teamSection" class="main-section">
+        <header class="section-header">
+            <h1>Management Echipa</h1>
+            <div class="header-actions">
+                <button id="addNewTeamMemberBtn" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                    <span>Adauga Membru Nou</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="section-content-grid">
+            <div class="section-col-list">
+                <div id="teamMembersList" class="modal-list">
+                    </div>
+            </div>
+            <div class="section-col-form">
+                <form id="teamMemberForm">
+                    <h3 id="teamFormTitle">Adauga Membru Nou</h3>
+                    <div class="form-group">
+                        <label for="memberName">Nume</label>
+                        <input type="text" id="memberName" name="memberName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberInitials">Initiale (max 3)</label>
+                        <input type="text" id="memberInitials" name="memberInitials" class="form-input" required maxlength="3">
+                    </div>
+                    <div class="form-group">
+                        <label for="memberRole">Rol</label>
+                        <select id="memberRole" name="memberRole" class="form-input" required>
+                            <option value="therapist">Terapeut</option>
+                            <option value="coordinator">Coordonator</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="memberColor">Culoare</label>
+                        <div class="color-picker-group">
+                            <input type="color" id="memberColor" name="memberColor" class="form-input-color" value="#4f46e5">
+                            <input type="text" id="memberColorHex" name="memberColorHex" class="form-input" value="#4F46E5" maxlength="7">
+                        </div>
+                    </div>
+                    <div class="modal-footer-form">
+                        <button id="deleteMemberBtn" type="button" class="btn btn-danger-outline">Sterge</button>
+                        <button id="cancelMemberBtn" type="button" class="btn btn-secondary">Anuleaza</button>
+                        <button type="submit" class="btn btn-primary">Salveaza</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    
+</main>
     </div>
     
     <div id="eventDetailsModal" class="modal-backdrop">
@@ -228,99 +328,10 @@
         </div>
     </div>
     
-    <div id="teamModal" class="modal-backdrop">
-        <div class="modal-content modal-lg modal-grid">
-            <div class="modal-col">
-                <div class="modal-header">
-                    <h2 class="modal-title">Management Echipa</h2>
-                    <button id="closeTeamModal" class="btn-icon btn-close" title="Inchide">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                    </button>
-                </div>
-                <div id="teamMembersList" class="modal-body modal-list">
-                    </div>
-            </div>
-            <div class="modal-col modal-col-form">
-                <form id="teamMemberForm">
-                    <h3 id="teamFormTitle">Adauga Membru Nou</h3>
-                    <div class="form-group">
-                        <label for="memberName">Nume</label>
-                        <input type="text" id="memberName" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="memberInitials">Initiale (max 3)</label>
-                        <input type="text" id="memberInitials" class="form-input" required maxlength="3">
-                    </div>
-                    <div class="form-group">
-                        <label for="memberRole">Rol</label>
-                        <select id="memberRole" class="form-input" required>
-                            <option value="therapist">Terapeut</option>
-                            <option value="coordinator">Coordonator</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="memberColor">Culoare</label>
-                        <div class="color-picker-group">
-                            <input type="color" id="memberColor" class="form-input-color" value="#4f46e5">
-                            <input type="text" id="memberColorHex" class="form-input" value="#4F46E5" maxlength="7">
-                        </div>
-                    </div>
-                    <div class="modal-footer-form">
-                        <button id="deleteMemberBtn" type="button" class="btn btn-danger-outline">Sterge</button>
-                        <button id="cancelMemberBtn" type="button" class="btn btn-secondary">Anuleaza</button>
-                        <button type="submit" class="btn btn-primary">Salveaza</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
     
-    <div id="clientModal" class="modal-backdrop">
-        <div class="modal-content modal-xl modal-grid">
-            <div class="modal-col">
-                <div class="modal-header">
-                    <h2 class="modal-title">Management Clienti</h2>
-                    <button id="closeClientModal" class="btn-icon btn-close" title="Inchide">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <input type="search" id="clientSearchBar" class="form-input" placeholder="Cauta client dupa nume, email, telefon...">
-                    </div>
-                    <div id="clientsList" class="modal-list">
-                        </div>
-                </div>
-            </div>
-            <div class="modal-col modal-col-form">
-                <form id="clientForm">
-                    <h3 id="clientFormTitle">Adauga Client Nou</h3>
-                    <div class="form-group">
-                        <label for="clientFullName">Nume Complet</label>
-                        <input type="text" id="clientFullName" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="clientEmail">Email</label>
-                        <input type="email" id="clientEmail" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="clientPhone">Telefon</label>
-                        <input type="tel" id="clientPhone" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="clientBirthdayInput">Data Nasterii</label>
-                        <input type="date" id="clientBirthdayInput" class="form-input">
-                    </div>
-                    <div class="modal-footer-form">
-                        <button id="deleteClientBtn" type="button" class="btn btn-danger-outline">Sterge</button>
-                        <button id="cancelClientBtn" type="button" class="btn btn-secondary">Anuleaza</button>
-                        <button type="submit" class="btn btn-primary">Salveaza</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    
+    
+    
 
     <div id="evolutionModal" class="modal-backdrop">
         <div class="modal-content modal-xl">

@@ -2262,3 +2262,160 @@ textarea:focus {
   padding-top: 1.5rem;
   border-top: 1px solid var(--border-color);
 }
+
+/* ==========================================================
+   SECȚIUNEA 10 — STILURI PAGINI ADMIN (Clienti/Echipa)
+   ========================================================== */
+
+/* === Managementul Secțiunilor Principale === */
+.main-section {
+  display: none; /* Ascunde toate secțiunile implicit */
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.main-section.active {
+  display: flex; /* Afișează doar secțiunea activă */
+}
+
+/* === Antetul Secțiunilor (Clienti/Echipa) === */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.section-header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.section-header .form-input {
+  min-width: 300px;
+}
+
+/* === Layout-ul cu Grilă (Listă + Formular) === */
+.section-content-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); /* 66% / 33% */
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  flex-grow: 1;
+  overflow: hidden;
+}
+
+.section-col-list {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.section-col-form {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-card);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+}
+
+.section-col-list .form-group {
+  flex-shrink: 0;
+  margin-bottom: 1rem;
+}
+
+/* Lista de clienți/echipă (fostul .modal-list) */
+.modal-list {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem; /* Spațiu pentru scrollbar */
+}
+
+/* Stiluri carduri (client/echipă) */
+.client-card,
+.team-member-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  margin-bottom: 0.75rem;
+  background: var(--bg-card);
+  transition: all 0.2s;
+}
+.client-card:hover,
+.team-member-card:hover {
+  box-shadow: var(--shadow);
+  border-color: var(--accent-primary);
+}
+.client-info,
+.team-member-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+.client-avatar,
+.team-member-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: white;
+  font-size: 1rem;
+  background-color: var(--accent-primary);
+}
+.client-details,
+.team-member-details {
+  flex: 1;
+}
+.client-name,
+.team-member-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.client-contact,
+.team-member-role {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+.client-stats {
+  text-align: right;
+  margin-right: 1rem;
+}
+.client-hours {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.client-hours-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+.client-actions,
+.team-member-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Ajustare pentru .calendar-container */
+#calendarSection {
+  display: flex; /* Asigură-te că secțiunea calendarului se afișează corect */
+  flex-direction: column;
+  height: 100%;
+}
+.calendar-container {
+  flex-grow: 1;
+  overflow-y: auto; /* Permite scroll doar pe calendar */
+}
