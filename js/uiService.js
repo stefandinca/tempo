@@ -463,32 +463,43 @@ export function renderClientsList(searchTerm = '') {
         const card = document.createElement('div');
         card.className = 'client-card';
         card.innerHTML = `
-            <div class="client-info">
-                <div class="client-avatar">${client.name.substring(0, 2).toUpperCase()}</div>
-                <div class="client-details">
-                    <div class="client-name">${client.name}</div>
-                    <div class="client-contact">${client.email || 'Fără email'} ⦁ ${client.phone || 'Fără telefon'}</div>
+            <div class="client-card-content">
+                <div class="client-info">
+                    <div class="client-avatar">${client.name.substring(0, 2).toUpperCase()}</div>
+                    <div class="client-details">
+                        <div class="client-name">${client.name}</div>
+                        <div class="client-contact">
+                            ${client.email ? `<span class="client-info-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>${client.email}</span>` : ''}
+                            ${client.phone ? `<span class="client-info-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${client.phone}</span>` : ''}
+                            ${client.birthDate ? `<span class="client-info-item"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${new Date(client.birthDate).toLocaleDateString('ro-RO')}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+                <div class="client-stats">
+                    <div class="client-hours">${monthHours}</div>
+                    <div class="client-hours-label">ore luna aceasta</div>
                 </div>
             </div>
-            <div class="client-stats">
-                <div class="client-hours">${monthHours}</div>
-                <div class="client-hours-label">ore luna aceasta</div>
-            </div>
             <div class="client-actions" data-client-id="${client.id}">
-                <button class="btn-icon btn-action" data-action="evolutie" title="Evoluție">
+                <button class="btn btn-action btn-action-text" data-action="evolutie" title="Evoluție">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9l-5 5-4-4-6 6"/></svg>
+                    <span>Evoluție</span>
                 </button>
-                <button class="btn-icon btn-action" data-action="raport" title="Descarcă Raport">
+                <button class="btn btn-action btn-action-text" data-action="raport" title="Descarcă Raport">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <span>Descarcă Raport</span>
                 </button>
-                <button class="btn-icon btn-action" data-action="email" title="Trimite Raport">
+                <button class="btn btn-action btn-action-text" data-action="email" title="Trimite Raport">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    <span>Trimite Raport</span>
                 </button>
-                <button class="btn-icon btn-action" data-action="editeaza" title="Editează">
+                <button class="btn btn-action btn-action-text" data-action="editeaza" title="Editează">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    <span>Editează</span>
                 </button>
-                <button class="btn-icon btn-action btn-delete" data-action="sterge" title="Șterge">
+                <button class="btn btn-action btn-action-text btn-delete" data-action="sterge" title="Șterge">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    <span>Șterge</span>
                 </button>
             </div>
         `;
