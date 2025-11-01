@@ -13,8 +13,12 @@ import { calendarState } from './calendarState.js';
 /**
  * Randează vizualizarea lunară.
  */
+/**
+ * Randează vizualizarea lunară.
+ */
 export function renderMonthView(onDayClick) {
-    const { currentDate, isAdminView, clients } = calendarState.getState();
+    // 1. ADĂUGĂM "activeFilters" AICI
+    const { currentDate, isAdminView, clients, activeFilters } = calendarState.getState();
     const container = document.getElementById('calendarView');
     container.innerHTML = ''; // Curăță vizualizarea anterioară
 
@@ -95,14 +99,21 @@ export function renderMonthView(onDayClick) {
                     // Previne adăugarea mai multor puncte pentru același terapeut în aceeași zi
                     if (addedMembers.has(memberId)) return; 
                     
-                    const member = calendarState.getTeamMemberById(memberId);
-                    if (member) {
-                        const dot = document.createElement('div');
-                        dot.className = 'event-dot';
-                        dot.style.backgroundColor = member.color;
-                        dot.title = member.name;
-                        dotsContainer.appendChild(dot);
-                        addedMembers.add(memberId);
+                    // 2. APLICĂM FILTRUL AICI
+                    // Verifică dacă filtrul este activ PENTRU ACEST MEMBRU
+                    // Sau dacă nu există filtre active (se afișează tot)
+                    const isFilterActive = activeFilters.length === 0 || activeFilters.includes(memberId);
+
+                    if (isFilterActive) { // <-- A fost adăugată această condiție
+                        const member = calendarState.getTeamMemberById(memberId);
+                        if (member) {
+                            const dot = document.createElement('div');
+                            dot.className = 'event-dot';
+                            dot.style.backgroundColor = member.color;
+                            dot.title = member.name;
+                            dotsContainer.appendChild(dot);
+                            addedMembers.add(memberId);
+                        }
                     }
                 });
             });
