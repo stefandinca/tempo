@@ -309,34 +309,165 @@ function renderPortageDomains() {
         const block = document.createElement('div');
         block.className = 'domain-block';
         
-        let itemsHtml = '';
+        // Group items by age range
+        const ageGroups = {};
         items.forEach(item => {
-            const isFuture = item.months > ageMonths;
-            itemsHtml += `
-                <div class="portage-item ${isFuture ? 'disabled' : ''}" data-months="${item.months}">
-                    <input type="checkbox" data-domain="${domain}" data-id="${item.id}" ${isFuture ? 'disabled' : ''}>
-                    <label>${item.text} <i>(${item.age})</i></label>
-                </div>
-            `;
+            const ageKey = item.age; // e.g., "0–3 luni", "13–15 luni"
+            if (!ageGroups[ageKey]) {
+                ageGroups[ageKey] = [];
+            }
+            ageGroups[ageKey].push(item);
         });
+
+        // Check if there are any future items
+        const hasFutureItems = items.some(item => item.months > ageMonths);
+        const firstFutureMonth = items.find(item => item.months > ageMonths)?.months;
+
+        // Build items HTML with age separators
+        let itemsHtml = '';
+        let showFutureButton = false;
+        let futureItemsHtml = '';
+        
+        Object.entries(ageGroups).forEach(([ageRange, groupItems]) => {
+            const firstItemInGroup = groupItems[0];
+            const isFutureGroup = firstItemInGroup.months > ageMonths;
+            
+            // Format age separator
+            let separatorText = formatAgeRange(ageRange, firstItemInGroup.months);
+            
+            // Start age group
+            const groupHtml = `<div class="portage-age-separator">${separatorText}</div>`;
+            
+            // Build items for this group
+            let groupItemsHtml = '';
+            groupItems.forEach(item => {
+                const isFuture = item.months > ageMonths;
+                groupItemsHtml += `
+                    <div class="portage-item ${isFuture ? 'disabled' : ''}" data-months="${item.months}">
+                        <input type="checkbox" data-domain="${domain}" data-id="${item.id}" ${isFuture ? 'disabled' : ''}>
+                        <label>${item.text} <i>(${item.age})</i></label>
+                    </div>
+                `;
+            });
+            
+            if (isFutureGroup && !showFutureButton) {
+                // This is the first future group - add warning and button
+                showFutureButton = true;
+                const ageYearsMonths = formatAgeInYearsMonths(ageMonths);
+                futureItemsHtml = `
+                    <div class="portage-future-warning">
+                        <p>Unele iteme din secțiunile următoare sunt pentru vârste mai mari decât ${ageYearsMonths}.</p>
+                        <button type="button" class="domain-toggle-btn portage-future-toggle">Arată iteme viitoare</button>
+                    </div>
+                    <div class="portage-future-items collapsed">
+                        ${groupHtml}
+                        ${groupItemsHtml}
+                `;
+            } else if (isFutureGroup) {
+                // Continue adding to future items
+                futureItemsHtml += groupHtml + groupItemsHtml;
+            } else {
+                // Current/past items
+                itemsHtml += groupHtml + groupItemsHtml;
+            }
+        });
+        
+        if (showFutureButton) {
+            futureItemsHtml += '</div>'; // Close portage-future-items
+            itemsHtml += futureItemsHtml;
+        }
 
         block.innerHTML = `
             <div class="domain-header">
                 <span>${domain}</span>
-                <button type="button" class="domain-toggle-btn">Ascunde</button>
+                <button type="button" class="domain-toggle-btn">Arată</button>
             </div>
-            <div class="checkbox-grid">${itemsHtml}</div>
+            <div class="checkbox-grid collapsed">${itemsHtml}</div>
         `;
         
-        // Adaugă logica de toggle
+        // Toggle domain visibility
         const grid = block.querySelector('.checkbox-grid');
-        block.querySelector('.domain-toggle-btn').addEventListener('click', (e) => {
+        const toggleBtn = block.querySelector('.domain-header .domain-toggle-btn');
+        toggleBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             grid.classList.toggle('collapsed');
-            e.target.textContent = grid.classList.contains('collapsed') ? 'Arată' : 'Ascunde';
+            toggleBtn.textContent = grid.classList.contains('collapsed') ? 'Arată' : 'Ascunde';
         });
+        
+        // Make entire header clickable
+        block.querySelector('.domain-header').addEventListener('click', (e) => {
+            if (e.target.tagName !== 'BUTTON') {
+                grid.classList.toggle('collapsed');
+                toggleBtn.textContent = grid.classList.contains('collapsed') ? 'Arată' : 'Ascunde';
+            }
+        });
+        
+        // Toggle future items visibility
+        const futureToggle = block.querySelector('.portage-future-toggle');
+        if (futureToggle) {
+            futureToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const futureItems = block.querySelector('.portage-future-items');
+                futureItems.classList.toggle('collapsed');
+                futureToggle.textContent = futureItems.classList.contains('collapsed') 
+                    ? 'Arată iteme viitoare' 
+                    : 'Ascunde iteme viitoare';
+            });
+        }
 
         container.appendChild(block);
     });
+}
+
+/**
+ * Format age range with years and months for ranges > 10-12 months
+ */
+function formatAgeRange(ageRange, monthsValue) {
+    // Extract month values from range like "13–15 luni"
+    const match = ageRange.match(/(\d+)–(\d+)/);
+    if (!match) return ageRange;
+    
+    const startMonth = parseInt(match[1]);
+    const endMonth = parseInt(match[2]);
+    
+    if (startMonth <= 12) {
+        return ageRange;
+    }
+    
+    // Calculate years and months
+    const startYears = Math.floor(startMonth / 12);
+    const startRemMonths = startMonth % 12;
+    const endYears = Math.floor(endMonth / 12);
+    const endRemMonths = endMonth % 12;
+    
+    const startText = formatYearsMonths(startYears, startRemMonths);
+    const endText = formatYearsMonths(endYears, endRemMonths);
+    
+    return `${ageRange} (${startText} - ${endText})`;
+}
+
+/**
+ * Format years and months in Romanian
+ */
+function formatYearsMonths(years, months) {
+    if (years === 0) {
+        return `${months} ${months === 1 ? 'luna' : 'luni'}`;
+    }
+    if (months === 0) {
+        return `${years} ${years === 1 ? 'an' : 'ani'}`;
+    }
+    const yearText = years === 1 ? 'an' : 'ani';
+    const monthText = months === 1 ? 'luna' : 'luni';
+    return `${years} ${yearText} si ${months} ${monthText}`;
+}
+
+/**
+ * Format age in years and months (e.g., "4 ani și 9 luni")
+ */
+function formatAgeInYearsMonths(totalMonths) {
+    const years = Math.floor(totalMonths / 12);
+    const months = totalMonths % 12;
+    return formatYearsMonths(years, months);
 }
 
 /**
