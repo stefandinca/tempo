@@ -257,27 +257,64 @@ body {
 
 .filter-chip {
   padding: 0.3rem 0.6rem;
-  border: 2px solid var(--border-color);
+  border: 3px solid var(--border-color);
   background: var(--bg-card);
   cursor: pointer;
   border-radius: 0.5rem;
   font-weight: 500;
   font-size: 0.7rem;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   gap: 0.375rem;
+  opacity: 0.5;
 }
 
 .filter-chip.active {
-  border-color: currentColor;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  opacity: 1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  border-width: 3px;
+  /* Border color is set inline via JavaScript */
+}
+
+.filter-chip:hover {
+  opacity: 0.8;
+  transform: translateY(-1px);
+}
+
+.filter-chip.active:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
 
 .filter-chip .color-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
+  transition: all 0.2s;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .filter-chip {
+  border-color: var(--border-color);
+  opacity: 0.45;
+  background: var(--bg-hover);
+}
+
+[data-theme="dark"] .filter-chip.active {
+  opacity: 1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  background: var(--bg-card);
+}
+
+[data-theme="dark"] .filter-chip:hover {
+  opacity: 0.7;
+}
+
+[data-theme="dark"] .filter-chip.active:hover {
+  opacity: 1;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
 }
 
 /* === Responsive Adjustments === */
@@ -2555,4 +2592,363 @@ textarea:focus {
      .main-header .btn {
         width: 44px; /* Buton devine pătrat */
      }
+}
+
+/* ==========================================================
+   EVOLUTION MODAL STYLING FIXES
+   ========================================================== */
+
+/* === FIX 1: Tab Section - Hide tabPrograme by default === */
+#tabPrograme {
+  display: none !important;
+}
+
+#tabPrograme.active {
+  display: block !important;
+}
+
+/* === FIX 2: Domain Blocks - Proper Vertical Stacking === */
+.domain-block {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 1rem; /* Add spacing between blocks */
+  width: 100%; /* Ensure full width */
+}
+
+.domain-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-card);
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  cursor: pointer; /* Make entire header clickable */
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.domain-header:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+}
+
+/* === FIX 3: Checkbox Grid - Stack Vertically === */
+.checkbox-grid {
+  display: flex; /* Changed from grid to flex */
+  flex-direction: column; /* Stack items vertically */
+  gap: 0.5rem;
+  padding: 1rem;
+  background: var(--bg-main);
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  overflow: hidden;
+}
+
+/* === FIX 4: Collapsed State - Hide grid content === */
+.checkbox-grid.collapsed {
+  max-height: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  opacity: 0;
+  margin-top: 0 !important;
+}
+
+/* === FIX 5: Portage Items - Full Width Display === */
+.portage-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%; /* Full width */
+}
+
+.portage-item:hover:not(.disabled) {
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+  transform: translateX(4px);
+}
+
+.portage-item.checked {
+  background: #dbeafe;
+  border-color: #60a5fa;
+}
+
+.portage-item input[type="checkbox"] {
+  transform: scale(1.4);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.portage-item label {
+  cursor: pointer;
+  flex: 1;
+  user-select: none;
+}
+
+/* === FIX 6: Domain Toggle Button === */
+.domain-toggle-btn {
+  background: var(--bg-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 0.4rem 0.85rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.domain-toggle-btn:hover {
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+}
+
+/* === FIX 7: Age Separators === */
+.portage-age-separator {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 1.5rem 0 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 2px solid var(--border-color);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.portage-age-separator:first-child {
+  margin-top: 0;
+}
+
+/* === FIX 8: Program History Container === */
+#programHistoryContainer {
+  padding: 1.5rem;
+  background: var(--bg-main);
+  border-radius: 0.75rem;
+  min-height: 200px;
+}
+
+/* === FIX 9: Evolution Modal Tab Content === */
+.tab-content {
+  display: none;
+  padding: 1.5rem 0;
+  animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === FIX 10: Tab Buttons === */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+  margin-bottom: 1rem;
+  padding-bottom: 0;
+}
+
+.tab-button {
+  padding: 0.875rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: -2px;
+}
+
+.tab-button:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+  border-radius: 0.5rem 0.5rem 0 0;
+}
+
+.tab-button.active {
+  color: var(--accent-primary);
+  border-bottom-color: var(--accent-primary);
+  font-weight: 600;
+}
+
+/* === FIX 11: Portage Warnings === */
+.portage-warning {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+  border-radius: 0.5rem;
+  padding: 0.875rem 1rem;
+  margin: 1rem 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.portage-warning::before {
+  content: "⚠️";
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* === FIX 12: Collapsible Groups === */
+.portage-group-container {
+  transition: all 0.3s ease;
+}
+
+.portage-group-container.collapsed {
+  display: none;
+}
+
+/* === FIX 13: Future/Disabled Items === */
+.portage-item.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  background: var(--bg-hover);
+}
+
+.portage-item.disabled label {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
+/* === FIX 14: Fin Badge === */
+.portage-fin-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: #e6f4ea;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+  border-radius: 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  vertical-align: middle;
+}
+
+/* === FIX 15: Dark Theme Support === */
+[data-theme="dark"] .domain-block {
+  border-color: #374151;
+}
+
+[data-theme="dark"] .domain-header {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .domain-header:hover {
+  background: #334155;
+}
+
+[data-theme="dark"] .checkbox-grid {
+  background: #1e293b;
+}
+
+[data-theme="dark"] #portageDomainsContainer .portage-item {
+  background: #1f2937;
+  border-color: #374151;
+  color: #f3f4f6;
+}
+
+[data-theme="dark"] .portage-item:hover:not(.disabled) {
+  background: #334155;
+  border-color: #60a5fa;
+}
+
+[data-theme="dark"] .portage-item.checked {
+  background: #1e3a8a33;
+  border-color: #60a5fa;
+}
+
+[data-theme="dark"] .portage-warning {
+  background: #3b3b0f;
+  border-color: #918a2a;
+  color: #fef9c3;
+}
+
+[data-theme="dark"] .portage-age-separator {
+  color: #9ca3af;
+  border-color: #374151;
+}
+
+[data-theme="dark"] .domain-toggle-btn {
+  background: #1f2937;
+  border: 1px solid #4b5563;
+  color: #d1d5db;
+}
+
+[data-theme="dark"] .domain-toggle-btn:hover {
+  background: #2563eb;
+  color: #f9fafb;
+  border-color: #2563eb;
+}
+
+[data-theme="dark"] #programHistoryContainer {
+  background: #1e293b;
+}
+
+/* === FIX 16: Responsive Adjustments === */
+@media (max-width: 768px) {
+  .domain-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .domain-toggle-btn {
+    align-self: stretch;
+    text-align: center;
+  }
+  
+  .portage-item {
+    padding: 0.5rem;
+  }
+  
+  .tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .tab-button {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* === FIX 17: Smooth Transitions === */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.domain-block,
+.portage-item,
+.checkbox-grid,
+.tab-content {
+  will-change: auto;
 }

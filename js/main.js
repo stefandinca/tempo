@@ -135,19 +135,33 @@ function renderFilters() {
     if (!dom.filtersContainer) return;
 
     dom.filtersContainer.innerHTML = '';
+    
     teamMembers.forEach(member => {
         const chip = document.createElement('div');
         chip.className = 'filter-chip';
+        
+        // Set text color to member color
         chip.style.color = member.color;
-        if (activeFilters.includes(member.id)) chip.classList.add('active');
+        
+        // Check if this filter is active
+        const isActive = activeFilters.includes(member.id);
+        
+        if (isActive) {
+            chip.classList.add('active');
+            // When active, set border color to member color
+            chip.style.borderColor = member.color;
+        }
         
         chip.innerHTML = `<span class="color-dot" style="background-color: ${member.color}"></span><span>${member.name}</span>`;
         
         chip.addEventListener('click', () => {
             calendarState.toggleFilter(member.id);
+            // Re-render filters first to update visual state
             renderFilters();
+            // Then re-render calendar to show/hide events
             render();
         });
+        
         dom.filtersContainer.appendChild(chip);
     });
 }
