@@ -579,6 +579,11 @@ async function init() {
     dom.viewBtns.forEach(btn => btn.addEventListener('click', handleViewChange));
     dom.addEventBtn.addEventListener('click', () => ui.openEventModal(null));
 
+    const addEventBtnCalendar = $('addEventBtnCalendar');
+if (addEventBtnCalendar) {
+    addEventBtnCalendar.addEventListener('click', () => ui.openEventModal(null));
+}
+
     // Modal Evenimente (Adăugare/Editare)
     dom.closeModalBtn.addEventListener('click', ui.closeEventModal);
     dom.cancelModalBtn.addEventListener('click', ui.closeEventModal);
