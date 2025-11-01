@@ -10,47 +10,65 @@ import * as api from './apiService.js';
 import { calendarState } from './calendarState.js';
 import * as ui from './uiService.js';
 import * as view from './calendarView.js';
+import * as reportService from './reportService.js';
+import * as evolutionService from './evolutionService.js';
 
 // --- Variabile DOM Globale ---
-// Stocăm referințele la elementele DOM frecvent utilizate
+const $ = (id) => document.getElementById(id);
 const dom = {
-    currentPeriod: document.getElementById('currentPeriod'),
-    prevBtn: document.getElementById('prevBtn'),
-    nextBtn: document.getElementById('nextBtn'),
-    todayBtn: document.getElementById('todayBtn'),
+    currentPeriod: $('currentPeriod'),
+    prevBtn: $('prevBtn'),
+    nextBtn: $('nextBtn'),
+    todayBtn: $('todayBtn'),
     viewBtns: document.querySelectorAll('.view-btn'),
-    filtersContainer: document.getElementById('filters'),
+    filtersContainer: $('filters'),
     
     // Modale și Butoane
-    addEventBtn: document.getElementById('addEventBtn'),
-    closeModalBtn: document.getElementById('closeModal'),
-    cancelModalBtn: document.getElementById('cancelBtn'),
-    eventForm: document.getElementById('eventForm'),
-    deleteEventBtn: document.getElementById('deleteBtn'),
+    addEventBtn: $('addEventBtn'),
+    closeModalBtn: $('closeModal'),
+    cancelModalBtn: $('cancelBtn'),
+    eventForm: $('eventForm'),
+    deleteEventBtn: $('deleteBtn'),
     
     // Câmpuri din Modalul de Evenimente
-    eventTypeSelect: document.getElementById('eventType'),
-    clientSearch: document.getElementById('clientSearch'),
-    programSearch: document.getElementById('programSearch'),
+    eventTypeSelect: $('eventType'),
+    clientSearch: $('clientSearch'),
+    programSearch: $('programSearch'),
     
     // Butoane Admin
-    manageTeamBtn: document.getElementById('manageTeamBtn'),
-    manageClientsBtn: document.getElementById('manageClientsBtn'),
+    manageTeamBtn: $('manageTeamBtn'),
+    manageClientsBtn: $('manageClientsBtn'),
+    
+    // Detalii Eveniment
+    closeEventDetailsModalBtn: $('closeEventDetailsModal'),
+    closeEventDetailsBtn: $('closeEventDetails'),
+    editEventFromDetailsBtn: $('editEventFromDetails'),
+    deleteEventFromDetailsBtn: $('deleteEventFromDetails'),
+    
+    // Modale Admin
+    teamModal: $('teamModal'),
+    closeTeamModalBtn: $('closeTeamModal'),
+    teamMemberForm: $('teamMemberForm'),
+    deleteMemberBtn: $('deleteMemberBtn'),
+    cancelMemberBtn: $('cancelMemberBtn'),
+    
+    clientModal: $('clientModal'),
+    closeClientModalBtn: $('closeClientModal'),
+    clientForm: $('clientForm'),
+    deleteClientBtn: $('deleteClientBtn'),
+    cancelClientBtn: $('cancelClientBtn'),
+    addNewClientBtn: $('addNewClientBtn'),
 };
 
 // --- Funcția Principală de Randare ---
 
 /**
  * Funcția centrală de randare.
- * Actualizează eticheta perioadei și desenează vizualizarea calendarului.
  */
 function render() {
     const { currentDate, currentView } = calendarState.getState();
-
-    // 1. Actualizează eticheta perioadei curente (ex. "Noiembrie 2025")
     updateCurrentPeriodLabel(currentDate, currentView);
 
-    // 2. Apelează funcția de randare corespunzătoare din calendarView
     if (currentView === 'month') {
         view.renderMonthView(handleDayClick);
     } else if (currentView === 'week') {
@@ -60,91 +78,66 @@ function render() {
     }
 }
 
-/**
- * Actualizează textul pentru #currentPeriod.
- */
 function updateCurrentPeriodLabel(date, view) {
     let label = '';
+    const ro = 'ro-RO';
     if (view === 'month') {
-        label = date.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
+        label = date.toLocaleString(ro, { month: 'long', year: 'numeric' });
     } else if (view === 'week') {
-        const weekStart = getWeekStart(date);
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekEnd.getDate() + 6);
-        label = `${formatDate(weekStart, 'short')} - ${formatDate(weekEnd, 'short')}`;
+        const start = getWeekStart(date);
+        const end = new Date(start);
+        end.setDate(end.getDate() + 6);
+        label = `${start.toLocaleDateString(ro, {day: 'numeric', month: 'short'})} - ${end.toLocaleDateString(ro, {day: 'numeric', month: 'short', year: 'numeric'})}`;
     } else if (view === 'day') {
-        label = date.toLocaleString('ro-RO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        label = date.toLocaleString(ro, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     }
     if (dom.currentPeriod) dom.currentPeriod.textContent = label;
 }
 
-// --- Randare Componente UI Auxiliare ---
-
 /**
- * Randează chip-urile de filtrare pentru membrii echipei.
+ * Randează chip-urile de filtrare.
  */
 function renderFilters() {
     const { teamMembers, activeFilters } = calendarState.getState();
     if (!dom.filtersContainer) return;
 
     dom.filtersContainer.innerHTML = '';
-    
     teamMembers.forEach(member => {
         const chip = document.createElement('div');
         chip.className = 'filter-chip';
         chip.style.color = member.color;
-        if (activeFilters.includes(member.id)) {
-            chip.classList.add('active');
-        }
+        if (activeFilters.includes(member.id)) chip.classList.add('active');
         
-        chip.innerHTML = `
-            <span class="color-dot" style="background-color: ${member.color}"></span>
-            <span>${member.name}</span>
-        `;
+        chip.innerHTML = `<span class="color-dot" style="background-color: ${member.color}"></span><span>${member.name}</span>`;
         
-        // Adaugă event listener pentru a comuta filtrul
         chip.addEventListener('click', () => {
             calendarState.toggleFilter(member.id);
-            renderFilters(); // Re-randează filtrele
-            render(); // Re-randează calendarul
+            renderFilters();
+            render();
         });
-        
         dom.filtersContainer.appendChild(chip);
     });
 }
 
 // --- Gestionarea Evenimentelor (Handlers) ---
 
-/**
- * Navighează calendarul (înainte, înapoi).
- */
 function handleNavigation(direction) {
     const { currentDate, currentView } = calendarState.getState();
     const newDate = new Date(currentDate);
 
-    if (currentView === 'month') {
-        newDate.setMonth(newDate.getMonth() + direction);
-    } else if (currentView === 'week') {
-        newDate.setDate(newDate.getDate() + (7 * direction));
-    } else if (currentView === 'day') {
-        newDate.setDate(newDate.getDate() + direction);
-    }
+    if (currentView === 'month') newDate.setMonth(newDate.getMonth() + direction);
+    else if (currentView === 'week') newDate.setDate(newDate.getDate() + (7 * direction));
+    else if (currentView === 'day') newDate.setDate(newDate.getDate() + direction);
     
     calendarState.setCurrentDate(newDate);
     render();
 }
 
-/**
- * Navighează la data curentă.
- */
 function navigateToToday() {
     calendarState.setCurrentDate(new Date());
     render();
 }
 
-/**
- * Schimbă vizualizarea (lună, săptămână, zi).
- */
 function handleViewChange(e) {
     const newView = e.target.dataset.view;
     if (newView) {
@@ -155,63 +148,62 @@ function handleViewChange(e) {
     }
 }
 
-/**
- * Apelat când se dă click pe o zi (în vizualizarea lunară).
- * Trece la vizualizarea zilnică pentru acea zi.
- */
 function handleDayClick(date) {
     calendarState.setCurrentDate(date);
     calendarState.setCurrentView('day');
-    
-    // Actualizează butoanele de vizualizare
-    dom.viewBtns.forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
     document.querySelector('[data-view="day"]').classList.add('active');
-    
     render();
 }
 
 /**
- * Apelat când se dă click pe un eveniment (în vizualizarea săptămânală/zilnică).
- * Deschide modalul de detalii (pe care îl vom adăuga ulterior).
+ * Apelat la click pe un eveniment. Deschide modalul de DETALII.
  */
 function handleEventClick(eventId) {
-    // TODO: Conectează la noul modal de detalii eveniment
-    console.log('Event clicked:', eventId);
-    // Deocamdată, deschidem modalul de editare (dacă suntem admin)
-    const { isAdminView } = calendarState.getState();
-    if (isAdminView) {
-        ui.openEventModal(eventId);
-    }
+    ui.showEventDetails(eventId);
 }
 
-/**
- * Gestionează salvarea unui eveniment din modal.
- */
+// --- Handlers Modal Evenimente (Adăugare/Editare) ---
+
 async function handleSaveEvent(e) {
     e.preventDefault();
     const { editingEventId } = calendarState.getState();
-    const form = e.target;
-    const formData = new FormData(form);
+    const formData = new FormData(e.target);
 
-    const teamMemberIds = Array.from(formData.getAll('teamMemberCheckbox')); // Asigură-te că 'name' este corect în HTML
+    const teamMemberIds = formData.getAll('teamMemberCheckbox');
+    if (teamMemberIds.length === 0) {
+        ui.showCustomAlert('Te rog selectează cel puțin un membru al echipei.', 'Validare');
+        return;
+    }
+    
     const clientIds = Array.from(calendarState.getState().selectedClientIds);
     const programIds = Array.from(calendarState.getState().selectedProgramIds);
     
-    // Obține zilele de recurență
     const repeatingDays = [];
     ['repeatMon', 'repeatTue', 'repeatWed', 'repeatThu', 'repeatFri'].forEach((id, index) => {
-        if (formData.has(id)) {
-            repeatingDays.push(index + 1); // Luni=1
-        }
+        if (formData.has(id)) repeatingDays.push(index + 1);
     });
     
+    const eventType = formData.get('eventType');
+    let startTime = formData.get('startTime');
+    let duration = parseInt(formData.get('duration'));
+
+    if (eventType === 'day-off' || eventType === 'pauza-masa' || eventType === 'sedinta') {
+        if (!startTime) startTime = '08:00';
+        if (!duration || isNaN(duration)) duration = 60;
+    }
+    if (!startTime || isNaN(duration)) {
+         ui.showCustomAlert('Te rog completează ora de început și durata.', 'Validare');
+        return;
+    }
+
     const eventBase = {
         name: formData.get('eventName'),
         details: formData.get('eventDetails') || undefined,
-        type: formData.get('eventType'),
+        type: eventType,
         date: formData.get('eventDate'),
-        startTime: formData.get('startTime') || '08:00', // Default
-        duration: parseInt(formData.get('duration')) || 60, // Default
+        startTime: startTime,
+        duration: duration,
         isPublic: formData.has('isPublic'),
         isBillable: formData.has('isBillable'),
         teamMemberIds,
@@ -221,52 +213,45 @@ async function handleSaveEvent(e) {
     };
 
     if (editingEventId) {
-        // --- Editare Eveniment ---
+        // Editare
         const existingEvent = calendarState.getEventById(editingEventId);
         const updatedEvent = { ...existingEvent, ...eventBase, id: editingEventId };
         calendarState.saveEvent(updatedEvent);
         // TODO: Adaugă logica de actualizare a evenimentelor recurente
         
     } else {
-        // --- Adăugare Eveniment Nou ---
+        // Adăugare Nouă
         if (repeatingDays.length > 0) {
-            // Caz recurent
             const newEvents = createRecurringEvents(eventBase);
             calendarState.saveEvent(newEvents);
         } else {
-            // Caz unic
             const newEvent = { ...eventBase, id: generateEventId() };
             calendarState.saveEvent(newEvent);
         }
     }
     
-    // Salvează pe server
     await api.saveData(calendarState.getState());
-    
     ui.closeEventModal();
     render();
 }
 
-/**
- * Gestionează ștergerea unui eveniment din modal.
- */
 async function handleDeleteEvent() {
     const { editingEventId } = calendarState.getState();
     if (!editingEventId) return;
 
     const event = calendarState.getEventById(editingEventId);
-    let choice = 'single'; // Default
+    let choice = 'single';
 
     if (event.repeating && event.repeating.length > 0) {
         choice = await ui.showRecurringDeleteModal();
+    } else {
+        const confirmed = await ui.showCustomConfirm('Ești sigur că vrei să ștergi acest eveniment?', 'Șterge eveniment');
+        if (!confirmed) choice = 'cancel';
     }
     
-    if (choice === 'cancel') {
-        return;
-    }
+    if (choice === 'cancel') return;
 
     if (choice === 'all') {
-        // Șterge toate evenimentele recurente
         const criteria = {
             name: event.name,
             teamMemberIds: event.teamMemberIds || [event.teamMemberId],
@@ -276,23 +261,142 @@ async function handleDeleteEvent() {
         };
         calendarState.deleteRecurringEvents(criteria);
     } else {
-        // Șterge doar evenimentul singular
         calendarState.deleteEvent(editingEventId);
     }
 
-    // Salvează pe server
     await api.saveData(calendarState.getState());
     
     ui.closeEventModal();
+    ui.closeEventDetailsModal(); // Închide și modalul de detalii dacă era deschis
     render();
 }
 
+// --- Handlers Modale Admin ---
 
-// --- Funcții Helper pentru Evenimente ---
+// Client Management
+async function handleSaveClient(e) {
+    e.preventDefault();
+    const { editingClientId } = calendarState.getState();
+    const formData = new FormData(e.target);
+    
+    const clientData = {
+        id: editingClientId || `client_${Date.now()}`,
+        name: formData.get('clientFullName'),
+        email: formData.get('clientEmail'),
+        phone: formData.get('clientPhone'),
+        birthDate: formData.get('clientBirthdayInput') || null
+    };
+
+    calendarState.saveClient(clientData);
+    await api.saveData(calendarState.getState());
+    
+    ui.renderClientsList($('clientSearchBar').value); // Re-randează lista
+    ui.resetClientForm();
+}
+
+async function handleDeleteClient() {
+    const { editingClientId } = calendarState.getState();
+    if (!editingClientId) return;
+
+    const confirmed = await ui.showCustomConfirm('Ești sigur că vrei să ștergi acest client? Acțiunile sunt ireversibile.', 'Șterge Client');
+    if (confirmed) {
+        calendarState.deleteClient(editingClientId);
+        await api.saveData(calendarState.getState());
+        ui.renderClientsList($('clientSearchBar').value);
+        ui.resetClientForm();
+    }
+}
+
+// Team Management
+async function handleSaveTeamMember(e) {
+    e.preventDefault();
+    const { editingMemberId } = calendarState.getState();
+    const formData = new FormData(e.target);
+
+    const memberData = {
+        id: editingMemberId || `member_${Date.now()}`,
+        name: formData.get('memberName'),
+        initials: formData.get('memberInitials'),
+        role: formData.get('memberRole'),
+        color: formData.get('memberColorHex')
+    };
+    
+    calendarState.saveTeamMember(memberData);
+    await api.saveData(calendarState.getState());
+    
+    ui.renderTeamMembersList();
+    ui.resetTeamForm();
+    renderFilters(); // Actualizează filtrele de pe pagina principală
+}
+
+async function handleDeleteTeamMember() {
+    const { editingMemberId } = calendarState.getState();
+    if (!editingMemberId) return;
+
+    const confirmed = await ui.showCustomConfirm('Ești sigur că vrei să ștergi acest membru? Toate evenimentele asociate vor fi de asemenea șterse.', 'Șterge Membru');
+    if (confirmed) {
+        calendarState.deleteTeamMember(editingMemberId);
+        await api.saveData(calendarState.getState());
+        ui.renderTeamMembersList();
+        ui.resetTeamForm();
+        renderFilters();
+        render(); // Re-randează calendarul (evenimentele au fost șterse)
+    }
+}
+
+// --- Handlers pentru Acțiuni pe Carduri (Event Delegation) ---
+
+function setupAdminListeners() {
+    // Modal Client
+    dom.clientModal?.addEventListener('click', (e) => {
+        const action = e.target.closest('.btn-action')?.dataset.action;
+        if (!action) return;
+        
+        const card = e.target.closest('.client-card');
+        const clientId = card?.querySelector('.client-actions')?.dataset.clientId;
+        if (!clientId) return;
+
+        switch (action) {
+            case 'evolutie': evolutionService.showEvolutionModal(clientId); break;
+            case 'raport': reportService.downloadClientReport(clientId); break;
+            case 'email': reportService.emailClientReport(clientId); break;
+            case 'editeaza': ui.editClientInModal(clientId); break;
+            case 'sterge': 
+                calendarState.setEditingId({ clientId }); // Setează ID-ul pentru handler
+                handleDeleteClient();
+                break;
+        }
+    });
+    
+    // Modal Echipă
+    dom.teamModal?.addEventListener('click', (e) => {
+        const action = e.target.closest('.btn-action')?.dataset.action;
+        if (!action) return;
+
+        const card = e.target.closest('.team-member-card');
+        const memberId = card?.querySelector('.team-member-actions')?.dataset.memberId;
+        if (!memberId) return;
+
+        switch (action) {
+            case 'raport': reportService.downloadTeamMemberReport(memberId); break;
+            case 'editeaza': ui.editTeamMemberInModal(memberId); break;
+            case 'sterge':
+                calendarState.setEditingId({ memberId }); // Setează ID-ul pentru handler
+                handleDeleteTeamMember();
+                break;
+        }
+    });
+}
+
+
+// --- Funcții Helper ---
 
 function createRecurringEvents(eventBase) {
     const events = [];
-    const startDate = new Date(eventBase.date);
+    // Data de început trebuie parsată corect
+    const parts = eventBase.date.split('-');
+    const startDate = new Date(parts[0], parts[1] - 1, parts[2]);
+    
     const endOfMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
     let currentDate = new Date(startDate);
 
@@ -316,8 +420,6 @@ function generateEventId() {
     return 'evt' + Date.now() + Math.random().toString(36).substr(2, 9);
 }
 
-// --- Funcții Helper pentru Date ---
-
 function getWeekStart(date) {
     const d = new Date(date);
     const day = d.getDay();
@@ -326,77 +428,94 @@ function getWeekStart(date) {
 }
 
 function formatDate(date, format = 'short') {
+    const ro = 'ro-RO';
     if (format === 'short') {
-        return date.toLocaleDateString('ro-RO', { month: 'short', day: 'numeric' });
+        return date.toLocaleDateString(ro, { month: 'short', day: 'numeric' });
     } else if (format === 'iso') {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+        return date.toISOString().split('T')[0];
     }
-    return date.toLocaleDateString('ro-RO');
+    return date.toLocaleDateString(ro);
 }
 
 // --- Funcția de Inițializare ---
 
-/**
- * Inițializează aplicația.
- */
 async function init() {
-    console.log('Inițializare aplicație Tempo...');
+    console.log('Inițializare aplicație Tempo (modular)...');
     
-    // Setează modul admin (simplificat)
-    const isAdmin = window.location.pathname.includes('admin.html');
+    const isAdmin = true; // Acest fișier este doar pentru admin.html
     calendarState.setIsAdminView(isAdmin);
 
-    // Încarcă datele
     try {
         const data = await api.loadData();
         calendarState.initializeData(data);
-        
-        // Încarcă datele auxiliare
-        const programs = await api.loadPrograms();
-        calendarState.setPrograms(programs.programs); // 'programs.json' are un array 'programs'
-        
+        const programsData = await api.loadPrograms();
+        calendarState.setPrograms(programsData.programs);
         const evolutionData = await api.loadEvolutionData();
         calendarState.setEvolutionData(evolutionData);
-        
-        // TODO: Încarcă datele Portrige dacă este necesar
-        // await api.loadPortrigeData();
-
     } catch (error) {
         console.error('Eroare critică la încărcarea datelor:', error);
         ui.showCustomAlert('Nu s-au putut încărca datele. Te rog verifică conexiunea și reîmprospătează pagina.', 'Eroare fatală');
-        return; // Oprește execuția
+        return;
     }
 
-    // Atașează event listeners
+    // Atașează listeners de bază
     dom.prevBtn.addEventListener('click', () => handleNavigation(-1));
     dom.nextBtn.addEventListener('click', () => handleNavigation(1));
     dom.todayBtn.addEventListener('click', navigateToToday);
     dom.viewBtns.forEach(btn => btn.addEventListener('click', handleViewChange));
 
-    if (isAdmin) {
-        // Listeners specifici pentru admin
-        dom.addEventBtn.addEventListener('click', () => ui.openEventModal(null));
-        dom.closeModalBtn.addEventListener('click', ui.closeEventModal);
-        dom.cancelModalBtn.addEventListener('click', ui.closeEventModal);
-        dom.eventForm.addEventListener('submit', handleSaveEvent);
-        dom.deleteEventBtn.addEventListener('click', handleDeleteEvent);
+    // Listeners specifici pentru admin
+    dom.addEventBtn.addEventListener('click', () => ui.openEventModal(null));
+    dom.closeModalBtn.addEventListener('click', ui.closeEventModal);
+    dom.cancelModalBtn.addEventListener('click', ui.closeEventModal);
+    dom.eventForm.addEventListener('submit', handleSaveEvent);
+    dom.deleteEventBtn.addEventListener('click', handleDeleteEvent);
 
-        // Listeners pentru actualizarea UI-ului din modal
-        dom.eventTypeSelect.addEventListener('change', (e) => {
-            ui.updateEventTypeDependencies(e.target.value);
-            ui.updateEventTitle();
-        });
-        dom.clientSearch.addEventListener('input', (e) => ui.filterClientsInModal(e.target.value));
-        dom.programSearch.addEventListener('input', (e) => ui.filterProgramsInModal(e.target.value));
-        
-        // TODO: Conectează butoanele 'manageTeamBtn' și 'manageClientsBtn' la modalele lor
-        // dom.manageTeamBtn.addEventListener('click', ...);
-        // dom.manageClientsBtn.addEventListener('click', ...);
-    }
+    // Listeners pentru modalul de detalii
+    dom.closeEventDetailsModalBtn.addEventListener('click', ui.closeEventDetailsModal);
+    dom.closeEventDetailsBtn.addEventListener('click', ui.closeEventDetailsModal);
+    dom.editEventFromDetailsBtn.addEventListener('click', () => {
+        const eventId = calendarState.getEventById(ui.currentDetailsEventId)?.id; // Obține ID-ul din uiService
+        if(eventId) {
+            ui.closeEventDetailsModal();
+            ui.openEventModal(eventId);
+        }
+    });
+    dom.deleteEventFromDetailsBtn.addEventListener('click', () => {
+        const eventId = calendarState.getEventById(ui.currentDetailsEventId)?.id;
+        if(eventId) {
+            calendarState.openEventModal(eventId); // Setează editingEventId
+            handleDeleteEvent();
+        }
+    });
 
+    // Listeners pentru modalele Client/Echipă
+    dom.manageTeamBtn.addEventListener('click', ui.openTeamModal);
+    dom.closeTeamModalBtn.addEventListener('click', ui.closeTeamModal);
+    dom.teamMemberForm.addEventListener('submit', handleSaveTeamMember);
+    dom.deleteMemberBtn.addEventListener('click', handleDeleteTeamMember);
+    dom.cancelMemberBtn.addEventListener('click', ui.resetTeamForm);
+
+    dom.manageClientsBtn.addEventListener('click', ui.openClientModal);
+    dom.closeClientModalBtn.addEventListener('click', ui.closeClientModal);
+    dom.clientForm.addEventListener('submit', handleSaveClient);
+    dom.deleteClientBtn.addEventListener('click', handleDeleteClient);
+    dom.cancelClientBtn.addEventListener('click', ui.resetClientForm);
+    dom.addNewClientBtn.addEventListener('click', () => $('clientForm').scrollIntoView({ behavior: 'smooth' }));
+
+    // Listeners pentru căutare în modale
+    dom.clientSearch.addEventListener('input', (e) => ui.filterClientsInModal(e.target.value));
+    dom.programSearch.addEventListener('input', (e) => ui.filterProgramsInModal(e.target.value));
+    
+    // Listener pentru actualizare titlu eveniment
+    dom.eventTypeSelect.addEventListener('change', (e) => {
+        ui.updateEventTypeDependencies(e.target.value);
+        ui.updateEventTitle();
+    });
+    
+    // Atașează listenerii delegați pentru acțiunile de pe carduri
+    setupAdminListeners();
+    
     // Randează starea inițială
     renderFilters();
     render();
