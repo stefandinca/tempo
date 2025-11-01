@@ -1742,7 +1742,7 @@ textarea.form-input {
   padding: 0;
   background: var(--bg-main);
   border-radius: 0 0 0.75rem 0.75rem;
-  max-height: 2000px;
+  max-height: 20000px;
   overflow: hidden;
   opacity: 1;
   transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
