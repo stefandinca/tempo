@@ -14,8 +14,12 @@ import * as evolutionService from './evolutionService.js';
 // --- Variabile DOM Globale ---
 const $ = (id) => document.getElementById(id);
 const dom = {
+    // Container principal
+    appContainer: $('appContainer'),
+
     // Navigare Sidebar
     sidebarLinks: document.querySelectorAll('.sidebar-menu .menu-item'),
+    sidebarToggle: $('sidebarToggle'),
     
     // Secțiuni Principale
     calendarSection: $('calendarSection'),
@@ -499,9 +503,15 @@ async function init() {
     // Navigare Principală
     dom.sidebarLinks.forEach(link => link.addEventListener('click', handleMainViewNavigation));
     
-    // UI (Temă & Fullscreen)
+    // UI (Temă & Fullscreen & Sidebar Toggle)
     initThemeToggle();
     initFullscreenToggle();
+
+    if (dom.sidebarToggle && dom.appContainer) {
+        dom.sidebarToggle.addEventListener('click', () => {
+            dom.appContainer.classList.toggle('sidebar-collapsed');
+        });
+    }
 
     // Navigare Calendar
     dom.prevBtn.addEventListener('click', () => handleNavigation(-1));

@@ -8,7 +8,7 @@
     <link rel="icon" href="tempo-logo-small.png" type="image/png">
 </head>
 <body>
-    <div class="app-container">
+    <div class="app-container" id="appContainer">
         
         <nav class="sidebar">
             <div class="sidebar-header">
@@ -36,6 +36,9 @@
     </li>
 </ul>
             <div class="sidebar-footer">
+                <button id="sidebarToggle" class="btn-icon" title="Restrange meniu">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                </button>
                 <button id="themeToggle" class="btn-icon" title="Schimba tema">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
                 </button>
@@ -86,7 +89,6 @@
         <header class="section-header">
             <h1>Management Clienti</h1>
             <div class="header-actions">
-                <input type="search" id="clientSearchBar" class="form-input" placeholder="Cauta client dupa nume, email...">
                 <button id="addNewClientBtn" class="btn btn-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                     <span>Adauga Client Nou</span>
@@ -96,6 +98,7 @@
         
         <div class="section-content-grid">
             <div class="section-col-list">
+                <input type="search" id="clientSearchBar" class="form-input" placeholder="Cauta client dupa nume, email...">
                 <div id="clientsList" class="modal-list">
                     </div>
             </div>
@@ -331,8 +334,6 @@
     
     
     
-    
-
     <div id="evolutionModal" class="modal-backdrop">
         <div class="modal-content modal-xl">
             <div class="modal-header">
@@ -470,5 +471,6 @@
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script type="module" src="js/main.js"></script> </body>
+    <script type="module" src="js/main.js"></script>
+</body>
 </html>
