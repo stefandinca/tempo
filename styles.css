@@ -2421,3 +2421,138 @@ textarea:focus {
 #calendarSection .filters-container {
   flex-shrink: 0;
 }
+
+/* === (ADAUGAT) Responsive Sidebar Collapse === */
+.app-container.sidebar-collapsed .sidebar {
+    width: 88px; /* Suficient pentru iconițe (88px) */
+}
+.app-container.sidebar-collapsed .sidebar .logo-full {
+    display: none;
+}
+.app-container.sidebar-collapsed .sidebar .logo-small {
+    display: block;
+}
+.app-container.sidebar-collapsed .sidebar .menu-item a span {
+    display: none; /* Ascunde textul link-ului */
+}
+.app-container.sidebar-collapsed .sidebar .menu-item a {
+    justify-content: center; /* Centrează iconița */
+}
+.app-container.sidebar-collapsed .sidebar .sidebar-footer {
+    justify-content: center;
+}
+
+/* === (ADAUGAT) Media Queries pentru Admin Responsive === */
+
+/* Pentru Tablete și Ecrane Mici (ex. 1024px) */
+@media (max-width: 1024px) {
+    .app-container {
+        /* Forțează layout-ul pe coloană (Nav sus, Conținut jos) */
+        flex-direction: column; 
+    }
+    .app-container .sidebar {
+        width: 100%;
+        height: auto; /* Anulează 100vh */
+        flex-direction: row; /* Transformă în nav-bar orizontal */
+        padding: 0.5rem 1rem;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .app-container .sidebar-header {
+        margin-bottom: 0;
+        justify-content: flex-start;
+        flex-basis: 50px; /* Spațiu pentru logo */
+    }
+    .app-container .sidebar .logo-full {
+        display: none;
+    }
+    .app-container .sidebar .logo-small {
+        display: block;
+        height: 30px;
+    }
+    .app-container .sidebar-menu {
+        display: flex;
+        flex-direction: row; /* Meniu orizontal */
+        flex-grow: 1;
+        justify-content: center;
+    }
+    .app-container .menu-item a {
+        padding: 0.75rem; /* Doar iconițe */
+        margin-bottom: 0;
+    }
+    .app-container .menu-item a span {
+        display: none; /* Ascunde textul */
+    }
+    .app-container .sidebar-footer {
+        border-top: none;
+        padding-top: 0;
+    }
+    /* Ascunde butonul de toggle al sidebar-ului, devine inutil */
+    #sidebarToggle {
+        display: none;
+    }
+    .main-content {
+        overflow-y: auto; /* Permite scroll pe conținutul principal */
+    }
+    .calendar-container {
+        padding: 1rem; /* Padding redus pe mobil */
+    }
+    .section-content-grid {
+         padding: 1rem;
+    }
+}
+
+/* Pentru Telefoane (ex. 768px) */
+@media (max-width: 768px) {
+    .section-content-grid {
+        grid-template-columns: 1fr; /* Stivuiește Lista și Formularul */
+        overflow-y: auto;
+        height: auto;
+    }
+    .section-col-form {
+        height: auto; /* Anulează înălțimea fixă */
+    }
+    .modal-list {
+        max-height: 40vh; /* Limitează înălțimea listei pe mobil */
+    }
+    
+    /* Stivuiește coloanele din modalul de evenimente */
+    .modal-body.modal-grid {
+        grid-template-columns: 1fr; 
+    }
+    .checkbox-list {
+        max-height: 200px; /* Înălțime fixă pt scroll în modal */
+    }
+    
+    /* Ajustări pentru header-ul principal */
+    .main-header, .section-header {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .period-navigation {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+/* Pentru Ecrane Foarte Mici (ex. 640px) */
+@media (max-width: 640px) {
+     .period-navigation h1 {
+        font-size: 1.25rem;
+     }
+     .header-actions .view-toggle {
+        display: none; /* Ascunde view toggle (Luna/Sapt/Zi) */
+     }
+     .main-header .btn span {
+        display: none; /* Ascunde textul "Adaugă" */
+     }
+     .main-header .btn {
+        width: 44px; /* Buton devine pătrat */
+     }
+}
