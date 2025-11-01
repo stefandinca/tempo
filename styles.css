@@ -876,6 +876,10 @@ textarea:focus {
   font-size: 1.125rem;
 }
 
+#clientSearchBar {
+  margin-bottom: 1.5rem;
+}
+
 .client-avatar {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
