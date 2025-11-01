@@ -296,6 +296,8 @@ async function handleSaveEvent(e) {
     }
     
     await api.saveData(calendarState.getState());
+    // logs saving activity
+    logActivity(editingEventId ? "Eveniment actualizat" : "Eveniment adăugat", eventBase.name);
     ui.closeEventModal();
     render();
 }
@@ -353,6 +355,9 @@ async function handleSaveClient(e) {
 
     calendarState.saveClient(clientData);
     await api.saveData(calendarState.getState());
+
+    // logs saving activity
+    logActivity(editingClientId ? "Client actualizat" : "Client adăugat", clientData.name);
     
     ui.renderClientsList(dom.clientSearchBar.value);
     ui.resetClientForm();
@@ -386,6 +391,9 @@ async function handleSaveTeamMember(e) {
     
     calendarState.saveTeamMember(memberData);
     await api.saveData(calendarState.getState());
+
+    // logs saving activity
+    logActivity(editingMemberId ? "Membru actualizat" : "Membru adăugat", memberData.name);
     
     ui.renderTeamMembersList();
     ui.resetTeamForm();
@@ -471,6 +479,41 @@ function createRecurringEvents(eventBase) {
     return events;
 }
 
+// --- Helper Functions ---
+
+/**
+ * Logs a recent activity to localStorage.
+ * @param {string} action - The action performed (e.g., "Client adăugat").
+ * @param {string} details - The name/details of the item (e.g., "Stefan Negru").
+ */
+function logActivity(action, details) {
+    let activityLog = [];
+    try {
+        activityLog = JSON.parse(localStorage.getItem('recentActivity')) || [];
+    } catch (e) {
+        activityLog = [];
+    }
+
+    const newEntry = {
+        timestamp: new Date().toISOString(),
+        action: action,
+        details: details
+    };
+
+    // Add new entry to the top
+    activityLog.unshift(newEntry);
+
+    // Keep the log to a reasonable size (e..g, last 15 items)
+    if (activityLog.length > 15) {
+        activityLog.pop();
+    }
+
+    // Save back to localStorage
+    localStorage.setItem('recentActivity', JSON.stringify(activityLog));
+}
+
+// ... (restul funcțiilor helper, ex: generateEventId, getWeekStart) ...
+
 function generateEventId() {
     return 'evt' + Date.now() + Math.random().toString(36).substr(2, 9);
 }
@@ -491,6 +534,8 @@ function formatDate(date, format = 'short') {
     }
     return date.toLocaleDateString(ro);
 }
+
+
 
 // --- Funcția de Inițializare ---
 

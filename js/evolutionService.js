@@ -578,6 +578,10 @@ async function savePortageEvaluation() {
     try {
         await api.saveEvolutionData(evolutionData);
         showCustomAlert('Evaluarea Portage a fost salvată cu succes!', 'Succes');
+
+        if (window.logActivity) {
+            window.logActivity("Evaluare salvată", client.name);
+        }
         
         // Re-randează graficele și închide
         renderEvolutionChart(evolutionData[currentClientId]);
