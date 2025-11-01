@@ -1756,6 +1756,32 @@ textarea.form-input {
   border-top: none;
 }
 
+/* Stil pentru noul tag [fin] */
+.portage-fin-tag {
+  display: inline-block;
+  font-size: 0.7rem; /* Mai mic */
+  font-weight: 600;
+  padding: 0.1rem 0.4rem;
+  margin-left: 0.25rem;
+  border-radius: 0.25rem;
+  background-color: var(--accent-primary);
+  color: white;
+  font-style: normal; /* Anulează stilul italic al părintelui */
+  vertical-align: middle;
+}
+
+/* Stil pentru a evidenția vizual item-ul selectat (pentru cerința 2) */
+.portage-item.checked {
+  background: linear-gradient(to right, #dbeafe 0%, transparent 100%);
+  border-left: 3px solid #60a5fa;
+  padding-left: calc(1.25rem - 3px); /* Compensează border-left */
+}
+
+[data-theme="dark"] .portage-item.checked {
+  background: linear-gradient(to right, rgba(37, 99, 235, 0.2) 0%, transparent 100%);
+  border-left-color: #60a5fa;
+}
+
 .portage-age-separator {
   text-align: left;
   font-weight: 700;

@@ -292,6 +292,9 @@ function updateChildAgeDisplay(birthDate) {
 /**
  * Randează domeniile și itemii Portage în container.
  */
+/**
+ * Randează domeniile și itemii Portage în container.
+ */
 function renderPortageDomains() {
     const container = $('portageDomainsContainer');
     container.innerHTML = '';
@@ -347,10 +350,18 @@ function renderPortageDomains() {
             let groupItemsHtml = '';
             groupItems.forEach(item => {
                 const isFuture = item.months > ageMonths;
+
+                // --- START CORECȚIE 1: Logica pentru tag-ul [fin] ---
+                let ageText = `(${item.age})`;
+                if (ageText.includes('(fin)')) {
+                    ageText = ageText.replace(/\(fin\)/gi, '<span class="portage-fin-tag">fin</span>');
+                }
+                // --- END CORECȚIE 1 ---
+
                 groupItemsHtml += `
                     <div class="portage-item ${isFuture ? 'disabled' : ''}" data-months="${item.months}">
                         <input type="checkbox" data-domain="${domain}" data-id="${item.id}" ${isFuture ? 'disabled' : ''}>
-                        <label>${item.text} <i>(${item.age})</i></label>
+                        <label>${item.text} <i>${ageText}</i></label>
                     </div>
                 `;
             });
@@ -419,6 +430,33 @@ function renderPortageDomains() {
                     : 'Ascunde iteme viitoare';
             });
         }
+
+        // --- START CORECȚIE 2: Click pe întregul rând ---
+        block.querySelectorAll('.portage-item').forEach(item => {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            if (!checkbox) return;
+
+            // 1. Listener pe tot item-ul (div)
+            item.addEventListener('click', (e) => {
+                if (e.target.tagName === 'INPUT' || checkbox.disabled) {
+                    // Dacă s-a dat click direct pe checkbox, lasă-l să-și facă treaba
+                    // Sau dacă e dezactivat, nu face nimic
+                    return; 
+                }
+                
+                // Comută manual starea checkbox-ului pentru click pe label/padding/etc.
+                checkbox.checked = !checkbox.checked;
+                // Comută și clasa vizuală
+                item.classList.toggle('checked', checkbox.checked);
+            });
+
+            // 2. Listener direct pe checkbox (pentru a prinde și click-ul pe el)
+            checkbox.addEventListener('change', (e) => {
+                // Sincronizează clasa vizuală când checkbox-ul se schimbă
+                item.classList.toggle('checked', e.target.checked);
+            });
+        });
+        // --- END CORECȚIE 2 ---
 
         container.appendChild(block);
     });
