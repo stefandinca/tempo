@@ -1,0 +1,120 @@
+/* Tailwind CSS Custom Styles - Minimal additions to Tailwind CDN */
+
+/* Custom animations */
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.4s ease;
+}
+
+.animate-modalFadeIn {
+  animation: modalFadeIn 0.3s ease;
+}
+
+/* Calendar specific styles */
+.event-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.event-block {
+  position: absolute;
+  border-radius: 0.375rem;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 1;
+}
+
+.event-block:hover {
+  transform: scale(1.02);
+  z-index: 2;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Portage item checked state */
+.portage-item.checked {
+  background: linear-gradient(to right, #dbeafe 0%, transparent 100%);
+  border-left: 3px solid #60a5fa;
+  padding-left: calc(1.25rem - 3px);
+}
+
+.dark .portage-item.checked {
+  background: linear-gradient(to right, rgba(37, 99, 235, 0.2) 0%, transparent 100%);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgb(209 213 219);
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background-color: rgb(75 85 99);
+}
+
+/* Modal active state */
+.modal.active,
+.modal-backdrop.active {
+  display: flex !important;
+}
+
+/* View button active state */
+.view-btn.active {
+  @apply bg-primary text-white;
+}
+
+/* Filter chip active state */
+.filter-chip.active {
+  opacity: 1;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive calendar grid */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.5rem;
+}
+
+@media (max-width: 640px) {
+  .calendar-grid {
+    gap: 0.25rem;
+  }
+}
+
+/* Event container positioning */
+.event-container {
+  position: relative;
+  min-height: 60px;
+  width: 100%;
+}
+
+/* Therapy initials badge positioning */
+.event-initials-container {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  max-width: 50%;
+  justify-content: flex-end;
+  z-index: 2;
+}
