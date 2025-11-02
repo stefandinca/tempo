@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ro" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selectează utilizatorul - Tempo Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4A90E2',
+                        secondary: '#F4E8D8',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="icon.png" type="image/png">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+        }
+        
+        .user-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .user-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        .user-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+            margin: 0 auto 1rem;
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .role-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .role-therapist { background: #dbeafe; color: #1e40af; }
+        .role-coordinator { background: #fef3c7; color: #92400e; }
+        .role-admin { background: #fce7f3; color: #9f1239; }
+        
+        [data-theme="dark"] .role-therapist { background: #1e3a8a; color: #dbeafe; }
+        [data-theme="dark"] .role-coordinator { background: #78350f; color: #fef3c7; }
+        [data-theme="dark"] .role-admin { background: #831843; color: #fce7f3; }
+    </style>
+</head>
+<body>
+    <div class="w-full max-w-6xl">
+        <div class="text-center mb-12">
+            <img src="tempo-logo-dark.png" alt="Tempo Logo" class="h-16 mx-auto mb-6">
+            <h1 class="text-4xl font-bold text-white mb-3">Bine ai venit!</h1>
+            <p class="text-xl text-white opacity-90">Selectează contul tău pentru a continua</p>
+        </div>
+        
+        <div id="userCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- User cards will be generated here -->
+        </div>
+        
+        <div class="text-center mt-8">
+            <button id="themeToggle" class="px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                <span class="ml-2">Schimbă tema</span>
+            </button>
+        </div>
+    </div>
+
+    <script type="module">
+        // API Configuration
+        const API_BASE = 'api.php';
+
+        async function loadTeamMembers() {
+            try {
+                const response = await fetch(`${API_BASE}?path=data`);
+                const data = await response.json();
+                return data.teamMembers || [];
+            } catch (error) {
+                console.error('Error loading team members:', error);
+                return [];
+            }
+        }
+
+        function getRoleLabel(role) {
+            const labels = {
+                'therapist': 'Terapeut',
+                'coordinator': 'Coordonator',
+                'admin': 'Administrator'
+            };
+            return labels[role] || role;
+        }
+
+        function getRoleClass(role) {
+            return `role-${role}`;
+        }
+
+        async function renderUserCards() {
+            const container = document.getElementById('userCardsContainer');
+            const teamMembers = await loadTeamMembers();
+
+            if (teamMembers.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12">
+                        <p class="text-white text-xl mb-4">Nu există membri în echipă.</p>
+                        <a href="dashboard.html" class="inline-block px-6 py-3 bg-white text-primary rounded-lg font-semibold hover:bg-opacity-90 transition-all">
+                            Mergi la Dashboard pentru a adăuga membri
+                        </a>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = teamMembers.map(member => `
+                <div class="user-card bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg" data-user-id="${member.id}">
+                    <div class="user-avatar" style="background-color: ${member.color}">
+                        ${member.initials}
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">${member.name}</h3>
+                    <span class="role-badge ${getRoleClass(member.role)}">${getRoleLabel(member.role)}</span>
+                </div>
+            `).join('');
+
+            // Add click handlers
+            document.querySelectorAll('.user-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const userId = card.dataset.userId;
+                    selectUser(userId);
+                });
+            });
+        }
+
+        function selectUser(userId) {
+            // Store selected user in session storage
+            sessionStorage.setItem('currentUserId', userId);
+            
+            // Redirect to dashboard
+            window.location.href = 'dashboard.html';
+        }
+
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('calendar-theme', newTheme);
+        });
+
+        // Initialize theme
+        const savedTheme = localStorage.getItem('calendar-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        // Load users on page load
+        renderUserCards();
+    </script>
+</body>
+</html>

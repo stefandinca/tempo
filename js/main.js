@@ -4,6 +4,7 @@
  */
 
 // --- Importarea Modulelor ---
+import * as auth from './authService.js';
 import * as api from './apiService.js';
 import { calendarState } from './calendarState.js';
 import * as ui from './uiService.js';
@@ -70,7 +71,13 @@ const dom = {
     // Butoane UI
     themeToggle: $('themeToggle'),
     fullscreenToggle: $('fullscreenToggle'),
+
+    
+    
 };
+
+//useri
+let currentUser = null;
 
 // --- Navigare Principală (Tab-uri) ---
 
@@ -252,6 +259,17 @@ function handleEventClick(eventId) {
 async function handleSaveEvent(e) {
     e.preventDefault();
     const { editingEventId } = calendarState.getState();
+
+     // === ADD PERMISSION CHECK FOR EDITING ===
+    if (editingEventId) {
+        const existingEvent = calendarState.getEventById(editingEventId);
+        if (!auth.canModifyEvent(existingEvent)) {
+            auth.showPermissionDenied('editați acest eveniment');
+            return;
+        }
+    }
+    // === END PERMISSION CHECK ===
+
     const formData = new FormData(e.target);
 
     const teamMemberIds = formData.getAll('teamMemberCheckbox');
@@ -322,6 +340,13 @@ async function handleDeleteEvent() {
     if (!editingEventId) return;
 
     const event = calendarState.getEventById(editingEventId);
+
+     // === ADD PERMISSION CHECK ===
+    if (!auth.canModifyEvent(event)) {
+        auth.showPermissionDenied('ștergeți acest eveniment');
+        return;
+    }
+
     let choice = 'single';
 
     if (event.repeating && event.repeating.length > 0) {
@@ -557,11 +582,169 @@ function formatDate(date, format = 'short') {
 }
 
 
+/**
+ * Update UI based on current user
+ */
+function updateUserInterface() {
+    // Update dashboard schedule
+    updateDashboardSchedule();
+    
+    // Update dashboard stats
+    updateDashboardStats();
+    
+    // Add user info to header
+    addUserInfoToHeader();
+    
+    // Update permissions for buttons
+    updatePermissions();
+}
+
+/**
+ * Update dashboard schedule for current user
+ */
+function updateDashboardSchedule() {
+    const container = $('dashboardTodaySchedule');
+    if (!container) return;
+    
+    const schedule = auth.getTodaysSchedule();
+    
+    if (schedule.length === 0) {
+        container.innerHTML = '<div class="empty-schedule">Nicio sesiune programată pentru astăzi.</div>';
+        return;
+    }
+    
+    container.innerHTML = schedule.map(event => {
+        const endTime = calculateEndTime(event.startTime, event.duration);
+        const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
+        const clientNames = clientIds.map(id => {
+            const client = calendarState.getClientById(id);
+            return client ? client.name : 'Client necunoscut';
+        }).join(', ');
+        
+        return `
+            <div class="schedule-item">
+                <div class="schedule-time">${event.startTime} - ${endTime}</div>
+                <div class="schedule-details">
+                    <div class="schedule-title">${event.name}</div>
+                    <div class="schedule-client">cu ${clientNames || 'Fără client'}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * Update dashboard stats for current user
+ */
+function updateDashboardStats() {
+    const stats = auth.getUserStats();
+    
+    const totalSessionsEl = $('statTotalSessions');
+    const attendanceEl = $('statAttendance');
+    const pendingReportsEl = $('statPendingReports');
+    
+    if (totalSessionsEl) totalSessionsEl.textContent = stats.totalSessions;
+    if (attendanceEl) attendanceEl.textContent = stats.attendance + '%';
+    if (pendingReportsEl) pendingReportsEl.textContent = stats.pendingReports;
+}
+
+/**
+ * Add user info to header
+ */
+function addUserInfoToHeader() {
+    const headers = document.querySelectorAll('.section-header, .main-header');
+    headers.forEach(header => {
+        const existing = header.querySelector('.user-info-badge');
+        if (existing) existing.remove();
+        
+        const userInfo = document.createElement('div');
+        userInfo.className = 'user-info-badge';
+        userInfo.style.cssText = 'display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; background: var(--bg-hover); border-radius: 0.5rem; border: 1px solid var(--border-color);';
+        userInfo.innerHTML = `
+            <div style="width: 32px; height: 32px; border-radius: 50%; background-color: ${currentUser.color}; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.875rem;">
+                ${currentUser.initials}
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                <span style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary);">${currentUser.name}</span>
+                <span style="font-size: 0.75rem; color: var(--text-secondary);">${getRoleLabel(currentUser.role)}</span>
+            </div>
+            <button id="logoutBtn" style="padding: 0.375rem 0.75rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer; color: var(--text-secondary); transition: all 0.2s;" title="Deconectare">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </button>
+        `;
+        
+        const actionsDiv = header.querySelector('.header-actions');
+        if (actionsDiv) {
+            actionsDiv.insertBefore(userInfo, actionsDiv.firstChild);
+        }
+    });
+    
+    // Add logout handler
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            auth.logout();
+        });
+    }
+}
+
+/**
+ * Update permissions for UI elements
+ */
+function updatePermissions() {
+    // All roles can add events, so no changes needed for add buttons
+    // Permission checks will be done when editing/deleting events
+}
+
+/**
+ * Helper function to get role label
+ */
+function getRoleLabel(role) {
+    const roles = { 'therapist': 'Terapeut', 'coordinator': 'Coordonator', 'admin': 'Admin' };
+    return roles[role] || role;
+}
+
+/**
+ * Helper function to calculate end time
+ */
+function calculateEndTime(startTime, durationMinutes) {
+    if (!startTime) return "N/A";
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const totalMinutes = (hours * 60) + minutes + durationMinutes;
+    const endHours = Math.floor(totalMinutes / 60) % 24;
+    const endMinutes = totalMinutes % 60;
+    return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
+}
+
 
 // --- Funcția de Inițializare ---
 
 async function init() {
     console.log('Inițializare aplicație Tempo (modular)...');
+
+    // === AUTHENTICATION CHECK - ADD THIS BLOCK ===
+    try {
+        const data = await api.loadData();
+        calendarState.initializeData(data);
+        
+        // Initialize authentication
+        currentUser = auth.initAuth();
+        if (!currentUser) {
+            return; // Will redirect to select-user.html
+        }
+        
+        console.log('User logged in:', currentUser.name, '-', currentUser.role);
+        
+        // Update UI with user info
+        updateUserInterface();
+        
+    } catch (error) {
+        console.error('Eroare critică la încărcarea datelor:', error);
+        ui.showCustomAlert('Nu s-au putut încărca datele.', 'Eroare fatală');
+        return;
+    }
+    // === END AUTHENTICATION BLOCK ===
     
     calendarState.setIsAdminView(true);
 
