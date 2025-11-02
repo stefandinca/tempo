@@ -25,6 +25,7 @@ const dom = {
     calendarSection: $('calendarSection'),
     clientSection: $('clientSection'),
     teamSection: $('teamSection'),
+    dashboardSection: $('dashboardSection'),
     
     // Calendar
     currentPeriod: $('currentPeriod'),
@@ -34,6 +35,7 @@ const dom = {
     viewBtns: document.querySelectorAll('.view-btn'),
     filtersContainer: $('filters'),
     addEventBtn: $('addEventBtn'),
+    addEventBtnCalendar: $('addEventBtnCalendar'),
     
     // Modal Evenimente (Adăugare/Editare)
     closeModalBtn: $('closeModal'),
@@ -73,7 +75,7 @@ const dom = {
 // --- Navigare Principală (Tab-uri) ---
 
 /**
- * Gestionează comutarea între secțiunile principale: Calendar, Clienti, Echipa.
+ * Gestionează comutarea între secțiunile principale: Dashboard, Calendar, Clienti, Echipa.
  * @param {Event} e Evenimentul de click de la link-ul din sidebar.
  */
 function handleMainViewNavigation(e) {
@@ -85,17 +87,27 @@ function handleMainViewNavigation(e) {
     if (!viewName) return;
 
     // 1. Ascunde toate secțiunile și butoanele
-    document.querySelectorAll('.main-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.main-section').forEach(s => {
+        s.classList.remove('active');
+        s.style.display = 'none'; // Explicitly hide
+    });
     dom.sidebarLinks.forEach(link => link.classList.remove('active'));
 
     // 2. Arată secțiunea și butonul corect
     const section = $(`${viewName}Section`);
     if (section) {
         section.classList.add('active');
+        section.style.display = 'flex'; // Explicitly show
         menuItem.classList.add('active');
+        
+        // 3. Render calendar if switching to calendar view
+        if (viewName === 'calendar') {
+            setTimeout(() => {
+                render();
+                renderFilters();
+            }, 50); // Small delay to ensure DOM is ready
+        }
     }
-    
-    // 3. Logica de lazy-loading a fost eliminată. Listele sunt acum randate la inițializare.
 }
 
 
@@ -115,6 +127,8 @@ function render() {
 }
 
 function updateCurrentPeriodLabel(date, view) {
+    if (!dom.currentPeriod) return;
+    
     let label = '';
     const ro = 'ro-RO';
     if (view === 'month') {
@@ -127,7 +141,7 @@ function updateCurrentPeriodLabel(date, view) {
     } else if (view === 'day') {
         label = date.toLocaleString(ro, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     }
-    if (dom.currentPeriod) dom.currentPeriod.textContent = label;
+    dom.currentPeriod.textContent = label;
 }
 
 function renderFilters() {
@@ -224,7 +238,8 @@ function handleDayClick(date) {
     calendarState.setCurrentDate(date);
     calendarState.setCurrentView('day');
     document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector('[data-view="day"]').classList.add('active');
+    const dayBtn = document.querySelector('[data-view="day"]');
+    if (dayBtn) dayBtn.classList.add('active');
     render();
 }
 
@@ -419,44 +434,48 @@ async function handleDeleteTeamMember() {
 
 function setupAdminListeners() {
     // Secțiunea Client
-    dom.clientsList.addEventListener('click', (e) => {
-        const actionBtn = e.target.closest('.btn-action');
-        if (!actionBtn) return;
-        
-        const action = actionBtn.dataset.action;
-        const clientId = actionBtn.closest('.client-actions').dataset.clientId;
-        if (!clientId) return;
+    if (dom.clientsList) {
+        dom.clientsList.addEventListener('click', (e) => {
+            const actionBtn = e.target.closest('.btn-action');
+            if (!actionBtn) return;
+            
+            const action = actionBtn.dataset.action;
+            const clientId = actionBtn.closest('.client-actions').dataset.clientId;
+            if (!clientId) return;
 
-        switch (action) {
-            case 'evolutie': evolutionService.showEvolutionModal(clientId); break;
-            case 'raport': reportService.downloadClientReport(clientId); break;
-            case 'email': reportService.emailClientReport(clientId); break;
-            case 'editeaza': ui.editClientInModal(clientId); break;
-            case 'sterge': 
-                calendarState.setEditingId({ clientId });
-                handleDeleteClient();
-                break;
-        }
-    });
+            switch (action) {
+                case 'evolutie': evolutionService.showEvolutionModal(clientId); break;
+                case 'raport': reportService.downloadClientReport(clientId); break;
+                case 'email': reportService.emailClientReport(clientId); break;
+                case 'editeaza': ui.editClientInModal(clientId); break;
+                case 'sterge': 
+                    calendarState.setEditingId({ clientId });
+                    handleDeleteClient();
+                    break;
+            }
+        });
+    }
     
     // Secțiunea Echipă
-    dom.teamMembersList.addEventListener('click', (e) => {
-        const actionBtn = e.target.closest('.btn-action');
-        if (!actionBtn) return;
+    if (dom.teamMembersList) {
+        dom.teamMembersList.addEventListener('click', (e) => {
+            const actionBtn = e.target.closest('.btn-action');
+            if (!actionBtn) return;
 
-        const action = actionBtn.dataset.action;
-        const memberId = actionBtn.closest('.team-member-actions').dataset.memberId;
-        if (!memberId) return;
+            const action = actionBtn.dataset.action;
+            const memberId = actionBtn.closest('.team-member-actions').dataset.memberId;
+            if (!memberId) return;
 
-        switch (action) {
-            case 'raport': reportService.downloadTeamMemberReport(memberId); break;
-            case 'editeaza': ui.editTeamMemberInModal(memberId); break;
-            case 'sterge':
-                calendarState.setEditingId({ memberId });
-                handleDeleteTeamMember();
-                break;
-        }
-    });
+            switch (action) {
+                case 'raport': reportService.downloadTeamMemberReport(memberId); break;
+                case 'editeaza': ui.editTeamMemberInModal(memberId); break;
+                case 'sterge':
+                    calendarState.setEditingId({ memberId });
+                    handleDeleteTeamMember();
+                    break;
+            }
+        });
+    }
 }
 
 
@@ -507,7 +526,7 @@ window.logActivity = function(action, details, actionType = 'generic', relatedId
     // Add new entry to the top
     activityLog.unshift(newEntry);
 
-    // Keep the log to a reasonable size (e..g, last 15 items)
+    // Keep the log to a reasonable size (e.g, last 15 items)
     if (activityLog.length > 15) {
         activityLog.pop();
     }
@@ -515,8 +534,6 @@ window.logActivity = function(action, details, actionType = 'generic', relatedId
     // Save back to localStorage
     localStorage.setItem('recentActivity', JSON.stringify(activityLog));
 }
-
-// ... (restul funcțiilor helper, ex: generateEventId, getWeekStart) ...
 
 function generateEventId() {
     return 'evt' + Date.now() + Math.random().toString(36).substr(2, 9);
@@ -561,7 +578,7 @@ async function init() {
         return;
     }
 
-    // --- Atașare Listeners ---
+    // --- Atașare Listeners (with null checks) ---
     
     // Navigare Principală
     dom.sidebarLinks.forEach(link => link.addEventListener('click', handleMainViewNavigation));
@@ -576,45 +593,56 @@ async function init() {
         });
     }
 
-    // Navigare Calendar
-    dom.prevBtn.addEventListener('click', () => handleNavigation(-1));
-    dom.nextBtn.addEventListener('click', () => handleNavigation(1));
-    dom.todayBtn.addEventListener('click', navigateToToday);
+    // Navigare Calendar (with null checks)
+    if (dom.prevBtn) dom.prevBtn.addEventListener('click', () => handleNavigation(-1));
+    if (dom.nextBtn) dom.nextBtn.addEventListener('click', () => handleNavigation(1));
+    if (dom.todayBtn) dom.todayBtn.addEventListener('click', navigateToToday);
     dom.viewBtns.forEach(btn => btn.addEventListener('click', handleViewChange));
-    dom.addEventBtn.addEventListener('click', () => ui.openEventModal(null));
+    if (dom.addEventBtn) dom.addEventBtn.addEventListener('click', () => ui.openEventModal(null));
+    if (dom.addEventBtnCalendar) dom.addEventBtnCalendar.addEventListener('click', () => ui.openEventModal(null));
 
-    // Modal Evenimente (Adăugare/Editare)
-    dom.closeModalBtn.addEventListener('click', ui.closeEventModal);
-    dom.cancelModalBtn.addEventListener('click', ui.closeEventModal);
-    dom.eventForm.addEventListener('submit', handleSaveEvent);
-    dom.deleteEventBtn.addEventListener('click', handleDeleteEvent);
+    // Modal Evenimente (Adăugare/Editare) (with null checks)
+    if (dom.closeModalBtn) dom.closeModalBtn.addEventListener('click', ui.closeEventModal);
+    if (dom.cancelModalBtn) dom.cancelModalBtn.addEventListener('click', ui.closeEventModal);
+    if (dom.eventForm) dom.eventForm.addEventListener('submit', handleSaveEvent);
+    if (dom.deleteEventBtn) dom.deleteEventBtn.addEventListener('click', handleDeleteEvent);
 
-    // Modal Detalii Eveniment
-    dom.closeEventDetailsModalBtn.addEventListener('click', ui.closeEventDetailsModal);
-    dom.closeEventDetailsBtn.addEventListener('click', ui.closeEventDetailsModal);
-    dom.editEventFromDetailsBtn.addEventListener('click', () => ui.editEventFromDetails());
-    dom.deleteEventFromDetailsBtn.addEventListener('click', () => ui.deleteEventFromDetails());
+    // Modal Detalii Eveniment (with null checks)
+    if (dom.closeEventDetailsModalBtn) dom.closeEventDetailsModalBtn.addEventListener('click', ui.closeEventDetailsModal);
+    if (dom.closeEventDetailsBtn) dom.closeEventDetailsBtn.addEventListener('click', ui.closeEventDetailsModal);
+    if (dom.editEventFromDetailsBtn) dom.editEventFromDetailsBtn.addEventListener('click', () => ui.editEventFromDetails());
+    if (dom.deleteEventFromDetailsBtn) dom.deleteEventFromDetailsBtn.addEventListener('click', () => ui.deleteEventFromDetails());
 
-    // Secțiunea Echipă
-    dom.teamMemberForm.addEventListener('submit', handleSaveTeamMember);
-    dom.deleteMemberBtn.addEventListener('click', handleDeleteTeamMember);
-    dom.cancelMemberBtn.addEventListener('click', ui.resetTeamForm);
-    dom.addNewTeamMemberBtn.addEventListener('click', () => dom.teamMemberForm.scrollIntoView({ behavior: 'smooth' }));
+    // Secțiunea Echipă (with null checks)
+    if (dom.teamMemberForm) dom.teamMemberForm.addEventListener('submit', handleSaveTeamMember);
+    if (dom.deleteMemberBtn) dom.deleteMemberBtn.addEventListener('click', handleDeleteTeamMember);
+    if (dom.cancelMemberBtn) dom.cancelMemberBtn.addEventListener('click', ui.resetTeamForm);
+    if (dom.addNewTeamMemberBtn) {
+        dom.addNewTeamMemberBtn.addEventListener('click', () => {
+            if (dom.teamMemberForm) dom.teamMemberForm.scrollIntoView({ behavior: 'smooth' });
+        });
+    }
 
-    // Secțiunea Client
-    dom.clientForm.addEventListener('submit', handleSaveClient);
-    dom.deleteClientBtn.addEventListener('click', handleDeleteClient);
-    dom.cancelClientBtn.addEventListener('click', ui.resetClientForm);
-    dom.addNewClientBtn.addEventListener('click', () => dom.clientForm.scrollIntoView({ behavior: 'smooth' }));
-    dom.clientSearchBar.addEventListener('input', (e) => ui.renderClientsList(e.target.value));
+    // Secțiunea Client (with null checks)
+    if (dom.clientForm) dom.clientForm.addEventListener('submit', handleSaveClient);
+    if (dom.deleteClientBtn) dom.deleteClientBtn.addEventListener('click', handleDeleteClient);
+    if (dom.cancelClientBtn) dom.cancelClientBtn.addEventListener('click', ui.resetClientForm);
+    if (dom.addNewClientBtn) {
+        dom.addNewClientBtn.addEventListener('click', () => {
+            if (dom.clientForm) dom.clientForm.scrollIntoView({ behavior: 'smooth' });
+        });
+    }
+    if (dom.clientSearchBar) dom.clientSearchBar.addEventListener('input', (e) => ui.renderClientsList(e.target.value));
 
-    // Câmpuri Modal Evenimente
-    dom.clientSearch.addEventListener('input', (e) => ui.filterClientsInModal(e.target.value));
-    dom.programSearch.addEventListener('input', (e) => ui.filterProgramsInModal(e.target.value));
-    dom.eventTypeSelect.addEventListener('change', (e) => {
-        ui.updateEventTypeDependencies(e.target.value);
-        ui.updateEventTitle();
-    });
+    // Câmpuri Modal Evenimente (with null checks)
+    if (dom.clientSearch) dom.clientSearch.addEventListener('input', (e) => ui.filterClientsInModal(e.target.value));
+    if (dom.programSearch) dom.programSearch.addEventListener('input', (e) => ui.filterProgramsInModal(e.target.value));
+    if (dom.eventTypeSelect) {
+        dom.eventTypeSelect.addEventListener('change', (e) => {
+            ui.updateEventTypeDependencies(e.target.value);
+            ui.updateEventTitle();
+        });
+    }
     
     // Acțiuni pe carduri (Clienti/Echipa)
     setupAdminListeners();
@@ -623,12 +651,11 @@ async function init() {
     renderFilters();
     render();
     
-    // **CORECTIA ESTE AICI:**
     // Randează listele o singură dată la încărcare
     ui.renderClientsList('');
     ui.renderTeamMembersList();
 
-    // --- Adaugă ascultători pentru sincronizarea culorilor ---
+    // --- Adaugă ascultători pentru sincronizarea culorilor (with null checks) ---
     const memberColorPicker = $('memberColor');
     const memberColorHex = $('memberColorHex');
 
@@ -646,7 +673,8 @@ async function init() {
             }
         });
     }
-    // --- Sfârșitul codului adăugat ---
+    
+    console.log('Inițializare completă!');
 }
 
 // --- Pornirea Aplicației ---
