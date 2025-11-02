@@ -580,7 +580,7 @@ async function savePortageEvaluation() {
         showCustomAlert('Evaluarea Portage a fost salvată cu succes!', 'Succes');
 
         if (window.logActivity) {
-            window.logActivity("Evaluare salvată", client.name);
+            window.logActivity("Evaluare salvată", client.name, 'evaluation', currentClientId);
         }
         
         // Re-randează graficele și închide

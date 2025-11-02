@@ -1,3 +1,5 @@
+
+
 /**
  * js/reportService.js
  *
@@ -42,6 +44,10 @@ export async function downloadClientReport(clientId) { // <-- Add async
         URL.revokeObjectURL(url);
         
         showCustomAlert('Raportul HTML a fost descărcat.\nÎl puteți deschide în browser (graficul este inclus).', 'Descărcare finalizată'); // Modified message
+        
+        if (window.logActivity) {
+            window.logActivity("Raport generat", client.name, 'report', clientId);
+        }
     } catch (error) {
         console.error('Eroare la generarea raportului client HTML:', error);
         showCustomAlert('A apărut o eroare la generarea raportului.', 'Eroare');

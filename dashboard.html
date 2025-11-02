@@ -159,30 +159,27 @@
                     <div class="widget-box-content" id="dashboardRecentActivity">
                         <div class="activity-item">
                             <div class="activity-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-                            </div>
-                            <div class="activity-text">
-                                <strong>Corina</strong> a marcat prezența pentru <strong>Cezar Dinca</strong>.
-                            </div>
-                            <div class="activity-time">acum 5 min</div>
-                        </div>
-                         <div class="activity-item">
-                            <div class="activity-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                             </div>
                             <div class="activity-text">
-                                O nouă evaluare Portage a fost salvată pentru <strong>Tudor</strong>.
+                                <strong>Evaluare salvată</strong>: Tudor
                             </div>
                             <div class="activity-time">acum 45 min</div>
+                            <div class="activity-action">
+                                <button class="btn btn-secondary btn-sm" data-action="goToClientEvolution" data-client-id="client_1761643441294">Vezi Evoluție</button>
+                            </div>
                         </div>
                          <div class="activity-item">
                             <div class="activity-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/></svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
                             </div>
                             <div class="activity-text">
-                                Un client nou, <strong>Stefan Negru</strong>, a fost adăugat în sistem.
+                                <strong>Eveniment adăugat</strong>: Terapie - Stefan Negru
                             </div>
                             <div class="activity-time">acum 2 ore</div>
+                            <div class="activity-action">
+                                <button class="btn btn-secondary btn-sm" data-action="goToDate" data-date="2025-11-03">Vezi Ziua</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -675,11 +672,27 @@
                 return;
             }
 
+            const icons = {
+                event: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>',
+                report: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+                evaluation: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9l-5 5-4-4-6 6"/></svg>',
+                generic: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'
+            };
+
             let html = '';
             activityLog.forEach(entry => {
-                // Poți adăuga iconițe diferite în funcție de entry.action
-                let icon = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
-                
+                const actionType = entry.actionType || 'generic';
+                const icon = icons[actionType] || icons.generic;
+                let actionButton = '';
+
+                if (actionType === 'event' && entry.relatedId) {
+                    actionButton = `<button class="btn btn-secondary btn-sm" data-action="goToDate" data-date="${entry.relatedId}">Vezi Ziua</button>`;
+                } else if (actionType === 'evaluation' && entry.relatedId) {
+                    actionButton = `<button class="btn btn-secondary btn-sm" data-action="goToClientEvolution" data-client-id="${entry.relatedId}">Vezi Evoluție</button>`;
+                } else if (actionType === 'report' && entry.relatedId) {
+                    actionButton = `<button class="btn btn-secondary btn-sm" data-action="goToClient" data-client-id="${entry.relatedId}">Vezi Client</button>`;
+                }
+
                 html += `
                 <div class="activity-item">
                     <div class="activity-icon">${icon}</div>
@@ -687,6 +700,7 @@
                         <strong>${entry.action}</strong>: ${entry.details}
                     </div>
                     <div class="activity-time">${formatTimeAgo(entry.timestamp)}</div>
+                    <div class="activity-action">${actionButton}</div>
                 </div>
                 `;
             });
@@ -696,7 +710,6 @@
         // Asigură-te că DOM-ul este încărcat
         document.addEventListener('DOMContentLoaded', () => {
             
-
             populateRecentActivity();
 
             // Leagă butoanele de Acțiuni Rapide
@@ -740,10 +753,64 @@
                 });
             }
             
-            // TODO în main.js:
-            // 1. Modifică handleMainViewNavigation pentru a recunoaște 'dashboard'.
-            // 2. Creează funcții care populează #dashboardTodaySchedule, 
-            //    #dashboardQuickStats, și #dashboardRecentActivity la încărcarea paginii.
+            // --- NOU: Adaugă ascultători pentru butoanele din Activitate Recentă ---
+            const activityContainer = document.getElementById('dashboardRecentActivity');
+            
+            activityContainer.addEventListener('click', (e) => {
+                const button = e.target.closest('button[data-action]');
+                if (!button) return;
+
+                const action = button.dataset.action;
+                
+                if (action === 'goToDate') {
+                    const date = button.dataset.date;
+                    if (!date) return;
+                    
+                    import('./js/calendarState.js').then(({ calendarState }) => {
+                        calendarState.setCurrentDate(new Date(date));
+                        calendarState.setCurrentView('day');
+                        document.querySelector('.menu-item[data-view="calendar"]').click();
+                        // Click-ul de mai sus va randa calendarul, dar
+                        // trebuie să forțăm și butonul de view
+                        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                        const dayBtn = document.querySelector('.view-btn[data-view="day"]');
+                        if(dayBtn) dayBtn.classList.add('active');
+                        
+                        // main.js render() va fi apelat de click-ul pe sidebar link
+                    });
+                }
+                
+                if (action === 'goToClientEvolution') {
+                    const clientId = button.dataset.clientId;
+                    if (!clientId) return;
+                    
+                    document.querySelector('.menu-item[data-view="client"]').click();
+                    
+                    import('./js/evolutionService.js').then(({ showEvolutionModal }) => {
+                        showEvolutionModal(clientId);
+                    });
+                }
+
+                if (action === 'goToClient') {
+                    const clientId = button.dataset.clientId;
+                    if (!clientId) return;
+
+                    document.querySelector('.menu-item[data-view="client"]').click();
+                    
+                    setTimeout(() => {
+                        const clientCard = document.querySelector(`.client-actions[data-client-id="${clientId}"]`);
+                        if(clientCard) {
+                            clientCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            clientCard.closest('.client-card').style.transition = 'all 0.3s ease';
+                            clientCard.closest('.client-card').style.boxShadow = '0 0 0 3px var(--accent-primary)';
+                            setTimeout(() => {
+                                clientCard.closest('.client-card').style.boxShadow = '';
+                            }, 2000);
+                        }
+                    }, 200); // Asteapta ca tab-ul sa se schimbe
+                }
+            });
+
         });
     </script>
 </body>

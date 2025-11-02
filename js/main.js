@@ -297,7 +297,7 @@ async function handleSaveEvent(e) {
     
     await api.saveData(calendarState.getState());
     // logs saving activity
-    logActivity(editingEventId ? "Eveniment actualizat" : "Eveniment adăugat", eventBase.name);
+    window.logActivity(editingEventId ? "Eveniment actualizat" : "Eveniment adăugat", eventBase.name, 'event', eventBase.date);
     ui.closeEventModal();
     render();
 }
@@ -357,7 +357,7 @@ async function handleSaveClient(e) {
     await api.saveData(calendarState.getState());
 
     // logs saving activity
-    logActivity(editingClientId ? "Client actualizat" : "Client adăugat", clientData.name);
+    window.logActivity(editingClientId ? "Client actualizat" : "Client adăugat", clientData.name, 'generic', clientData.id);
     
     ui.renderClientsList(dom.clientSearchBar.value);
     ui.resetClientForm();
@@ -393,7 +393,7 @@ async function handleSaveTeamMember(e) {
     await api.saveData(calendarState.getState());
 
     // logs saving activity
-    logActivity(editingMemberId ? "Membru actualizat" : "Membru adăugat", memberData.name);
+    window.logActivity(editingMemberId ? "Membru actualizat" : "Membru adăugat", memberData.name, 'generic', memberData.id);
     
     ui.renderTeamMembersList();
     ui.resetTeamForm();
@@ -485,8 +485,10 @@ function createRecurringEvents(eventBase) {
  * Logs a recent activity to localStorage.
  * @param {string} action - The action performed (e.g., "Client adăugat").
  * @param {string} details - The name/details of the item (e.g., "Stefan Negru").
+ * @param {string} actionType - 'event', 'report', 'evaluation', 'generic'
+ * @param {string} relatedId - Client ID or Event Date
  */
-function logActivity(action, details) {
+window.logActivity = function(action, details, actionType = 'generic', relatedId = null) {
     let activityLog = [];
     try {
         activityLog = JSON.parse(localStorage.getItem('recentActivity')) || [];
@@ -497,7 +499,9 @@ function logActivity(action, details) {
     const newEntry = {
         timestamp: new Date().toISOString(),
         action: action,
-        details: details
+        details: details,
+        actionType: actionType,
+        relatedId: relatedId
     };
 
     // Add new entry to the top
@@ -578,11 +582,6 @@ async function init() {
     dom.todayBtn.addEventListener('click', navigateToToday);
     dom.viewBtns.forEach(btn => btn.addEventListener('click', handleViewChange));
     dom.addEventBtn.addEventListener('click', () => ui.openEventModal(null));
-
-    const addEventBtnCalendar = $('addEventBtnCalendar');
-if (addEventBtnCalendar) {
-    addEventBtnCalendar.addEventListener('click', () => ui.openEventModal(null));
-}
 
     // Modal Evenimente (Adăugare/Editare)
     dom.closeModalBtn.addEventListener('click', ui.closeEventModal);
