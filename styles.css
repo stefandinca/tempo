@@ -2081,46 +2081,68 @@ textarea.form-input {
     .app-container {
         flex-direction: column; 
     }
+
     .app-container .sidebar {
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        padding: 0.5rem 1rem;
-        align-items: center;
-        justify-content: space-between;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 280px; /* Lățime fixă pentru meniul flyout */
+        height: 100vh;
+        z-index: 101;
+        flex-direction: column; /* Asigură-te că este vertical */
+        transform: translateX(-100%); /* Ascuns în stânga */
+        transition: transform 0.3s ease;
+        box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        padding: 1.5rem; /* Resetează padding-ul la cel de desktop */
     }
-    .app-container .sidebar-header {
-        margin-bottom: 0;
-        justify-content: flex-start;
-        flex-basis: 50px;
+    
+    /* Starea activă când meniul e deschis */
+    .sidebar.mobile-active {
+        transform: translateX(0);
     }
+
+    .app-container .sidebar-menu {
+    flex-direction: column; /* FORȚEAZĂ vertical */
+    justify-content: flex-start; /* Aliniază de sus */
+    overflow-y: auto; /* Permite scroll vertical DACA e nevoie */
+    overflow-x: hidden;
+    flex-grow: 1; /* Ocupă spațiul rămas */
+}
+
+/* NOU: Readaugă spațierea verticală între butoane */
+.app-container .sidebar .menu-item a {
+    margin-bottom: 0.5rem;
+}
+
+    /* Afișează conținutul sidebar-ului corect în modul flyout */
     .app-container .sidebar .logo-full {
-        display: none;
+        display: block;
     }
     .app-container .sidebar .logo-small {
+        display: none;
+    }
+    .app-container .sidebar .menu-item a span,
+    .app-container .sidebar #sidebarLogoutBtn span {
+        display: inline;
+    }
+    .app-container .sidebar .menu-item a {
+        justify-content: flex-start;
+    }
+    
+    /* Fundalul */
+    .mobile-menu-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 100;
+        backdrop-filter: blur(2px);
+    }
+    .mobile-menu-backdrop.active {
         display: block;
-        height: 30px;
     }
-    .app-container .sidebar-menu {
-        display: flex;
-        flex-direction: row;
-        flex-grow: 1;
-        justify-content: center;
-    }
-    .app-container .menu-item a {
-        padding: 0.75rem;
-        margin-bottom: 0;
-    }
-    .app-container .menu-item a span {
-        display: none;
-    }
-    .app-container .sidebar-footer {
-        border-top: none;
-        padding-top: 0;
-    }
-    #sidebarToggle {
-        display: none;
-    }
+    
     .main-content {
         overflow-y: auto;
     }
@@ -2140,12 +2162,13 @@ textarea.form-input {
         overflow-y: auto;
         height: auto;
     }
-    .section-col-form {
-        height: auto;
+    .section-col-form,
+    .section-col-list {
+        height: 70vh;
     }
-    .modal-list {
-        max-height: 200vh;
-    }
+    
+     
+
     .modal-body.modal-grid {
         grid-template-columns: 1fr; 
         gap: 1.5rem;
@@ -2158,17 +2181,36 @@ textarea.form-input {
     }
     .main-header, .section-header {
         padding: 1rem;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
+    /* Am scos: flex-direction: column; align-items: flex-start; */
+    /* NOU: */
+    display: flex;
+    flex-direction: row; /* Asigură alinierea orizontală */
+    align-items: center; /* Centrează vertical */
+    justify-content: space-between; /* Spațiază elementele */
+    gap: 1rem;
     }
+
+    .main-header .header-title-group,
+.section-header .header-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1; /* Permite titlului să crească */
+    min-width: 0; /* Previne depășirea pe ecrane mici */
+}
+
+.header-title-group h1 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
     .period-navigation {
         width: 100%;
         justify-content: space-between;
     }
     .header-actions {
-        width: 100%;
-        justify-content: space-between;
+        width: auto; /* Nu mai forța lățimea completă */
+    flex-shrink: 0; /* Nu lăsa acțiunile să se micșoreze */
     }
     .event-details-grid {
       grid-template-columns: 1fr;

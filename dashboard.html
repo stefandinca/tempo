@@ -33,7 +33,7 @@
                 <img src="tempo-logo-dark.png" alt="Tempo Logo" class="logo-full h-8 md:h-10">
                 <img src="tempo-logo-small.png" alt="Tempo Logo" class="logo-small h-8 hidden">
             </div>
-            <ul class="sidebar-menu flex md:flex-col flex-1 overflow-x-auto md:overflow-y-auto p-2 md:p-4">
+            <ul class="sidebar-menu flex-col flex-1 overflow-y-auto p-2 md:p-4">
                 <li class="menu-item active" data-view="dashboard">
                     <a href="#" class="flex items-center gap-3 px-3 py-2 md:px-4 md:py-3 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
@@ -90,7 +90,17 @@
             <section id="dashboardSection" class="main-section active flex flex-col h-full">
                 <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6 flex-shrink-0">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Panou de control</h1>
+                        <!--- HAMBURGER MENU-->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div class="header-title-group">
+                                <button class="mobile-menu-toggle btn-icon md:hidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                                </button>
+                                <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Panou de control</h1>
+                            </div>
+                            
+                            
+                        </div>
                         
                         <div class="flex items-center gap-2">
                             <button id="addEventBtn" class="btn btn-primary flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors text-sm md:text-base">
@@ -98,7 +108,10 @@
                                 <span class="hidden sm:inline">Adauga Sesiune</span>
                                 <span class="sm:hidden">Adauga</span>
                             </button>
-                        </div>
+                        </div> 
+
+
+                        
                     </div>
                 </header>
 
@@ -226,7 +239,18 @@
             <section id="calendarSection" class="main-section hidden">
                 <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <h1 id="currentPeriod" class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Loading...</h1>
+                        <!--- HAMBURGER MENU-->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div class="header-title-group">
+                                <button class="mobile-menu-toggle btn-icon md:hidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                                </button>
+                                <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Panou de control</h1>
+                            </div>
+                            
+                            
+                            
+                        </div>
                         
                         <div class="flex flex-wrap items-center gap-2">
                             <div class="flex items-center gap-1">
@@ -248,6 +272,8 @@
                                 <span class="hidden sm:inline">Adauga</span>
                             </button>
                         </div>
+
+                        
                     </div>
                 </header>
                 
@@ -257,7 +283,17 @@
 
             <section id="clientSection" class="main-section">
         <header class="section-header">
-            <h1>Management Clienti</h1>
+            <!--- HAMBURGER MENU-->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div class="header-title-group">
+                                <button class="mobile-menu-toggle btn-icon md:hidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                                </button>
+                                <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Panou de control</h1>
+                            </div>
+                            
+                            
+                        </div>
             <div class="header-actions">
                 <button id="addNewClientBtn" class="btn btn-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
@@ -303,7 +339,17 @@
 
     <section id="teamSection" class="main-section">
         <header class="section-header">
-            <h1>Management Echipa</h1>
+            <!--- HAMBURGER MENU-->
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div class="header-title-group">
+                                <button class="mobile-menu-toggle btn-icon md:hidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                                </button>
+                                <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Panou de control</h1>
+                            </div>
+                            
+                            
+                        </div>
             <div class="header-actions">
                 <button id="addNewTeamMemberBtn" class="btn btn-primary">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
@@ -831,5 +877,6 @@
             });
         });
     </script>
+    <div id="mobileMenuBackdrop" class="mobile-menu-backdrop md:hidden"></div>
 </body>
 </html>

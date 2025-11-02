@@ -75,6 +75,9 @@ const dom = {
     themeToggle: $('themeToggle'),
     fullscreenToggle: $('fullscreenToggle'),
     sidebarLogoutBtn: $('sidebarLogoutBtn'),
+    mobileMenuToggles: document.querySelectorAll('.mobile-menu-toggle'),
+    mobileMenuBackdrop: $('mobileMenuBackdrop'),
+    sidebar: document.querySelector('.sidebar'),
 
     
     
@@ -773,6 +776,28 @@ async function init() {
     // Logout (with null checks)
     if (dom.sidebarLogoutBtn) {
         dom.sidebarLogoutBtn.addEventListener('click', auth.logout);
+    }
+
+    const toggleMobileMenu = () => {
+        if (dom.sidebar) dom.sidebar.classList.toggle('mobile-active');
+        if (dom.mobileMenuBackdrop) dom.mobileMenuBackdrop.classList.toggle('active');
+    };
+
+    if (dom.mobileMenuToggles.length > 0) {
+        dom.mobileMenuToggles.forEach(btn => {
+            btn.addEventListener('click', toggleMobileMenu);
+        });
+    }
+    if (dom.mobileMenuBackdrop) {
+        dom.mobileMenuBackdrop.addEventListener('click', toggleMobileMenu);
+    }
+    // Închide meniul și când se dă click pe un link din interior
+    if (dom.sidebar) {
+        dom.sidebar.addEventListener('click', (e) => {
+            if (e.target.closest('a') && dom.sidebar.classList.contains('mobile-active')) {
+                toggleMobileMenu();
+            }
+        });
     }
 
     // Navigare Calendar (with null checks)
