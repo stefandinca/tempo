@@ -2144,7 +2144,7 @@ textarea.form-input {
         height: auto;
     }
     .modal-list {
-        max-height: 40vh;
+        max-height: 200vh;
     }
     .modal-body.modal-grid {
         grid-template-columns: 1fr; 

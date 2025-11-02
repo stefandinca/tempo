@@ -68,9 +68,13 @@ const dom = {
     clientsList: $('clientsList'),
     clientSearchBar: $('clientSearchBar'),
 
+    
+    
+
     // Butoane UI
     themeToggle: $('themeToggle'),
     fullscreenToggle: $('fullscreenToggle'),
+    sidebarLogoutBtn: $('sidebarLogoutBtn'),
 
     
     
@@ -764,6 +768,11 @@ async function init() {
         dom.sidebarToggle.addEventListener('click', () => {
             dom.appContainer.classList.toggle('sidebar-collapsed');
         });
+    }
+
+    // Logout (with null checks)
+    if (dom.sidebarLogoutBtn) {
+        dom.sidebarLogoutBtn.addEventListener('click', auth.logout);
     }
 
     // Navigare Calendar (with null checks)
