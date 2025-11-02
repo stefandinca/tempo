@@ -668,9 +668,6 @@ function addUserInfoToHeader() {
                 <span style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary);">${currentUser.name}</span>
                 <span style="font-size: 0.75rem; color: var(--text-secondary);">${getRoleLabel(currentUser.role)}</span>
             </div>
-            <button id="logoutBtn" style="padding: 0.375rem 0.75rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer; color: var(--text-secondary); transition: all 0.2s;" title="Deconectare">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            </button>
         `;
         
         const actionsDiv = header.querySelector('.header-actions');
@@ -679,14 +676,7 @@ function addUserInfoToHeader() {
         }
     });
     
-    // Add logout handler
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            auth.logout();
-        });
-    }
+   
 }
 
 /**

@@ -275,6 +275,10 @@ body {
     justify-content: center;
 }
 
+.app-container.sidebar-collapsed .sidebar .menu-item a span,
+.app-container.sidebar-collapsed .sidebar #sidebarLogoutBtn span {
+    display: none;
+}
 
 /* ==========================================================
    3. LAYOUT (PUBLIC - index.html)
