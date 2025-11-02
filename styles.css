@@ -1654,6 +1654,7 @@ textarea.form-input {
   border: 1px solid var(--border-color);
   border-radius: 0.5rem;
   background: var(--bg-card);
+  min-height:550px;
 }
 
 .evolution-summary {
@@ -2167,7 +2168,31 @@ textarea.form-input {
         height: 70vh;
     }
     
-     
+     .tabs {
+    overflow-x: auto;   /* Permite scroll orizontal */
+    white-space: nowrap;  /* Împiedică butoanele să treacă pe rândul următor */
+    padding: 0 0.5rem;    /* Micșorează padding-ul lateral al containerului */
+    
+    /* Ascunde bara de scroll vizuală */
+    -ms-overflow-style: none;  /* IE și Edge */
+    scrollbar-width: none;     /* Firefox */
+}
+
+.tabs::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari, Opera */
+}
+
+.tab-button {
+    padding: 0.75rem 1rem; /* Micșorează padding-ul butoanelor */
+    font-size: 0.875rem;   /* Micșorează puțin textul */
+    flex-shrink: 0;      /* Împiedică butoanele să se "strângă" */
+}
+
+
+.chart-container {
+    padding: 0.5rem;       /* Reduce padding-ul pe mobil */
+    min-height: 280px;   /* Forțează o înălțime minimă pentru grafic */
+}
 
     .modal-body.modal-grid {
         grid-template-columns: 1fr; 
@@ -2253,10 +2278,136 @@ textarea.form-input {
     .header-logo-inline {
       height: 40px;
     }
+
+    .evolution-table {
+    border: none;
+    box-shadow: none;
+}
+.evolution-table thead {
+    /* Ascunde headerele desktop */
+    display: none;
+}
+.evolution-table tr {
+    /* Fiecare rând devine un card */
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow);
+    background: var(--bg-card);
+    overflow: hidden; /* Asigură colțurile rotunjite */
+    
+}
+.evolution-table td {
+    /* Afișează celulele ca blocuri (una sub alta) */
+    display: block;
+    padding: 0.75rem 1rem;
+    text-align: right; /* Aliniază valoarea la dreapta */
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    padding-left: 50%; /* Fă loc pentru etichetă */
+    min-height: 44px; /* O înălțime minimă pentru lizibilitate */
+    white-space: normal; /* Permite textului să treacă pe rândul următor */
+}
+.evolution-table td:last-child {
+    border-bottom: none;
+}
+.evolution-table td::before {
+    /* Afișează eticheta (luată din data-label) */
+    content: attr(data-label);
+    position: absolute;
+    left: 1rem;
+    width: 45%; /* Ocupă ~jumătatea din stânga */
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
 }
 
 /* --- Admin Cards (Mobile) --- */
 @media (max-width: 768px) {
+
+  /* Resetăm containerul .evolution-summary (acum gol) ca să nu ocupe spațiu */
+.evolution-summary {
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    margin-top: 0;
+}
+
+/* Anulăm stilurile desktop pentru containerul tabelului DQ */
+.evolution-table-container {
+    overflow-x: visible;  /* ANULEAZĂ scroll-ul orizontal */
+    border-radius: 0;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+/* Anulăm lățimea minimă a tabelului pe mobil */
+.evolution-table {
+    min-width: 0; 
+    width: 100%;    
+    border: none;
+    box-shadow: none;
+    border-spacing: 0; 
+}
+
+/* Ascundem headerele desktop */
+.evolution-table thead {
+    display: none; 
+}
+
+/* Transformăm fiecare rând într-un card */
+.evolution-table tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow);
+    background: var(--bg-card);
+    overflow: hidden; 
+}
+
+/* Celulele devin rânduri verticale */
+.evolution-table td {
+    display: block;
+    padding: 0.75rem 1rem;
+    text-align: right; /* Valoarea la dreapta */
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    padding-left: 50%; /* Spațiu pentru etichetă */
+    min-height: 44px; 
+    white-space: normal; 
+}
+
+.evolution-table td:last-child {
+    border-bottom: none;
+}
+
+/* Adăugăm eticheta (din data-label) în stânga */
+.evolution-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1rem;
+    width: 45%; 
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+/* Micșorăm padding-ul general al tab-urilor pe mobil */
+.tab-content {
+    padding: 0 0.5rem 1rem 0.5rem;
+}
+
+.form-grid-3 {
+    grid-template-columns: 1fr; /* Trecem de la 3 coloane la 1 singură */
+}
     .client-card-content,
     .team-member-card-content {
         flex-direction: column;

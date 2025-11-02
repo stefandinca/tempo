@@ -3,28 +3,34 @@
         "name": "Cezar Dinca",
         "evaluations": {
             "Portrige - Motricitate fina": {
-                "2025-10-30": 4,
-                "2025-12-30": 16
+                
+                "2025-10-30": 16,
+                "2025-11-01": 43
             },
             "Portrige - Motricitate grosieră": {
-                "2025-10-30": 0,
-                "2025-12-30": 17
+                
+                "2025-10-30": 17,
+                "2025-11-01": 57
             },
             "Portrige - Limbaj receptiv": {
-                "2025-10-30": 0,
-                "2025-12-30": 22
+                
+                "2025-10-30": 22,
+                "2025-11-01": 57
             },
             "Portrige - Limbaj expresiv": {
-                "2025-10-30": 0,
-                "2025-12-30": 13
+                
+                "2025-10-30": 13,
+                "2025-11-01": 57
             },
             "Portrige - Socializare": {
-                "2025-10-30": 0,
-                "2025-12-30": 11
+                
+                "2025-10-30": 11,
+                "2025-11-01": 57
             },
             "Portrige - Autonomie personală": {
-                "2025-10-30": 0,
-                "2025-12-30": 33
+                
+                "2025-10-30": 33,
+                "2025-11-01": 54
             }
         },
         "programHistory": []
@@ -221,6 +227,142 @@
                 "programTitle": "Atenție",
                 "score": "P",
                 "eventId": "evt1761645434697_x1ze0vy0h"
+            }
+        ]
+    },
+    "client_1761900123672": {
+        "name": "Copilul test3 test",
+        "evaluations": [],
+        "programHistory": [
+            {
+                "date": "2025-10-30",
+                "programId": "prog_7",
+                "programTitle": "Răspuns la nume",
+                "score": "+",
+                "eventId": "evt17620234153093e8eer5da"
+            },
+            {
+                "date": "2025-10-30",
+                "programId": "prog_8",
+                "programTitle": "Așteaptă",
+                "score": "+",
+                "eventId": "evt17620234153093e8eer5da"
+            },
+            {
+                "date": "2025-10-30",
+                "programId": "prog_4",
+                "programTitle": "Imitare motorie cu și fără obiect",
+                "score": "+",
+                "eventId": "evt17620234153093e8eer5da"
+            },
+            {
+                "date": "2025-10-30",
+                "programId": "prog_3",
+                "programTitle": "Instrucțiuni functionale",
+                "score": "P",
+                "eventId": "evt17620234153093e8eer5da"
+            },
+            {
+                "date": "2025-10-30",
+                "programId": "prog_5",
+                "programTitle": "Receptiv obiecte",
+                "score": "P",
+                "eventId": "evt17620234153093e8eer5da"
+            },
+            {
+                "date": "2025-10-30",
+                "programId": "prog_1",
+                "programTitle": "Imitare orala",
+                "score": "-",
+                "eventId": "evt17620234153093e8eer5da"
+            },
+            {
+                "date": "2025-10-21",
+                "programId": "prog_7",
+                "programTitle": "Răspuns la nume",
+                "score": "0",
+                "eventId": "evt1762023415309vrvbzk9xs"
+            },
+            {
+                "date": "2025-10-21",
+                "programId": "prog_8",
+                "programTitle": "Așteaptă",
+                "score": "0",
+                "eventId": "evt1762023415309vrvbzk9xs"
+            },
+            {
+                "date": "2025-10-21",
+                "programId": "prog_4",
+                "programTitle": "Imitare motorie cu și fără obiect",
+                "score": "0",
+                "eventId": "evt1762023415309vrvbzk9xs"
+            },
+            {
+                "date": "2025-10-21",
+                "programId": "prog_3",
+                "programTitle": "Instrucțiuni functionale",
+                "score": "0",
+                "eventId": "evt1762023415309vrvbzk9xs"
+            },
+            {
+                "date": "2025-10-21",
+                "programId": "prog_5",
+                "programTitle": "Receptiv obiecte",
+                "score": "0",
+                "eventId": "evt1762023415309vrvbzk9xs"
+            },
+            {
+                "date": "2025-10-21",
+                "programId": "prog_1",
+                "programTitle": "Imitare orala",
+                "score": "0",
+                "eventId": "evt1762023415309vrvbzk9xs"
+            }
+        ]
+    },
+    "client_1762029840903": {
+        "name": "copilul test 0",
+        "evaluations": {
+            "Portrige - Motricitate fina": {
+                "2025-11-01": 3
+            },
+            "Portrige - Motricitate grosieră": {
+                "2025-11-01": 0
+            },
+            "Portrige - Limbaj receptiv": {
+                "2025-11-01": 0
+            },
+            "Portrige - Limbaj expresiv": {
+                "2025-11-01": 0
+            },
+            "Portrige - Socializare": {
+                "2025-11-01": 0
+            },
+            "Portrige - Autonomie personală": {
+                "2025-11-01": 0
+            }
+        },
+        "programHistory": [
+            {
+                "date": "2025-11-02",
+                "programId": "prog_2",
+                "programTitle": "Stimulare de limbaj",
+                "score": "0",
+                "eventId": "evt1762036411764dsfwcbwtr"
+            },
+            {
+                "date": "2025-11-02",
+                "programId": "prog_1",
+                "programTitle": "Imitare orala",
+                "score": "-",
+                "eventId": "evt1762036411764dsfwcbwtr"
+            },
+            {
+                "date": "2025-11-02",
+                "programId": "prog_3",
+                "programTitle": "Instrucțiuni functionale",
+                "score": "-",
+                "eventId": "evt1762036411764dsfwcbwtr"
             }
         ]
     }

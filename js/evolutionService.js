@@ -128,9 +128,10 @@ function renderEvolutionChart(clientData) {
         data: { labels: sortedDates, datasets },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
-                legend: { display: true, position: 'bottom', labels: { padding: 20 } },
-                title: { display: true, text: `Evoluție Scoruri Portage`, font: { size: 16 } }
+                legend: { display: true, position: 'bottom', labels: { padding: 10, boxWidth: 12 } },
+                title: { display: true, text: `Evoluție Scoruri Portage`, font: { size: 14 } }
             },
             scales: {
                 y: { beginAtZero: true, max: 100 }
@@ -138,6 +139,8 @@ function renderEvolutionChart(clientData) {
         }
     });
 }
+
+// În fișierul: js/evolutionService.js
 
 function renderPortageSummary(clientData, client) {
     const summaryEl = $('evolutionSummary');
@@ -161,7 +164,9 @@ function renderPortageSummary(clientData, client) {
         if (evalValues.length === 0) return;
 
         const avgDevAge = evalValues.reduce((a, b) => a + b, 0) / evalValues.length;
-        const chronoAge = (new Date(date) - birthDate) / (1000 * 60 * 60 * 24 * 30.44); // Luni
+        // Folosim funcția getAgeInMonths() deja existentă în fișier
+        const chronoAge = getAgeInMonths(birthDate, date); 
+        if (chronoAge === 0) return; // Evităm împărțirea la zero
         const dq = (avgDevAge / chronoAge) * 100;
         results.push({ date, avgDevAge, chronoAge, dq });
     });
@@ -171,27 +176,30 @@ function renderPortageSummary(clientData, client) {
         return;
     }
 
+    // --- MODIFICARE AICI ---
+    // Am eliminat div-ul .evolution-summary și am adăugat stiluri 
+    // direct pe titlu pentru a se potrivi cu restul modalului.
     summaryEl.innerHTML = `
-        <div class="evolution-summary">
-            <h3>Evoluție generală Portage (DQ)</h3>
-            <div class="evolution-table-container">
-                <table class="evolution-table">
-                    <thead><tr><th>Data</th><th>Vârstă cronologică</th><th>Vârstă mentală</th><th>Indice dezvoltare (DQ)</th></tr></thead>
-                    <tbody>
-                        ${results.map(r => {
-                            const color = r.dq < 70 ? '#e74c3c' : r.dq < 85 ? '#f39c12' : '#27ae60';
-                            return `<tr>
-                                <td>${r.date}</td>
-                                <td>${r.chronoAge.toFixed(1)} luni</td>
-                                <td>${r.avgDevAge.toFixed(1)} luni</td>
-                                <td style="font-weight:600;color:${color};">${r.dq.toFixed(1)}</td>
-                            </tr>`;
-                        }).join('')}
-                    </tbody>
-                </table>
-            </div>
+        <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem; margin-top: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Evoluție generală Portage (DQ)</h3>
+        <div class="evolution-table-container">
+            <table class="evolution-table">
+                <thead><tr><th>Data</th><th>Vârstă cronologică</th><th>Vârstă mentală</th><th>Indice dezvoltare (DQ)</th></tr></thead>
+                <tbody>
+                    ${results.map(r => {
+                        const color = r.dq < 70 ? '#e74c3c' : r.dq < 85 ? '#f39c12' : '#27ae60';
+                        // Adăugăm atributele data-label pentru CSS-ul responsiv
+                        return `<tr>
+                            <td data-label="Data">${r.date}</td>
+                            <td data-label="Vârstă cronologică">${r.chronoAge.toFixed(1)} luni</td>
+                            <td data-label="Vârstă mentală">${r.avgDevAge.toFixed(1)} luni</td>
+                            <td data-label="Indice dezvoltare (DQ)" style="font-weight:600;color:${color};">${r.dq.toFixed(1)}</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
         </div>
     `;
+    // --- SFÂRȘIT MODIFICARE ---
 }
 
 // --- Secțiunea Istoric Programe ---
