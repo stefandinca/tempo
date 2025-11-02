@@ -18,8 +18,9 @@
             }
         }
     </script>
-    <link rel="stylesheet" href="styles.css">
+   <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="dashboard-styles.css">
+    <link rel="stylesheet" href="tailwind-custom.css">
     <link rel="icon" href="icon.png" type="image/png">
     
 </head>
@@ -343,7 +344,311 @@
         </main>
     </div>
     
-    <!-- Modals remain the same from original file -->
+    <div id="eventDetailsModal" class="modal-backdrop">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2 id="eventDetailsTitle" class="modal-title">Detalii Eveniment</h2>
+                <button id="closeEventDetailsModal" class="btn-icon btn-close" title="Inchide">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="eventDetailsContent">
+                    </div>
+                
+                <div class="event-details-section">
+                    <h3>Comentarii (Private)</h3>
+                    <textarea id="eventComments" class="form-input" placeholder="Adauga notite private despre eveniment..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer justify-between">
+                <div>
+                    <button id="deleteEventFromDetails" class="btn btn-danger-outline">Sterge</button>
+                </div>
+                <div>
+                    <button id="closeEventDetails" class="btn btn-secondary">Inchide</button>
+                    <button id="editEventFromDetails" class="btn btn-primary">Editeaza</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="eventModal" class="modal-backdrop">
+        <div class="modal-content modal-xl">
+            <form id="eventForm">
+                <div class="modal-header">
+                    <h2 id="modalTitle" class="modal-title">Adauga/Editeaza Eveniment</h2>
+                    <button id="closeModal" type="button" class="btn-icon btn-close" title="Inchide">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                </div>
+                
+                <div class="modal-body modal-grid">
+                    
+                    <div class="modal-col">
+                        <h3>Detalii Eveniment</h3>
+                        
+                        <div class="form-group">
+                            <label for="eventName">Nume Eveniment</label>
+                            <input type="text" id="eventName" name="eventName" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="eventDetails">Detalii Eveniment (Optionale)</label>
+                            <textarea id="eventDetails" name="eventDetails" class="form-input" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="eventType">Tip Eveniment</label>
+                            <select id="eventType" name="eventType" class="form-input" required>
+                                <option value="therapy">Terapie</option>
+                                <option value="group-therapy">Terapie de grup</option>
+                                <option value="coordination">Coordonare</option>
+                                <option value="pauza-masa">Pauza de masa</option>
+                                <option value="sedinta">Sedinta</option>
+                                <option value="day-off">Zi libera</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-grid-2">
+                            <div class="form-group">
+                                <label for="eventDate">Data</label>
+                                <input type="date" id="eventDate" name="eventDate" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="startTime">Ora Inceput</label>
+                                <select id="startTime" name="startTime" class="form-input" required>
+                                    <option value="08:00">08:00</option>
+                                    <option value="08:30">08:30</option>
+                                    <option value="09:00">09:00</option>
+                                    <option value="09:30">09:30</option>
+                                    <option value="10:00">10:00</option>
+                                    <option value="10:30">10:30</option>
+                                    <option value="11:00">11:00</option>
+                                    <option value="11:30">11:30</option>
+                                    <option value="12:00">12:00</option>
+                                    <option value="12:30">12:30</option>
+                                    <option value="13:00">13:00</option>
+                                    <option value="13:30">13:30</option>
+                                    <option value="14:00">14:00</option>
+                                    <option value="14:30">14:30</option>
+                                    <option value="15:00">15:00</option>
+                                    <option value="15:30">15:30</option>
+                                    <option value="16:00">16:00</option>
+                                    <option value="16:30">16:30</option>
+                                    <option value="17:00">17:00</option>
+                                    <option value="17:30">17:30</option>
+                                    <option value="18:00">18:00</option>
+                                    <option value="18:30">18:30</option>
+                                    <option value="19:00">19:00</option>
+                                    <option value="19:30">19:30</option>
+                                    <option value="20:00">20:00</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="duration">Durata (minute)</label>
+                                <input type="number" id="duration" name="duration" class="form-input" value="60" step="15" min="15" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Recurenta (in aceasta luna)</label>
+                            <div class="repeating-days">
+                                <input type="checkbox" id="repeatMon" name="repeatMon" value="1"><label for="repeatMon">L</label>
+                                <input type="checkbox" id="repeatTue" name="repeatTue" value="2"><label for="repeatTue">M</label>
+                                <input type="checkbox" id="repeatWed" name="repeatWed" value="3"><label for="repeatWed">M</label>
+                                <input type="checkbox" id="repeatThu" name="repeatThu" value="4"><label for="repeatThu">J</label>
+                                <input type="checkbox" id="repeatFri" name="repeatFri" value="5"><label for="repeatFri">V</label>
+                            </div>
+                        </div>
+
+                        <div class="form-group-checkboxes">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="isPublic" name="isPublic">
+                                <label for="isPublic">Eveniment public (vizibil in calendarul public)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="isBillable" name="isBillable" checked>
+                                <label for="isBillable">Facturabil</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-col">
+                        <h3>Clienti</h3>
+                        <div class="form-group">
+                            <input type="search" id="clientSearch" class="form-input" placeholder="Cauta client...">
+                        </div>
+                        <div id="clientCheckboxes" class="checkbox-list">
+                            </div>
+                        <button type="button" id="addNewClientBtn" class="btn btn-secondary btn-full-width">Adauga Client Nou</button>
+                        
+                        <h3 style="margin-top: 1.5rem;">Programe</h3>
+                        <div class="form-group">
+                            <input type="search" id="programSearch" class="form-input" placeholder="Cauta program...">
+                        </div>
+                        <div id="programCheckboxes" class="checkbox-list program-list">
+                            </div>
+                    </div>
+                    
+                    <div class="modal-col">
+                        <h3>Echipa (Terapeuti)</h3>
+                        <div class="form-group">
+                            <label>Selecteaza membrii echipei</label>
+                        </div>
+                        <div id="teamMemberCheckboxes" class="checkbox-list">
+                            </div>
+                    </div>
+                    
+                </div>
+                
+                <div class="modal-footer justify-between">
+                    <div>
+                        <button id="deleteBtn" type="button" class="btn btn-danger-outline">Sterge Eveniment</button>
+                    </div>
+                    <div>
+                        <button id="cancelBtn" type="button" class="btn btn-secondary">Anuleaza</button>
+                        <button type="submit" class="btn btn-primary">Salveaza Eveniment</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    
+    
+    
+    <div id="evolutionModal" class="modal-backdrop">
+        <div class="modal-content modal-xl">
+            <div class="modal-header">
+                <h2 id="evolutionTitle" class="modal-title">Evolutie Client</h2>
+                <button id="closeEvolutionModal" class="btn-icon btn-close" title="Inchide">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="tabGrafice">Grafice Evolutie</button>
+                    <button class="tab-button" data-tab="tabPrograme">Istoric Programe</button>
+                    <button class="tab-button" data-tab="tabEvaluare">Adauga Evaluare</button>
+                </div>
+                
+                <div id="tabGrafice" class="tab-content active">
+                    <div id="evolutionChartContainer" class="chart-container">
+                        <canvas id="evolutionChart"></canvas>
+                        </div>
+                    <div id="evolutionSummary">
+                        </div>
+                    <div id="evolutionEditor" style="display:none;">
+                        <table class="form-table">
+                            <thead>
+                                <tr>
+                                    <th>Test</th>
+                                    <th>1m</th>
+                                    <th>3m</th>
+                                    <th>6m</th>
+                                    <th>9m</th>
+                                    <th>12m</th>
+                                </tr>
+                            </thead>
+                            <tbody id="evolutionEditRows"></tbody>
+                        </table>
+                        <div class="modal-footer">
+                            <button id="cancelEvolutionEdit" class="btn btn-secondary">Anuleaza</button>
+                            <button id="saveEvolutionBtn" class="btn btn-primary">Salveaza Scoruri</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tabPrograme" class="tab-content">
+                    <div id="programHistoryContainer">
+                        </div>
+                </div>
+
+                <div id="tabEvaluare" class="tab-content">
+                    <form id="addEvaluationForm">
+                        <div class="form-grid-3">
+                            <div class="form-group">
+                                <label for="childBirthDateInput">Data Nasterii Client</label>
+                                <input type="date" id="childBirthDateInput" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="evaluationDateInput">Data Evaluarii</label>
+                                <input type="date" id="evaluationDateInput" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label>Varsta Curenta</label>
+                                <div id="childAgeDisplay" class="form-input-static">–</div>
+                            </div>
+                        </div>
+                        
+                        <div id="portageDomainsContainer">
+                            </div>
+                        
+                        <div class="modal-footer">
+                            <button id="cancelEvaluationBtn" type="button" class="btn btn-secondary">Anuleaza</button>
+                            <button id="saveEvaluationBtn" type="button" class="btn btn-primary">Salveaza Evaluarea</button>
+                        </div>
+                    </form>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <div id="alertModal" class="modal-backdrop modal-small">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="alertModalTitle" class="modal-title">Notificare</h2>
+                <button id="closeAlertModal" class="btn-icon btn-close" title="Inchide">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="alertModalMessage">Mesaj...</p>
+            </div>
+            <div class="modal-footer">
+                <button id="alertModalOk" class="btn btn-primary">OK</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="confirmModal" class="modal-backdrop modal-small">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="confirmModalTitle" class="modal-title">Confirma actiunea</h2>
+                <button id="closeConfirmModal" class="btn-icon btn-close" title="Inchide">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmModalMessage">Esti sigur?</p>
+            </div>
+            <div class="modal-footer">
+                <button id="confirmModalCancel" class="btn btn-secondary">Anuleaza</button>
+                <button id="confirmModalOk" class="btn btn-danger">Confirma</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="recurringDeleteModal" class="modal-backdrop modal-small">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="recurringDeleteModalTitle" class="modal-title">Stergere Eveniment Recurent</h2>
+                <button id="closeRecurringDeleteModal" class="btn-icon btn-close" title="Inchide">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="recurringDeleteModalMessage">Acesta este un eveniment recurent. Ce doresti sa stergi?</p>
+            </div>
+            <div class="modal-footer column-footer">
+                <button id="recurringDeleteSingle" class="btn btn-primary">Doar acest eveniment</button>
+                <button id="recurringDeleteAll" class="btn btn-danger-outline">Toate evenimentele (din aceasta luna)</button>
+                <button id="recurringDeleteCancel" class="btn btn-secondary">Anuleaza</button>
+            </div>
+        </div>
+    </div>
     <!-- (All modal HTML code from original dashboard.html should be included here) -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
