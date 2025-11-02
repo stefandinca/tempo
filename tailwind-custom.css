@@ -50,7 +50,7 @@
   padding-left: calc(1.25rem - 3px);
 }
 
-.dark .portage-item.checked {
+[data-theme="dark"] .portage-item.checked {
   background: linear-gradient(to right, rgba(37, 99, 235, 0.2) 0%, transparent 100%);
 }
 
@@ -65,7 +65,7 @@
   border-radius: 3px;
 }
 
-.dark ::-webkit-scrollbar-thumb {
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
   background-color: rgb(75 85 99);
 }
 
@@ -77,7 +77,8 @@
 
 /* View button active state */
 .view-btn.active {
-  @apply bg-primary text-white;
+  background-color: #4A90E2;
+  color: white;
 }
 
 /* Filter chip active state */

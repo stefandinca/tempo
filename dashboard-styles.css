@@ -1,50 +1,188 @@
 @keyframes fadeInUp {
-            0% { opacity: 0; transform: translateY(10px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeInUp { animation: fadeInUp 0.4s ease; }
-        
-        /* Custom stats card styling */
-        .stat-item {
-            @apply flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0;
-        }
-        .stat-label {
-            @apply font-medium text-gray-600 dark:text-gray-400 text-sm;
-        }
-        .stat-value {
-            @apply text-2xl md:text-3xl font-bold text-primary;
-        }
-        
-        /* Schedule item styling */
-        .schedule-item {
-            @apply flex gap-4 py-3.5 border-b border-gray-200 dark:border-gray-700 last:border-b-0;
-        }
-        .schedule-time {
-            @apply font-semibold text-primary flex-shrink-0 w-24 text-sm md:text-base;
-        }
-        .schedule-details {
-            @apply flex-1 min-w-0;
-        }
-        .schedule-title {
-            @apply font-semibold text-gray-900 dark:text-gray-100 truncate;
-        }
-        .schedule-client {
-            @apply text-sm text-gray-600 dark:text-gray-400;
-        }
-        
-        /* Activity item styling */
-        .activity-item {
-            @apply grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 md:gap-4 py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0;
-        }
-        .activity-icon {
-            @apply w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center flex-shrink-0;
-        }
-        .activity-text {
-            @apply text-sm text-gray-700 dark:text-gray-300 truncate;
-        }
-        .activity-time {
-            @apply text-xs md:text-sm text-gray-500 dark:text-gray-400 flex-shrink-0 whitespace-nowrap;
-        }
-        .activity-action {
-            @apply flex-shrink-0;
-        }
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeInUp { 
+    animation: fadeInUp 0.4s ease; 
+}
+
+/* Custom stats card styling */
+.stat-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+[data-theme="dark"] .stat-item {
+    border-bottom-color: #374151;
+}
+
+.stat-item:last-child {
+    border-bottom: 0;
+}
+
+.stat-label {
+    font-weight: 500;
+    color: #4b5563;
+    font-size: 0.875rem;
+}
+
+[data-theme="dark"] .stat-label {
+    color: #9ca3af;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4A90E2;
+}
+
+@media (min-width: 768px) {
+    .stat-value {
+        font-size: 1.875rem;
+    }
+}
+
+/* Schedule item styling */
+.schedule-item {
+    display: flex;
+    gap: 1rem;
+    padding-top: 0.875rem;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+[data-theme="dark"] .schedule-item {
+    border-bottom-color: #374151;
+}
+
+.schedule-item:last-child {
+    border-bottom: 0;
+}
+
+.schedule-time {
+    font-weight: 600;
+    color: #4A90E2;
+    flex-shrink: 0;
+    width: 6rem;
+    font-size: 0.875rem;
+}
+
+@media (min-width: 768px) {
+    .schedule-time {
+        font-size: 1rem;
+    }
+}
+
+.schedule-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.schedule-title {
+    font-weight: 600;
+    color: #111827;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+[data-theme="dark"] .schedule-title {
+    color: #f3f4f6;
+}
+
+.schedule-client {
+    font-size: 0.875rem;
+    color: #4b5563;
+}
+
+[data-theme="dark"] .schedule-client {
+    color: #9ca3af;
+}
+
+.empty-schedule {
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+}
+
+[data-theme="dark"] .empty-schedule {
+    color: #9ca3af;
+}
+
+/* Activity item styling */
+.activity-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 0.75rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+@media (min-width: 768px) {
+    .activity-item {
+        gap: 1rem;
+    }
+}
+
+[data-theme="dark"] .activity-item {
+    border-bottom-color: #374151;
+}
+
+.activity-item:last-child {
+    border-bottom: 0;
+}
+
+.activity-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 9999px;
+    background-color: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+[data-theme="dark"] .activity-icon {
+    background-color: #1f2937;
+}
+
+.activity-text {
+    font-size: 0.875rem;
+    color: #374151;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+[data-theme="dark"] .activity-text {
+    color: #d1d5db;
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    color: #6b7280;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+    .activity-time {
+        font-size: 0.875rem;
+    }
+}
+
+[data-theme="dark"] .activity-time {
+    color: #9ca3af;
+}
+
+.activity-action {
+    flex-shrink: 0;
+}
