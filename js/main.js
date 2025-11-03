@@ -666,35 +666,90 @@ function updateUserInterface() {
 /**
  * Update dashboard schedule for current user
  */
+/**
+ * Update dashboard schedule for current user
+ */
 function updateDashboardSchedule() {
     const container = $('dashboardTodaySchedule');
     if (!container) return;
     
+    // Obține programul zilei. Pentru admin, auth.getTodaysSchedule()
+    // returnează TOATE evenimentele. Pentru terapeut, le returnează doar pe ale lui.
     const schedule = auth.getTodaysSchedule();
     
-    if (schedule.length === 0) {
-        container.innerHTML = '<div class="empty-schedule">Nicio sesiune programată pentru astăzi.</div>';
-        return;
-    }
-    
-    container.innerHTML = schedule.map(event => {
-        const endTime = calculateEndTime(event.startTime, event.duration);
-        const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
-        const clientNames = clientIds.map(id => {
-            const client = calendarState.getClientById(id);
-            return client ? client.name : 'Client necunoscut';
-        }).join(', ');
+    if (auth.isAdmin()) {
+        // --- LOGICĂ NOUĂ PENTRU ADMIN ---
+        // Grupăm evenimentele pe terapeut
+        container.innerHTML = '';
+        const { teamMembers } = calendarState.getState();
         
-        return `
-            <div class="schedule-item">
-                <div class="schedule-time">${event.startTime} - ${endTime}</div>
-                <div class="schedule-details">
-                    <div class="schedule-title">${event.name}</div>
-                    <div class="schedule-client">cu ${clientNames || 'Fără client'}</div>
+        let hasAnyEvents = false;
+
+        teamMembers.forEach(member => {
+            // Găsește evenimentele pentru acest membru din programul zilei
+            const memberEvents = schedule.filter(event => {
+                const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+                return teamMemberIds.includes(member.id);
+            });
+            
+            if (memberEvents.length > 0) {
+                hasAnyEvents = true;
+                
+                // Adaugă header-ul terapeutului
+                container.innerHTML += `<h3 class="therapist-group-header" style="color: ${member.color || '#4A90E2'}">${member.name}</h3>`;
+                
+                // Adaugă evenimentele pentru acest terapeut
+                container.innerHTML += memberEvents.map(event => {
+                    const endTime = calculateEndTime(event.startTime, event.duration);
+                    const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
+                    const clientNames = clientIds.map(id => {
+                        const client = calendarState.getClientById(id);
+                        return client ? client.name : 'Fără client';
+                    }).join(', ');
+                    
+                    return `
+                        <div class="schedule-item">
+                            <div class="schedule-time">${event.startTime} - ${endTime}</div>
+                            <div class="schedule-details">
+                                <div class="schedule-title">${event.name}</div>
+                                <div class="schedule-client">cu ${clientNames || 'Fără client'}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        });
+
+        if (!hasAnyEvents) {
+            container.innerHTML = '<div class="empty-schedule">Nicio sesiune programată pentru astăzi.</div>';
+        }
+
+    } else {
+        // --- LOGICA EXISTENTĂ (PENTRU NON-ADMINI) ---
+        if (schedule.length === 0) {
+            container.innerHTML = '<div class="empty-schedule">Nicio sesiune programată pentru astăzi.</div>';
+            return;
+        }
+        
+        container.innerHTML = schedule.map(event => {
+            const endTime = calculateEndTime(event.startTime, event.duration);
+            const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
+            const clientNames = clientIds.map(id => {
+                const client = calendarState.getClientById(id);
+                return client ? client.name : 'Fără client';
+            }).join(', ');
+            
+            return `
+                <div class="schedule-item">
+                    <div class="schedule-time">${event.startTime} - ${endTime}</div>
+                    <div class="schedule-details">
+                        <div class="schedule-title">${event.name}</div>
+                        <div class="schedule-client">cu ${clientNames || 'Fără client'}</div>
+                    </div>
                 </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }).join('');
+    }
 }
 
 /**

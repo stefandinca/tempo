@@ -186,3 +186,39 @@
 .activity-action {
     flex-shrink: 0;
 }
+
+/* Stiluri adăugate pentru scroll și grupare dashboard */
+
+/* Aplică scrollbar-ul pe containerul programului */
+#dashboardTodaySchedule {
+    max-height: 450px; /* Înălțime maximă (aprox. 5-6 evenimente + headere) - o poți ajusta */
+    overflow-y: auto;  /* Adaugă scrollbar vertical la nevoie */
+    padding-right: 0.5rem; /* Un mic spațiu pentru a nu lipi scrollbar-ul de conținut */
+}
+
+/* Stilizare pentru header-ul fiecărui terapeut (în modul admin) */
+.therapist-group-header {
+    font-size: 1rem; /* 16px */
+    font-weight: 700;
+    margin-top: 1.25rem; /* 20px */
+    padding-bottom: 0.5rem; /* 8px */
+    border-bottom: 2px solid #e5e7eb; /* border-gray-200 */
+    
+    /* Facem header-ul "lipicios" în interiorul containerului scrollabil */
+    position: sticky;
+    top: 0;
+    
+    /* Asigură un fundal pentru a acoperi textul care trece pe sub el la scroll */
+    background-color: white; 
+}
+
+/* Stiluri pentru tema dark */
+[data-theme="dark"] .therapist-group-header {
+    border-bottom-color: #374151; /* dark:border-gray-700 */
+    background-color: #1f2937; /* dark:bg-gray-800 */
+}
+
+/* Elimină marginea de sus pentru primul header din listă */
+#dashboardTodaySchedule .therapist-group-header:first-child {
+    margin-top: 0;
+}
