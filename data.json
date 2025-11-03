@@ -1,4 +1,7 @@
 {
+    "isAdminView": true,
+    "currentDate": "2025-11-03T06:59:29.626Z",
+    "currentView": "day",
     "teamMembers": [
         {
             "id": "corina",
@@ -27,12 +30,19 @@
             "color": "#9B59B6",
             "initials": "AP",
             "role": "therapist"
+        },
+        {
+            "id": "member_1762036330730",
+            "name": "Stefan",
+            "initials": "S",
+            "role": "admin",
+            "color": "#4F46E5"
         }
     ],
     "clients": [
         {
             "id": "client_1761405694424",
-            "name": "Cezar-Casian Dinca",
+            "name": "Cezar Dinca",
             "email": "stefan.dinca07@gmail.com",
             "phone": "+40746060987",
             "birthDate": "2021-02-18"
@@ -385,7 +395,21 @@
             "name": "Copilul test3 test",
             "email": "aaaaast@test.ro",
             "phone": "074400000",
-            "birthDate": "2025-01-04"
+            "birthDate": "2021-02-04"
+        },
+        {
+            "id": "client_1762029840903",
+            "name": "copilul test 0",
+            "email": "",
+            "phone": "",
+            "birthDate": "1988-03-15"
+        },
+        {
+            "id": "client_1762089045757",
+            "name": "copilul test 4",
+            "email": "",
+            "phone": "",
+            "birthDate": "2017-02-11"
         }
     ],
     "events": [
@@ -529,103 +553,6 @@
             "startTime": "13:00",
             "duration": 60,
             "repeating": [],
-            "comments": ""
-        },
-        {
-            "id": "evt1761644459456_rs6xgfitd",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "clientIds": [
-                "client_1761643648237"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-10-27",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ],
-            "comments": "",
-            "attendance": {
-                "client_1761643648237": "present"
-            }
-        },
-        {
-            "id": "evt1761644489819_6f0e07mmk",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "clientIds": [
-                "client_1761643648237"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-11-03",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ],
-            "comments": "",
-            "attendance": {
-                "client_1761643648237": "present"
-            }
-        },
-        {
-            "id": "evt1761644489819_hg6zkc4bt",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-11-10",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ],
-            "comments": ""
-        },
-        {
-            "id": "evt1761644489819_9qn3yjptv",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-11-17",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ],
-            "comments": ""
-        },
-        {
-            "id": "evt1761644489819_ae7mvucxi",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-11-24",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ],
             "comments": ""
         },
         {
@@ -1031,7 +958,8 @@
             "duration": 60,
             "repeating": [
                 1
-            ]
+            ],
+            "comments": ""
         },
         {
             "id": "evt1761645529482_d7vcg25hv",
@@ -1259,7 +1187,8 @@
             "duration": 60,
             "repeating": [
                 1
-            ]
+            ],
+            "comments": ""
         },
         {
             "id": "evt1761645680938_jswrxpr2f",
@@ -1903,7 +1832,8 @@
             "duration": 60,
             "repeating": [
                 1
-            ]
+            ],
+            "comments": ""
         },
         {
             "id": "evt1761654622510_wnyn8qjgn",
@@ -2033,82 +1963,6 @@
             "isBillable": true,
             "date": "2025-11-24",
             "startTime": "15:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ]
-        },
-        {
-            "id": "evt1761654695323_wpe5w6zm6",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "clientIds": [
-                "client_1761643648237"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-11-03",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ]
-        },
-        {
-            "id": "evt1761654695323_y1dmr3g3h",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "clientIds": [
-                "client_1761643648237"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-11-10",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ]
-        },
-        {
-            "id": "evt1761654695323_xmdnmyg03",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "clientIds": [
-                "client_1761643648237"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-11-17",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ]
-        },
-        {
-            "id": "evt1761654695323_br9ld140g",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "clientIds": [
-                "client_1761643648237"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-11-24",
-            "startTime": "16:00",
             "duration": 60,
             "repeating": [
                 1
@@ -3679,7 +3533,8 @@
             "duration": 120,
             "repeating": [
                 2
-            ]
+            ],
+            "comments": " "
         },
         {
             "id": "evt1761655539516_7313chs2y",
@@ -9325,7 +9180,8 @@
                 2,
                 3,
                 5
-            ]
+            ],
+            "comments": ""
         },
         {
             "id": "evt1761658916441_wp7hpxcno",
@@ -9453,7 +9309,8 @@
                 2,
                 3,
                 5
-            ]
+            ],
+            "comments": ""
         },
         {
             "id": "evt1761658916441_axhly9gjh",
@@ -9665,80 +9522,6 @@
                 3,
                 5
             ]
-        },
-        {
-            "id": "evt1761680729478_nisz32i7z",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "clientIds": [
-                "client_1761643648237"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-12-01",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ],
-            "comments": "",
-            "attendance": {
-                "client_1761643648237": "present"
-            }
-        },
-        {
-            "id": "evt1761680729478_vq08y6pqa",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-12-08",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ],
-            "comments": ""
-        },
-        {
-            "id": "evt1761680729478_foj4qhphp",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-12-15",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ],
-            "comments": ""
-        },
-        {
-            "id": "evt1761680729478_uq1l84607",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-12-22",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ],
-            "comments": ""
         },
         {
             "id": "evt1761680729478_qmri8q93w",
@@ -11131,82 +10914,6 @@
             "isBillable": true,
             "date": "2025-12-22",
             "startTime": "15:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ]
-        },
-        {
-            "id": "evt1761680729480_izgtwk98u",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "clientIds": [
-                "client_1761643648237"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-12-01",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ]
-        },
-        {
-            "id": "evt1761680729480_5b6n9nz9f",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "clientIds": [
-                "client_1761643648237"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-12-08",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ]
-        },
-        {
-            "id": "evt1761680729480_ss1p7ac5i",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "clientIds": [
-                "client_1761643648237"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-12-15",
-            "startTime": "16:00",
-            "duration": 60,
-            "repeating": [
-                1
-            ]
-        },
-        {
-            "id": "evt1761680729480_z9b8chvua",
-            "name": "Stefan Negru - Terapie",
-            "teamMemberIds": [
-                "alexandra"
-            ],
-            "clientIds": [
-                "client_1761643648237"
-            ],
-            "type": "therapy",
-            "isPublic": false,
-            "isBillable": true,
-            "date": "2025-12-22",
-            "startTime": "16:00",
             "duration": 60,
             "repeating": [
                 1
@@ -19416,6 +19123,566 @@
             "startTime": "08:00",
             "duration": 720,
             "repeating": []
+        },
+        {
+            "name": "Pauză de masă",
+            "type": "pauza-masa",
+            "date": "2025-11-10",
+            "startTime": "13:00",
+            "duration": 60,
+            "isPublic": true,
+            "isBillable": false,
+            "teamMemberIds": [
+                "corina",
+                "dana",
+                "daniela",
+                "alexandra"
+            ],
+            "repeating": [],
+            "id": "evt1762018833058a87ivqoes"
+        },
+        {
+            "name": "Terapie - Copilul test3 test",
+            "details": "test aaa",
+            "type": "therapy",
+            "date": "2025-10-31",
+            "startTime": "13:00",
+            "duration": 60,
+            "isPublic": false,
+            "isBillable": true,
+            "teamMemberIds": [
+                "corina",
+                "daniela"
+            ],
+            "clientIds": [
+                "client_1761900123672"
+            ],
+            "programIds": [
+                "prog_1",
+                "prog_2",
+                "prog_3"
+            ],
+            "repeating": [],
+            "id": "evt176201894881106oa4l7ga"
+        },
+        {
+            "name": "Terapie - Stefan Negru",
+            "type": "therapy",
+            "date": "2025-11-02",
+            "startTime": "16:00",
+            "duration": 60,
+            "isPublic": false,
+            "isBillable": true,
+            "teamMemberIds": [
+                "alexandra"
+            ],
+            "clientIds": [
+                "client_1761643648237"
+            ],
+            "repeating": [
+                1
+            ],
+            "id": "evt1762126671296dmeu4dzi5"
+        },
+        {
+            "name": "Terapie - Stefan Negru",
+            "type": "therapy",
+            "date": "2025-11-03",
+            "startTime": "16:00",
+            "duration": 60,
+            "isPublic": false,
+            "isBillable": true,
+            "teamMemberIds": [
+                "alexandra"
+            ],
+            "clientIds": [
+                "client_1761643648237"
+            ],
+            "repeating": [
+                1
+            ],
+            "id": "evt1762126671296pq24vfure",
+            "comments": ""
+        },
+        {
+            "name": "Terapie - Stefan Negru",
+            "type": "therapy",
+            "date": "2025-11-16",
+            "startTime": "16:00",
+            "duration": 60,
+            "isPublic": false,
+            "isBillable": true,
+            "teamMemberIds": [
+                "alexandra"
+            ],
+            "clientIds": [
+                "client_1761643648237"
+            ],
+            "repeating": [
+                1
+            ],
+            "id": "evt17621266712968bqfijncu"
+        },
+        {
+            "name": "Terapie - Stefan Negru",
+            "type": "therapy",
+            "date": "2025-11-23",
+            "startTime": "16:00",
+            "duration": 60,
+            "isPublic": false,
+            "isBillable": true,
+            "teamMemberIds": [
+                "alexandra"
+            ],
+            "clientIds": [
+                "client_1761643648237"
+            ],
+            "repeating": [
+                1
+            ],
+            "id": "evt1762126671296nnt9y5uxl"
         }
-    ]
+    ],
+    "programs": [
+        {
+            "id": "prog_1",
+            "title": "Imitare orala",
+            "description": "Reproduce mișcările gurii și sunetele produse de terapeut (ex: suflat, deschis gura, pronunțat silabe)."
+        },
+        {
+            "id": "prog_2",
+            "title": "Stimulare de limbaj",
+            "description": "Activități pentru a crește dorința și capacitatea copilului de a comunica verbal."
+        },
+        {
+            "id": "prog_3",
+            "title": "Instrucțiuni functionale",
+            "description": "Urmează comenzi simple din viața de zi cu zi („adu mingea”, „pune cana pe masă”)."
+        },
+        {
+            "id": "prog_4",
+            "title": "Imitare motorie cu și fără obiect",
+            "description": "Copiază acțiuni ale adultului care implică obiecte (ex: bate toba, împinge o mașinuță)."
+        },
+        {
+            "id": "prog_5",
+            "title": "Receptiv obiecte",
+            "description": "Copilul învață să recunoască și să indice obiecte atunci când sunt denumite („arată scaunul”)."
+        },
+        {
+            "id": "prog_6",
+            "title": "Motricitate",
+            "description": "Exerciții pentru dezvoltarea mișcărilor fine și grosiere (ex: apucare, sărituri, tras linii)."
+        },
+        {
+            "id": "prog_7",
+            "title": "Răspuns la nume",
+            "description": "Învață să se întoarcă sau să răspundă când își aude numele."
+        },
+        {
+            "id": "prog_8",
+            "title": "Așteaptă",
+            "description": "Învață să aștepte pe rând, să amâne o dorință sau o acțiune."
+        },
+        {
+            "id": "prog_9",
+            "title": "Joc social",
+            "description": "Exerciții de interacțiune și schimb reciproc în joc (ex: „dă-mi mingea”, „hai să construim împreună”)."
+        },
+        {
+            "id": "prog_10",
+            "title": "Gesturi și limbaj functional",
+            "description": "Copilul folosește gesturi sau cuvinte pentru a cere, a refuza sau a comunica nevoi („vreau apă”, „gata”)."
+        },
+        {
+            "id": "prog_11",
+            "title": "Imitare verbală",
+            "description": "Repetă cuvinte sau propoziții după adult („spune mama”, „spune apă”)."
+        },
+        {
+            "id": "prog_12",
+            "title": "Joc și mișcare",
+            "description": "Activități care combină jocul cu exercițiile fizice pentru coordonare și socializare."
+        },
+        {
+            "id": "prog_13",
+            "title": "Atenție",
+            "description": "Exerciții pentru a crește capacitatea de concentrare pe o sarcină sau pe interlocutor."
+        }
+    ],
+    "evolutionData": {
+        "client_1761405694424": {
+            "name": "Cezar Dinca",
+            "evaluations": {
+                "Portrige - Motricitate fina": {
+                    "2025-10-30": 16,
+                    "2025-11-01": 43
+                },
+                "Portrige - Motricitate grosieră": {
+                    "2025-10-30": 17,
+                    "2025-11-01": 57
+                },
+                "Portrige - Limbaj receptiv": {
+                    "2025-10-30": 22,
+                    "2025-11-01": 57
+                },
+                "Portrige - Limbaj expresiv": {
+                    "2025-10-30": 13,
+                    "2025-11-01": 57
+                },
+                "Portrige - Socializare": {
+                    "2025-10-30": 11,
+                    "2025-11-01": 57
+                },
+                "Portrige - Autonomie personală": {
+                    "2025-10-30": 33,
+                    "2025-11-01": 54
+                }
+            },
+            "programHistory": []
+        },
+        "client_1761643441294": {
+            "name": "Tudor",
+            "evaluations": [],
+            "programHistory": [
+                {
+                    "date": "2025-12-22",
+                    "programId": "prog_1",
+                    "programTitle": "Imitare orala",
+                    "score": "0",
+                    "eventId": "evt1761680729478_n8d69iie4"
+                },
+                {
+                    "date": "2025-12-22",
+                    "programId": "prog_3",
+                    "programTitle": "Instrucțiuni functionale",
+                    "score": "P",
+                    "eventId": "evt1761680729478_n8d69iie4"
+                },
+                {
+                    "date": "2025-12-22",
+                    "programId": "prog_11",
+                    "programTitle": "Imitare verbală",
+                    "score": "-",
+                    "eventId": "evt1761680729478_n8d69iie4"
+                },
+                {
+                    "date": "2025-12-22",
+                    "programId": "prog_4",
+                    "programTitle": "Imitare motorie cu și fără obiect",
+                    "score": "+",
+                    "eventId": "evt1761680729478_n8d69iie4"
+                },
+                {
+                    "date": "2025-12-22",
+                    "programId": "prog_7",
+                    "programTitle": "Răspuns la nume",
+                    "score": "+",
+                    "eventId": "evt1761680729478_n8d69iie4"
+                },
+                {
+                    "date": "2025-12-22",
+                    "programId": "prog_6",
+                    "programTitle": "Motricitate",
+                    "score": "+",
+                    "eventId": "evt1761680729478_n8d69iie4"
+                },
+                {
+                    "date": "2025-12-22",
+                    "programId": "prog_12",
+                    "programTitle": "Joc și mișcare",
+                    "score": "+",
+                    "eventId": "evt1761680729478_n8d69iie4"
+                },
+                {
+                    "date": "2025-12-22",
+                    "programId": "prog_8",
+                    "programTitle": "Așteaptă",
+                    "score": "+",
+                    "eventId": "evt1761680729478_n8d69iie4"
+                },
+                {
+                    "date": "2025-12-22",
+                    "programId": "prog_13",
+                    "programTitle": "Atenție",
+                    "score": "+",
+                    "eventId": "evt1761680729478_n8d69iie4"
+                },
+                {
+                    "date": "2025-12-15",
+                    "programId": "prog_1",
+                    "programTitle": "Imitare orala",
+                    "score": "0",
+                    "eventId": "evt1761680729478_xci1kyk0w"
+                },
+                {
+                    "date": "2025-12-15",
+                    "programId": "prog_3",
+                    "programTitle": "Instrucțiuni functionale",
+                    "score": "P",
+                    "eventId": "evt1761680729478_xci1kyk0w"
+                },
+                {
+                    "date": "2025-12-15",
+                    "programId": "prog_11",
+                    "programTitle": "Imitare verbală",
+                    "score": "-",
+                    "eventId": "evt1761680729478_xci1kyk0w"
+                },
+                {
+                    "date": "2025-12-15",
+                    "programId": "prog_4",
+                    "programTitle": "Imitare motorie cu și fără obiect",
+                    "score": "+",
+                    "eventId": "evt1761680729478_xci1kyk0w"
+                },
+                {
+                    "date": "2025-12-15",
+                    "programId": "prog_6",
+                    "programTitle": "Motricitate",
+                    "score": "+",
+                    "eventId": "evt1761680729478_xci1kyk0w"
+                },
+                {
+                    "date": "2025-12-15",
+                    "programId": "prog_7",
+                    "programTitle": "Răspuns la nume",
+                    "score": "-",
+                    "eventId": "evt1761680729478_xci1kyk0w"
+                },
+                {
+                    "date": "2025-12-15",
+                    "programId": "prog_12",
+                    "programTitle": "Joc și mișcare",
+                    "score": "-",
+                    "eventId": "evt1761680729478_xci1kyk0w"
+                },
+                {
+                    "date": "2025-12-15",
+                    "programId": "prog_8",
+                    "programTitle": "Așteaptă",
+                    "score": "0",
+                    "eventId": "evt1761680729478_xci1kyk0w"
+                },
+                {
+                    "date": "2025-12-15",
+                    "programId": "prog_13",
+                    "programTitle": "Atenție",
+                    "score": "-",
+                    "eventId": "evt1761680729478_xci1kyk0w"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_1",
+                    "programTitle": "Imitare orala",
+                    "score": "0",
+                    "eventId": "evt1761645434697_x1ze0vy0h"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_3",
+                    "programTitle": "Instrucțiuni functionale",
+                    "score": "-",
+                    "eventId": "evt1761645434697_x1ze0vy0h"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_11",
+                    "programTitle": "Imitare verbală",
+                    "score": "P",
+                    "eventId": "evt1761645434697_x1ze0vy0h"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_4",
+                    "programTitle": "Imitare motorie cu și fără obiect",
+                    "score": "-",
+                    "eventId": "evt1761645434697_x1ze0vy0h"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_7",
+                    "programTitle": "Răspuns la nume",
+                    "score": "P",
+                    "eventId": "evt1761645434697_x1ze0vy0h"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_6",
+                    "programTitle": "Motricitate",
+                    "score": "+",
+                    "eventId": "evt1761645434697_x1ze0vy0h"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_12",
+                    "programTitle": "Joc și mișcare",
+                    "score": "P",
+                    "eventId": "evt1761645434697_x1ze0vy0h"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_8",
+                    "programTitle": "Așteaptă",
+                    "score": "-",
+                    "eventId": "evt1761645434697_x1ze0vy0h"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_13",
+                    "programTitle": "Atenție",
+                    "score": "P",
+                    "eventId": "evt1761645434697_x1ze0vy0h"
+                }
+            ]
+        },
+        "client_1761900123672": {
+            "name": "Copilul test3 test",
+            "evaluations": [],
+            "programHistory": [
+                {
+                    "date": "2025-10-30",
+                    "programId": "prog_7",
+                    "programTitle": "Răspuns la nume",
+                    "score": "+",
+                    "eventId": "evt17620234153093e8eer5da"
+                },
+                {
+                    "date": "2025-10-30",
+                    "programId": "prog_8",
+                    "programTitle": "Așteaptă",
+                    "score": "+",
+                    "eventId": "evt17620234153093e8eer5da"
+                },
+                {
+                    "date": "2025-10-30",
+                    "programId": "prog_4",
+                    "programTitle": "Imitare motorie cu și fără obiect",
+                    "score": "+",
+                    "eventId": "evt17620234153093e8eer5da"
+                },
+                {
+                    "date": "2025-10-30",
+                    "programId": "prog_3",
+                    "programTitle": "Instrucțiuni functionale",
+                    "score": "P",
+                    "eventId": "evt17620234153093e8eer5da"
+                },
+                {
+                    "date": "2025-10-30",
+                    "programId": "prog_5",
+                    "programTitle": "Receptiv obiecte",
+                    "score": "P",
+                    "eventId": "evt17620234153093e8eer5da"
+                },
+                {
+                    "date": "2025-10-30",
+                    "programId": "prog_1",
+                    "programTitle": "Imitare orala",
+                    "score": "-",
+                    "eventId": "evt17620234153093e8eer5da"
+                },
+                {
+                    "date": "2025-10-21",
+                    "programId": "prog_7",
+                    "programTitle": "Răspuns la nume",
+                    "score": "0",
+                    "eventId": "evt1762023415309vrvbzk9xs"
+                },
+                {
+                    "date": "2025-10-21",
+                    "programId": "prog_8",
+                    "programTitle": "Așteaptă",
+                    "score": "0",
+                    "eventId": "evt1762023415309vrvbzk9xs"
+                },
+                {
+                    "date": "2025-10-21",
+                    "programId": "prog_4",
+                    "programTitle": "Imitare motorie cu și fără obiect",
+                    "score": "0",
+                    "eventId": "evt1762023415309vrvbzk9xs"
+                },
+                {
+                    "date": "2025-10-21",
+                    "programId": "prog_3",
+                    "programTitle": "Instrucțiuni functionale",
+                    "score": "0",
+                    "eventId": "evt1762023415309vrvbzk9xs"
+                },
+                {
+                    "date": "2025-10-21",
+                    "programId": "prog_5",
+                    "programTitle": "Receptiv obiecte",
+                    "score": "0",
+                    "eventId": "evt1762023415309vrvbzk9xs"
+                },
+                {
+                    "date": "2025-10-21",
+                    "programId": "prog_1",
+                    "programTitle": "Imitare orala",
+                    "score": "0",
+                    "eventId": "evt1762023415309vrvbzk9xs"
+                }
+            ]
+        },
+        "client_1762029840903": {
+            "name": "copilul test 0",
+            "evaluations": {
+                "Portrige - Motricitate fina": {
+                    "2025-11-01": 3
+                },
+                "Portrige - Motricitate grosieră": {
+                    "2025-11-01": 0
+                },
+                "Portrige - Limbaj receptiv": {
+                    "2025-11-01": 0
+                },
+                "Portrige - Limbaj expresiv": {
+                    "2025-11-01": 0
+                },
+                "Portrige - Socializare": {
+                    "2025-11-01": 0
+                },
+                "Portrige - Autonomie personală": {
+                    "2025-11-01": 0
+                }
+            },
+            "programHistory": [
+                {
+                    "date": "2025-11-02",
+                    "programId": "prog_2",
+                    "programTitle": "Stimulare de limbaj",
+                    "score": "0",
+                    "eventId": "evt1762036411764dsfwcbwtr"
+                },
+                {
+                    "date": "2025-11-02",
+                    "programId": "prog_1",
+                    "programTitle": "Imitare orala",
+                    "score": "-",
+                    "eventId": "evt1762036411764dsfwcbwtr"
+                },
+                {
+                    "date": "2025-11-02",
+                    "programId": "prog_3",
+                    "programTitle": "Instrucțiuni functionale",
+                    "score": "-",
+                    "eventId": "evt1762036411764dsfwcbwtr"
+                }
+            ]
+        }
+    },
+    "activeFilters": [
+        "corina",
+        "dana",
+        "daniela",
+        "alexandra",
+        "member_1762036330730"
+    ],
+    "editingEventId": null,
+    "editingMemberId": null,
+    "editingClientId": null,
+    "selectedClientIds": [],
+    "selectedProgramIds": []
 }

@@ -358,6 +358,194 @@
         .program-history-score[data-score="-"] { color: #f59e0b; border-color: #f59e0b; }
         .program-history-score[data-score="P"] { color: #3b82f6; border-color: #3b82f6; }
         .program-history-score[data-score="+"] { color: #10b981; border-color: #10b981; }
+        
+        /* Monthly Schedule Stats */
+        .schedule-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        [data-theme="dark"] .stat-card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+        
+        [data-theme="dark"] .stat-value {
+            color: #f3f4f6;
+        }
+        
+        .stat-value.hours { color: #4A90E2; }
+        .stat-value.present { color: #10b981; }
+        .stat-value.absent { color: #ef4444; }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        [data-theme="dark"] .stat-label {
+            color: #9ca3af;
+        }
+        
+        .schedule-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .schedule-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        [data-theme="dark"] .schedule-item {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        
+        .schedule-item:hover {
+            border-color: #4A90E2;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .schedule-date {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 0.875rem;
+        }
+        
+        [data-theme="dark"] .schedule-date {
+            color: #f3f4f6;
+        }
+        
+        .schedule-time {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        
+        [data-theme="dark"] .schedule-time {
+            color: #9ca3af;
+        }
+        
+        .schedule-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.625rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-badge.present {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-badge.absent {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        [data-theme="dark"] .status-badge.present {
+            background: #14532d;
+            color: #dcfce7;
+        }
+        
+        [data-theme="dark"] .status-badge.absent {
+            background: #450a0a;
+            color: #fecaca;
+        }
+        
+        .month-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 0.75rem;
+            background: #f9fafb;
+            border-radius: 0.5rem;
+        }
+        
+        [data-theme="dark"] .month-selector {
+            background: #1e293b;
+        }
+        
+        .month-selector button {
+            padding: 0.5rem;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        [data-theme="dark"] .month-selector button {
+            background: #0f172a;
+            border-color: #334155;
+            color: #f3f4f6;
+        }
+        
+        .month-selector button:hover {
+            background: #4A90E2;
+            border-color: #4A90E2;
+            color: white;
+        }
+        
+        .month-selector span {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1f2937;
+            min-width: 150px;
+            text-align: center;
+        }
+        
+        [data-theme="dark"] .month-selector span {
+            color: #f3f4f6;
+        }
     </style>
 </head>
 <body>
@@ -398,6 +586,9 @@
     <script type="module">
         // API Configuration
         const API_BASE = 'api.php';
+        
+        // Store current selected month for schedule viewing
+        let currentScheduleDate = new Date();
 
         async function loadTeamMembers() {
             try {
@@ -425,9 +616,17 @@
                 
                 const clientEvolution = evolutionData[clientId] || {};
                 
+                // Filter events for this client
+                const clientEvents = data.events.filter(event => {
+                    const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
+                    return clientIds.includes(clientId);
+                });
+                
                 return {
                     client,
-                    evolution: clientEvolution
+                    evolution: clientEvolution,
+                    events: clientEvents,
+                    teamMembers: data.teamMembers || []
                 };
             } catch (error) {
                 console.error('Error loading client data:', error);
@@ -523,6 +722,7 @@
                 const clientData = await loadClientData(clientId);
                 
                 if (clientData) {
+                    currentScheduleDate = new Date(); // Reset to current month
                     showParentModal(clientData);
                 } else {
                     alert('Client negăsit. Verificați codul introdus.');
@@ -537,6 +737,143 @@
                     viewProfileBtn.click();
                 }
             });
+        }
+
+        function calculateMonthlyStats(events, clientId, year, month) {
+            const monthEvents = events.filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate.getFullYear() === year && eventDate.getMonth() === month;
+            });
+            
+            let totalHours = 0;
+            let presentHours = 0;
+            let absentHours = 0;
+            let totalSessions = monthEvents.length;
+            
+            monthEvents.forEach(event => {
+                if (!event.duration) return;
+                const hours = event.duration / 60;
+                totalHours += hours;
+                
+                const attendance = (event.attendance && event.attendance[clientId]) || 'present';
+                if (attendance === 'present') {
+                    presentHours += hours;
+                } else {
+                    absentHours += hours;
+                }
+            });
+            
+            return {
+                totalSessions,
+                totalHours: totalHours.toFixed(1),
+                presentHours: presentHours.toFixed(1),
+                absentHours: absentHours.toFixed(1),
+                events: monthEvents
+            };
+        }
+
+        function generateScheduleHTML(clientData) {
+            const year = currentScheduleDate.getFullYear();
+            const month = currentScheduleDate.getMonth();
+            const monthName = currentScheduleDate.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
+            
+            const stats = calculateMonthlyStats(clientData.events, clientData.client.id, year, month);
+            
+            let html = `
+                <div class="client-info-section">
+                    <h3 class="section-title">Program Lunar</h3>
+                    
+                    <div class="month-selector">
+                        <button id="prevMonth">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                        </button>
+                        <span>${monthName}</span>
+                        <button id="nextMonth">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="schedule-stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value hours">${stats.totalHours}</div>
+                            <div class="stat-label">Ore Totale</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value present">${stats.presentHours}</div>
+                            <div class="stat-label">Ore Prezent</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value absent">${stats.absentHours}</div>
+                            <div class="stat-label">Ore Absent</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${stats.totalSessions}</div>
+                            <div class="stat-label">Sesiuni</div>
+                        </div>
+                    </div>
+            `;
+            
+            if (stats.events.length > 0) {
+                // Sort events by date
+                const sortedEvents = stats.events.sort((a, b) => new Date(a.date) - new Date(b.date));
+                
+                html += `<div class="schedule-list">`;
+                sortedEvents.forEach(event => {
+                    const eventDate = new Date(event.date);
+                    const formattedDate = eventDate.toLocaleDateString('ro-RO', { 
+                        weekday: 'short', 
+                        day: 'numeric', 
+                        month: 'short' 
+                    });
+                    
+                    const attendance = (event.attendance && event.attendance[clientData.client.id]) || 'present';
+                    const statusClass = attendance === 'present' ? 'present' : 'absent';
+                    const statusText = attendance === 'present' ? 'Prezent' : 'Absent';
+                    
+                    const endTime = calculateEndTime(event.startTime, event.duration);
+                    const hours = (event.duration / 60).toFixed(1);
+                    
+                    // Get therapist names
+                    const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+                    const therapistNames = teamMemberIds
+                        .map(id => {
+                            const therapist = clientData.teamMembers.find(m => m.id === id);
+                            return therapist ? therapist.name : 'Terapeut necunoscut';
+                        })
+                        .join(', ');
+                    
+                    html += `
+                        <div class="schedule-item">
+                            <div>
+                                <div class="schedule-date">${formattedDate}</div>
+                                <div class="schedule-time">${event.startTime} - ${endTime} (${hours}h)</div>
+                                <div class="schedule-time" style="margin-top: 0.25rem; color: #4A90E2;">
+                                    ${therapistNames}
+                                </div>
+                            </div>
+                            <div class="schedule-status">
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            } else {
+                html += `<p style="text-align: center; color: #6b7280; padding: 2rem;">Nu există sesiuni programate în această lună.</p>`;
+            }
+            
+            html += `</div>`;
+            
+            return html;
+        }
+
+        function calculateEndTime(startTime, durationMinutes) {
+            if (!startTime) return "N/A";
+            const [hours, minutes] = startTime.split(':').map(Number);
+            const totalMinutes = (hours * 60) + minutes + durationMinutes;
+            const endHours = Math.floor(totalMinutes / 60) % 24;
+            const endMinutes = totalMinutes % 60;
+            return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
         }
 
         function showParentModal(clientData) {
@@ -589,6 +926,9 @@
                 </div>
             `;
 
+            // Add schedule section
+            contentHTML += generateScheduleHTML(clientData);
+
             // Add evolution chart if data exists
             if (clientData.evolution && clientData.evolution.evaluations && Object.keys(clientData.evolution.evaluations).length > 0) {
                 contentHTML += `
@@ -616,9 +956,38 @@
             modalContent.innerHTML = contentHTML;
             modal.classList.add('active');
 
+            // Setup month navigation
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                currentScheduleDate.setMonth(currentScheduleDate.getMonth() - 1);
+                updateScheduleSection(clientData);
+            });
+            
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                currentScheduleDate.setMonth(currentScheduleDate.getMonth() + 1);
+                updateScheduleSection(clientData);
+            });
+
             // Render chart if data exists
             if (clientData.evolution && clientData.evolution.evaluations && Object.keys(clientData.evolution.evaluations).length > 0) {
                 setTimeout(() => renderEvolutionChart(clientData.evolution.evaluations), 100);
+            }
+        }
+
+        function updateScheduleSection(clientData) {
+            const scheduleSection = document.querySelector('.client-info-section:nth-child(2)');
+            if (scheduleSection) {
+                scheduleSection.outerHTML = generateScheduleHTML(clientData);
+                
+                // Re-attach event listeners
+                document.getElementById('prevMonth').addEventListener('click', () => {
+                    currentScheduleDate.setMonth(currentScheduleDate.getMonth() - 1);
+                    updateScheduleSection(clientData);
+                });
+                
+                document.getElementById('nextMonth').addEventListener('click', () => {
+                    currentScheduleDate.setMonth(currentScheduleDate.getMonth() + 1);
+                    updateScheduleSection(clientData);
+                });
             }
         }
 
