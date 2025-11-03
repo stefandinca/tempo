@@ -21,532 +21,7 @@
     </script>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="icon.png" type="image/png">
-    <style>
-        body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 2rem;
-        }
-        
-        .user-card {
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .user-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
-        }
-        
-        .user-card.parent-card {
-            cursor: default;
-        }
-        
-        .user-card.parent-card:hover {
-            transform: translateY(-4px);
-        }
-        
-        .user-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            font-weight: 700;
-            color: white;
-            margin: 0 auto 1rem;
-            border: 4px solid white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-        
-        .role-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        .role-therapist { background: #dbeafe; color: #1e40af; }
-        .role-coordinator { background: #fef3c7; color: #92400e; }
-        .role-admin { background: #fce7f3; color: #9f1239; }
-        .role-parent { background: #dcfce7; color: #166534; }
-        
-        [data-theme="dark"] .role-therapist { background: #1e3a8a; color: #dbeafe; }
-        [data-theme="dark"] .role-coordinator { background: #78350f; color: #fef3c7; }
-        [data-theme="dark"] .role-admin { background: #831843; color: #fce7f3; }
-        [data-theme="dark"] .role-parent { background: #14532d; color: #dcfce7; }
-        
-        .parent-input-container {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 2px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .client-code-input {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-            background: white;
-            color: #1f2937;
-        }
-        
-        .client-code-input:focus {
-            outline: none;
-            border-color: #10b981;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
-        }
-        
-        .client-code-input::placeholder {
-            color: #9ca3af;
-        }
-        
-        [data-theme="dark"] .client-code-input {
-            background: #1f2937;
-            color: #f3f4f6;
-            border-color: #4b5563;
-        }
-        
-        [data-theme="dark"] .client-code-input:focus {
-            border-color: #10b981;
-        }
-        
-        .view-profile-btn {
-            width: 100%;
-            margin-top: 0.75rem;
-            padding: 0.75rem 1rem;
-            background: #10b981;
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .view-profile-btn:hover:not(:disabled) {
-            background: #059669;
-            transform: translateY(-1px);
-        }
-        
-        .view-profile-btn:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-        }
-        
-        /* Parent Profile Modal */
-        .parent-modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 1000;
-            background-color: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            padding: 2rem;
-            overflow-y: auto;
-            align-items: flex-start;
-            justify-content: center;
-        }
-        
-        .parent-modal.active {
-            display: flex;
-        }
-        
-        .parent-modal-content {
-            width: 100%;
-            max-width: 1200px;
-            margin: 2rem auto;
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
-        
-        [data-theme="dark"] .parent-modal-content {
-            background: #1e293b;
-        }
-        
-        .parent-modal-header {
-            padding: 2rem;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .parent-modal-header h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0;
-        }
-        
-        .parent-modal-close {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        
-        .parent-modal-close:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.1);
-        }
-        
-        .parent-modal-body {
-            padding: 2rem;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-        
-        .client-info-section {
-            background: #f9fafb;
-            padding: 1.5rem;
-            border-radius: 0.75rem;
-            margin-bottom: 2rem;
-            border: 1px solid #e5e7eb;
-        }
-        
-        [data-theme="dark"] .client-info-section {
-            background: #0f172a;
-            border-color: #334155;
-        }
-        
-        .section-title {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: #1f2937;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #e5e7eb;
-        }
-        
-        [data-theme="dark"] .section-title {
-            color: #f3f4f6;
-            border-bottom-color: #334155;
-        }
-        
-        .client-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .info-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-        
-        .info-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            color: #6b7280;
-            letter-spacing: 0.05em;
-        }
-        
-        [data-theme="dark"] .info-label {
-            color: #9ca3af;
-        }
-        
-        .info-value {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #1f2937;
-        }
-        
-        [data-theme="dark"] .info-value {
-            color: #f3f4f6;
-        }
-        
-        .error-message {
-            padding: 1rem;
-            background: #fee2e2;
-            color: #991b1b;
-            border-radius: 0.5rem;
-            text-align: center;
-            font-weight: 500;
-        }
-        
-        [data-theme="dark"] .error-message {
-            background: #450a0a;
-            color: #fecaca;
-        }
-        
-        .chart-container-parent {
-            min-height: 400px;
-            background: white;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            border: 1px solid #e5e7eb;
-        }
-        
-        [data-theme="dark"] .chart-container-parent {
-            background: #0f172a;
-            border-color: #334155;
-        }
-        
-        .program-history-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 0.75rem;
-            overflow: hidden;
-            border: 1px solid #e5e7eb;
-        }
-        
-        [data-theme="dark"] .program-history-table {
-            background: #0f172a;
-            border-color: #334155;
-        }
-        
-        .program-history-table th,
-        .program-history-table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        
-        [data-theme="dark"] .program-history-table th,
-        [data-theme="dark"] .program-history-table td {
-            border-bottom-color: #334155;
-        }
-        
-        .program-history-table thead th {
-            background: #f9fafb;
-            font-weight: 600;
-            color: #6b7280;
-        }
-        
-        [data-theme="dark"] .program-history-table thead th {
-            background: #1e293b;
-            color: #9ca3af;
-        }
-        
-        .program-history-score {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            width: 28px;
-            height: 28px;
-            border-radius: 0.25rem;
-            border: 2px solid;
-        }
-        
-        .program-history-score[data-score="0"] { color: #ef4444; border-color: #ef4444; }
-        .program-history-score[data-score="-"] { color: #f59e0b; border-color: #f59e0b; }
-        .program-history-score[data-score="P"] { color: #3b82f6; border-color: #3b82f6; }
-        .program-history-score[data-score="+"] { color: #10b981; border-color: #10b981; }
-        
-        /* Monthly Schedule Stats */
-        .schedule-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .stat-card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.75rem;
-            padding: 1rem;
-            text-align: center;
-        }
-        
-        [data-theme="dark"] .stat-card {
-            background: #1e293b;
-            border-color: #334155;
-        }
-        
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1f2937;
-            line-height: 1;
-            margin-bottom: 0.5rem;
-        }
-        
-        [data-theme="dark"] .stat-value {
-            color: #f3f4f6;
-        }
-        
-        .stat-value.hours { color: #4A90E2; }
-        .stat-value.present { color: #10b981; }
-        .stat-value.absent { color: #ef4444; }
-        
-        .stat-label {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        [data-theme="dark"] .stat-label {
-            color: #9ca3af;
-        }
-        
-        .schedule-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            margin-top: 1rem;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .schedule-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            transition: all 0.2s;
-        }
-        
-        [data-theme="dark"] .schedule-item {
-            background: #1e293b;
-            border-color: #334155;
-        }
-        
-        .schedule-item:hover {
-            border-color: #4A90E2;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .schedule-date {
-            font-weight: 600;
-            color: #1f2937;
-            font-size: 0.875rem;
-        }
-        
-        [data-theme="dark"] .schedule-date {
-            color: #f3f4f6;
-        }
-        
-        .schedule-time {
-            font-size: 0.75rem;
-            color: #6b7280;
-            margin-top: 0.25rem;
-        }
-        
-        [data-theme="dark"] .schedule-time {
-            color: #9ca3af;
-        }
-        
-        .schedule-status {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 600;
-        }
-        
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.625rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .status-badge.present {
-            background: #dcfce7;
-            color: #166534;
-        }
-        
-        .status-badge.absent {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        
-        [data-theme="dark"] .status-badge.present {
-            background: #14532d;
-            color: #dcfce7;
-        }
-        
-        [data-theme="dark"] .status-badge.absent {
-            background: #450a0a;
-            color: #fecaca;
-        }
-        
-        .month-selector {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding: 0.75rem;
-            background: #f9fafb;
-            border-radius: 0.5rem;
-        }
-        
-        [data-theme="dark"] .month-selector {
-            background: #1e293b;
-        }
-        
-        .month-selector button {
-            padding: 0.5rem;
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        [data-theme="dark"] .month-selector button {
-            background: #0f172a;
-            border-color: #334155;
-            color: #f3f4f6;
-        }
-        
-        .month-selector button:hover {
-            background: #4A90E2;
-            border-color: #4A90E2;
-            color: white;
-        }
-        
-        .month-selector span {
-            font-weight: 600;
-            font-size: 1rem;
-            color: #1f2937;
-            min-width: 150px;
-            text-align: center;
-        }
-        
-        [data-theme="dark"] .month-selector span {
-            color: #f3f4f6;
-        }
-    </style>
+    <link rel="stylesheet" href="select-user.css">
 </head>
 <body>
     <div class="w-full max-w-6xl">
@@ -557,8 +32,7 @@
         </div>
         
         <div id="userCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- User cards will be generated here -->
-        </div>
+            </div>
         
         <div class="text-center mt-8">
             <button id="themeToggle" class="px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg transition-all">
@@ -568,7 +42,6 @@
         </div>
     </div>
 
-    <!-- Parent Profile Modal -->
     <div id="parentModal" class="parent-modal">
         <div class="parent-modal-content">
             <div class="parent-modal-header">
@@ -578,8 +51,7 @@
                 </button>
             </div>
             <div class="parent-modal-body" id="parentModalContent">
-                <!-- Content will be loaded here -->
-            </div>
+                </div>
         </div>
     </div>
 
@@ -587,6 +59,15 @@
         // API Configuration
         const API_BASE = 'api.php';
         
+        // NOU: Parole hardcodate
+        const USER_PASSWORDS = {
+            'corina': '$C0r1n4',
+            'dana': '#D4n4G',      // ID-ul din data.json pentru Dana G
+            'daniela': '@D4n4P',    // ID-ul din data.json pentru Dana P
+            'alexandra': '!Al3x4', // ID-ul din data.json pentru Alexandra
+            'member_1762036330730': '&St3f' // ID-ul din data.json pentru Stefan
+        };
+
         // Store current selected month for schedule viewing
         let currentScheduleDate = new Date();
 
@@ -594,7 +75,8 @@
             try {
                 const response = await fetch(`${API_BASE}?path=data`);
                 const data = await response.json();
-                return data.teamMembers || [];
+                // Filtrăm utilizatorii care au parole definite (excludem pe oricine nu e în lista de parole)
+                return (data.teamMembers || []).filter(member => USER_PASSWORDS.hasOwnProperty(member.id));
             } catch (error) {
                 console.error('Error loading team members:', error);
                 return [];
@@ -663,7 +145,19 @@
                         </div>
                         <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">${member.name}</h3>
                         <span class="role-badge ${getRoleClass(member.role)}">${getRoleLabel(member.role)}</span>
-                    </div>
+                        
+                        <div class="password-input-container">
+                            <input 
+                                type="password" 
+                                id="pass_${member.id}" 
+                                class="password-input" 
+                                placeholder="Parolă"
+                            />
+                            <button id="login_btn_${member.id}" class="login-btn" data-user-id="${member.id}">
+                                Intră în cont
+                            </button>
+                        </div>
+                        </div>
                 `;
             });
 
@@ -691,15 +185,39 @@
 
             container.innerHTML = cardsHTML;
 
-            // Add click handlers for team members
-            document.querySelectorAll('.user-card:not(.parent-card)').forEach(card => {
-                card.addEventListener('click', () => {
-                    const userId = card.dataset.userId;
-                    selectUser(userId);
+            // --- CLICK HANDLERE MODIFICATE ---
+            // Adaugă click handlere pentru butoanele de login ale echipei
+            teamMembers.forEach(member => {
+                const loginBtn = document.getElementById(`login_btn_${member.id}`);
+                const passInput = document.getElementById(`pass_${member.id}`);
+                
+                if (!loginBtn || !passInput) return;
+
+                const handleLogin = () => {
+                    const userId = loginBtn.dataset.userId;
+                    const password = passInput.value;
+                    
+                    // Verifică parola
+                    if (USER_PASSWORDS[userId] && password === USER_PASSWORDS[userId]) {
+                        selectUser(userId);
+                    } else {
+                        alert('Parolă incorectă!');
+                        passInput.value = '';
+                        passInput.focus();
+                    }
+                };
+
+                loginBtn.addEventListener('click', handleLogin);
+                
+                passInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleLogin();
+                    }
                 });
             });
+            // --- SFÂRȘIT MODIFICARE ---
 
-            // Add parent card functionality
+            // Add parent card functionality (rămâne neschimbat)
             setupParentCard();
         }
 
