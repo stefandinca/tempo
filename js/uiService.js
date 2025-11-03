@@ -715,13 +715,52 @@ export function editClientInModal(clientId) {
 }
 
 export function renderTeamMembersList() {
+    // NOU: Obține utilizatorul curent și permisiunile
     const { teamMembers } = calendarState.getState();
+    const currentUser = auth.getCurrentUser();
+    const canManage = auth.isAdmin() || auth.isCoordinator();
+
     const container = $('teamMembersList');
     container.innerHTML = '<h3>Echipa curentă</h3>';
 
     teamMembers.forEach(member => {
         const card = document.createElement('div');
         card.className = 'team-member-card';
+
+        // NOU: Construiește HTML-ul pentru acțiuni în mod condiționat
+        let actionsHtml = '';
+        if (canManage) {
+            // Adminii și Coordonatorii pot face tot
+            actionsHtml = `
+                <button class="btn-icon btn-action" data-action="raport" title="Descarcă Raport">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+                <button class="btn-icon btn-action" data-action="editeaza" title="Editează">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="btn-icon btn-action btn-delete" data-action="sterge" title="Șterge">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                </button>
+            `;
+        } else if (auth.isTherapist() && member.id === currentUser.id) {
+            // Terapeutul își poate edita propriul profil (dar nu și rolul, vezi editTeamMemberInModal)
+            actionsHtml = `
+                <button class="btn-icon btn-action" data-action="raport" title="Descarcă Raport">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+                <button class="btn-icon btn-action" data-action="editeaza" title="Editează">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+            `;
+        } else {
+            // Terapeutul se uită la alți membri (doar raport)
+            actionsHtml = `
+                <button class="btn-icon btn-action" data-action="raport" title="Descarcă Raport">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+            `;
+        }
+
         card.innerHTML = `
                 <div class="team-member-card-content">
                     <div class="team-member-info">
@@ -732,33 +771,11 @@ export function renderTeamMembersList() {
                         </div>
                     </div>
                     <div class="team-member-stats">
-                        <div class="team-member-hours"><!-- You can add stats here if needed --></div>
-                        <div class="team-member-hours-label"><!-- Label here --></div>
+                        <div class="team-member-hours"></div>
+                        <div class="team-member-hours-label"></div>
                     </div>
                 </div>
-                <div class="team-member-actions" data-member-id="${member.id}">
-                    <button class="btn-icon btn-action" data-action="raport" title="Descarcă Raport">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7 10 12 15 17 10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                    </button>
-                    <button class="btn-icon btn-action" data-action="editeaza" title="Editează">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                        </svg>
-                    </button>
-                    <button class="btn-icon btn-action btn-delete" data-action="sterge" title="Șterge">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="3 6 5 6 21 6"/>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                            <line x1="10" y1="11" x2="10" y2="17"/>
-                            <line x1="14" y1="11" x2="14" y2="17"/>
-                        </svg>
-                    </button>
-                </div>
+                <div class="team-member-actions" data-member-id="${member.id}">${actionsHtml}</div>
             `;
         container.appendChild(card);
     });
@@ -769,7 +786,16 @@ export function resetTeamForm() {
     $('teamFormTitle').textContent = 'Adaugă Membru Nou';
     $('memberColor').value = '#4f46e5';
     $('memberColorHex').value = '#4F46E5';
-    $('deleteMemberBtn').style.display = 'none';
+
+    // NOU: Verifică permisiunile la resetarea formularului
+    const canChangeRole = auth.isAdmin() || auth.isCoordinator();
+    const roleSelect = $('memberRole');
+    roleSelect.disabled = !canChangeRole;
+    if (!canChangeRole) {
+        roleSelect.value = 'therapist'; // Setează implicit 'terapeut' dacă utilizatorul e terapeut
+    }
+
+    $('deleteMemberBtn').style.display = 'none'; // Butonul de ștergere e ascuns la adăugare
     calendarState.setEditingId({ memberId: null });
 }
 
@@ -784,7 +810,11 @@ export function editTeamMemberInModal(memberId) {
     $('memberRole').value = member.role;
     $('memberColor').value = member.color;
     $('memberColorHex').value = member.color.toUpperCase();
-    $('deleteMemberBtn').style.display = 'inline-block';
+
+    // NOU: Dezactivează dropdown-ul de ROL și butonul de ȘTERGERE dacă e terapeut
+    const canChangeRole = auth.isAdmin() || auth.isCoordinator();
+    $('memberRole').disabled = !canChangeRole;
+    $('deleteMemberBtn').style.display = canChangeRole ? 'inline-block' : 'none';
 
     $('teamMemberForm').scrollIntoView({ behavior: 'smooth' });
 }

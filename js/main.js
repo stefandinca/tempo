@@ -57,6 +57,11 @@ const dom = {
     
     // Secțiune Echipă
     teamMemberForm: $('teamMemberForm'),
+    // NOU: Adăugat pentru a ascunde opțiunile de rol
+    memberRoleSelect: $('memberRole'),
+    adminRoleOption: document.querySelector('#memberRole option[value="admin"]'),
+    coordinatorRoleOption: document.querySelector('#memberRole option[value="coordinator"]'),
+    // SFÂRȘIT NOU
     deleteMemberBtn: $('deleteMemberBtn'),
     cancelMemberBtn: $('cancelMemberBtn'),
     teamMembersList: $('teamMembersList'),
@@ -173,6 +178,32 @@ function handleMainViewNavigation(e) {
         return; // Oprește execuția funcției
     }
 }
+    }
+}
+
+/**
+ * NOU: Setează permisiunile la nivel de UI în funcție de rol
+ */
+function setupRolePermissions() {
+    // Dacă utilizatorul este Admin sau Coordonator, nu se aplică restricții
+    if (auth.isAdmin() || auth.isCoordinator()) {
+        return;
+    }
+
+    // Restricții pentru Terapeut
+    if (auth.isTherapist()) {
+        // 1. Ascunde butonul de "Adaugă Membru Nou"
+        // CORECȚIE: Utilizatorul a spus că poate adăuga ALȚI terapeuți. Lăsăm butonul.
+        // $('addNewTeamMemberBtn').style.display = 'none';
+
+        // 2. Restricționează dropdown-ul de roluri în formularul de echipă
+        if (dom.memberRoleSelect) {
+            // Ascunde opțiunile pe care un terapeut nu le poate atribui
+            if (dom.adminRoleOption) dom.adminRoleOption.style.display = 'none';
+            if (dom.coordinatorRoleOption) dom.coordinatorRoleOption.style.display = 'none';
+            // Setează valoarea implicită la 'therapist'
+            dom.memberRoleSelect.value = 'therapist';
+        }
     }
 }
 
@@ -508,6 +539,24 @@ async function handleDeleteClient() {
 async function handleSaveTeamMember(e) {
     e.preventDefault();
     const { editingMemberId } = calendarState.getState();
+    
+    // NOU: Verificare permisiuni
+    if (!auth.isAdmin() && !auth.isCoordinator()) { // Dacă e Terapeut
+        const formData = new FormData(e.target);
+        const newRole = formData.get('memberRole');
+
+        if (editingMemberId && editingMemberId !== auth.getCurrentUser().id) {
+            // Un terapeut încearcă să editeze datele altcuiva (nu ar trebui să ajungă aici dacă UI e corect)
+            auth.showPermissionDenied('editați alți membri ai echipei');
+            return;
+        }
+        if (newRole !== 'therapist') {
+            // Un terapeut încearcă să-și schimbe rolul sau să adauge un non-terapeut
+            auth.showPermissionDenied('adăugați sau setați roluri de Coordonator/Admin');
+            return; // Oprește salvarea
+        }
+    }
+
     const formData = new FormData(e.target);
 
     const memberData = {
@@ -531,6 +580,13 @@ async function handleSaveTeamMember(e) {
 
 async function handleDeleteTeamMember() {
     const { editingMemberId } = calendarState.getState();
+    
+    // NOU: Verificare permisiuni
+    if (!auth.isAdmin() && !auth.isCoordinator()) {
+        auth.showPermissionDenied('ștergeți membri ai echipei');
+        return;
+    }
+
     if (!editingMemberId) return;
 
     const confirmed = await ui.showCustomConfirm('Ești sigur că vrei să ștergi acest membru? Toate evenimentele asociate vor fi de asemenea șterse.', 'Șterge Membru');
@@ -876,6 +932,9 @@ async function init() {
         // Update UI with user info
         updateUserInterface();
 
+        // NOU: Setează restricțiile de UI pe bază de rol
+        setupRolePermissions();
+
         if (!auth.isAdmin()) {
         // Ascunde link-ul de Facturare din sidebar
         const billingLink = document.querySelector('.menu-item[data-view="billing"]');
@@ -899,8 +958,8 @@ async function init() {
     calendarState.setIsAdminView(true);
 
     try {
-        const data = await api.loadData();
-        calendarState.initializeData(data);
+        // const data = await api.loadData(); // Deja încărcat mai sus
+        // calendarState.initializeData(data); // Deja inițializat mai sus
         const programsData = await api.loadPrograms();
         calendarState.setPrograms(programsData.programs);
         const evolutionData = await api.loadEvolutionData();
