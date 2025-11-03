@@ -299,18 +299,60 @@ export const calendarState = {
         state.activeFilters = state.activeFilters.filter(id => id !== memberId);
     },
 
-    /**
+   /**
      * Salvează un client.
      * @param {object} clientData - Datele clientului (include ID)
      */
     saveClient: (clientData) => {
-        const index = state.clients.findIndex(c => c.id === clientData.id);
-        if (index > -1) {
-            // Editare
-            state.clients[index] = { ...state.clients[index], ...clientData };
+        // Verifică dacă suntem în modul de editare (dacă state.editingClientId este setat)
+        const originalId = state.editingClientId;
+        const newId = clientData.id;
+
+        if (originalId) {
+            // --- MOD EDITARE ---
+            // Caută clientul după ID-ul original
+            const index = state.clients.findIndex(c => c.id === originalId);
+            
+            if (index > -1) {
+                // Actualizează clientul în array-ul 'clients'
+                state.clients[index] = { ...state.clients[index], ...clientData }; // Acest pas actualizează și ID-ul dacă a fost schimbat
+
+                // Verifică dacă ID-ul a fost schimbat
+                if (originalId !== newId) {
+                    // --- ID-ul s-a schimbat, trebuie migrate datele ---
+                    
+                    // 1. Migrează datele din evolutionData (evaluări)
+                    if (state.evolutionData[originalId]) {
+                        state.evolutionData[newId] = state.evolutionData[originalId];
+                        delete state.evolutionData[originalId];
+                        
+                        // De asemenea, actualizează numele în datele de evoluție migrate
+                        state.evolutionData[newId].name = clientData.name;
+                    }
+                    
+                    // 2. Migrează referințele din 'events' (istoricul programelor)
+                    state.events.forEach(event => {
+                        // Câmpul vechi (dacă există)
+                        if (event.clientId === originalId) {
+                            event.clientId = newId;
+                        }
+                        // Câmpul nou (array)
+                        if (event.clientIds && event.clientIds.includes(originalId)) {
+                            event.clientIds = event.clientIds.map(id => id === originalId ? newId : id);
+                        }
+                    });
+                }
+            } else {
+                // Fallback: dacă clientul original nu e găsit, adaugă-l ca nou
+                state.clients.push(clientData);
+            }
         } else {
-            // Adăugare
-            state.clients.push(clientData);
+            // --- MOD ADĂUGARE NOU ---
+            // Verifică să nu existe deja (deși main.js face asta, e bine să fie și aici)
+            const index = state.clients.findIndex(c => c.id === newId);
+            if (index === -1) { 
+                state.clients.push(clientData);
+            }
         }
     },
     

@@ -1,7 +1,7 @@
 {
     "isAdminView": true,
-    "currentDate": "2025-11-18T22:00:00.000Z",
-    "currentView": "day",
+    "currentDate": "2025-11-03T11:21:00.499Z",
+    "currentView": "month",
     "teamMembers": [
         {
             "id": "corina",
@@ -390,34 +390,16 @@
             "phone": "",
             "birthDate": "2021-02-18"
         },
+       
         {
-            "id": "client_1761900123672",
-            "name": "Copilul test3 test",
-            "email": "aaaaast@test.ro",
-            "phone": "074400000",
-            "birthDate": "2021-02-04"
-        },
-        {
-            "id": "client_1762029840903",
-            "name": "copilul test 0",
+            "id": "test",
+            "name": "Copil_test",
             "email": "",
             "phone": "",
-            "birthDate": "1988-03-15"
-        },
-        {
-            "id": "client_1762089045757",
-            "name": "copilul test 4",
-            "email": "",
-            "phone": "",
-            "birthDate": "2017-02-11"
-        },
-        {
-            "id": "client_1762165001926",
-            "name": "Copilul test",
-            "email": "",
-            "phone": "",
-            "birthDate": "2021-01-01"
+            "birthDate": "2021-02-21"
         }
+        
+        
     ],
     "events": [
         {
@@ -19161,9 +19143,7 @@
                 "corina",
                 "daniela"
             ],
-            "clientIds": [
-                "client_1761900123672"
-            ],
+            "clientIds": [],
             "programIds": [
                 "prog_1",
                 "prog_2",
@@ -19250,7 +19230,7 @@
             "id": "evt1762126671296nnt9y5uxl"
         },
         {
-            "name": "Terapie - Copilul test",
+            "name": "Terapie - Copil_test",
             "type": "therapy",
             "date": "2025-11-03",
             "startTime": "08:00",
@@ -19261,37 +19241,33 @@
                 "member_1762036330730"
             ],
             "clientIds": [
-                "client_1762165001926"
+                "test"
             ],
             "programIds": [
-                "prog_1",
-                "prog_3",
-                "prog_4",
-                "prog_5",
                 "prog_6",
-                "prog_9",
-                "prog_8",
-                "prog_7"
+                "prog_5",
+                "prog_4",
+                "prog_3",
+                "prog_2",
+                "prog_1"
             ],
             "repeating": [
                 2,
                 4
             ],
-            "id": "evt17621650488899gwg023y8",
-            "comments": "",
+            "id": "evt1762167456542byjzsowjt",
             "programScores": {
-                "prog_1": "0",
-                "prog_3": "-",
-                "prog_4": "0",
+                "prog_6": "0",
                 "prog_5": "0",
-                "prog_6": "-",
-                "prog_9": "0",
-                "prog_8": "-",
-                "prog_7": "-"
-            }
+                "prog_4": "0",
+                "prog_3": "0",
+                "prog_2": "0",
+                "prog_1": "0"
+            },
+            "comments": ""
         },
         {
-            "name": "Terapie - Copilul test",
+            "name": "Terapie - Copil_test",
             "type": "therapy",
             "date": "2025-11-05",
             "startTime": "08:00",
@@ -19302,37 +19278,33 @@
                 "member_1762036330730"
             ],
             "clientIds": [
-                "client_1762165001926"
+                "test"
             ],
             "programIds": [
-                "prog_1",
-                "prog_3",
-                "prog_4",
-                "prog_5",
                 "prog_6",
-                "prog_9",
-                "prog_8",
-                "prog_7"
+                "prog_5",
+                "prog_4",
+                "prog_3",
+                "prog_2",
+                "prog_1"
             ],
             "repeating": [
                 2,
                 4
             ],
-            "id": "evt1762165048889glokumv4z",
-            "comments": "",
+            "id": "evt1762167456542yqxux0ozo",
             "programScores": {
-                "prog_1": "-",
-                "prog_3": "-",
-                "prog_4": "0",
+                "prog_6": "0",
                 "prog_5": "-",
-                "prog_6": "-",
-                "prog_9": "0",
-                "prog_8": "P",
-                "prog_7": "-"
-            }
+                "prog_4": "-",
+                "prog_3": "0",
+                "prog_2": "-",
+                "prog_1": "0"
+            },
+            "comments": ""
         },
         {
-            "name": "Terapie - Copilul test",
+            "name": "Terapie - Copil_test",
             "type": "therapy",
             "date": "2025-11-10",
             "startTime": "08:00",
@@ -19343,37 +19315,33 @@
                 "member_1762036330730"
             ],
             "clientIds": [
-                "client_1762165001926"
+                "test"
             ],
             "programIds": [
-                "prog_1",
-                "prog_3",
-                "prog_4",
-                "prog_5",
                 "prog_6",
-                "prog_9",
-                "prog_8",
-                "prog_7"
+                "prog_5",
+                "prog_4",
+                "prog_3",
+                "prog_2",
+                "prog_1"
             ],
             "repeating": [
                 2,
                 4
             ],
-            "id": "evt1762165048889axb9t7lr4",
+            "id": "evt1762167456542ymhdont7h",
             "programScores": {
-                "prog_1": "-",
-                "prog_3": "P",
-                "prog_4": "P",
+                "prog_6": "-",
                 "prog_5": "-",
-                "prog_6": "P",
-                "prog_9": "P",
-                "prog_8": "P",
-                "prog_7": "-"
+                "prog_4": "P",
+                "prog_3": "-",
+                "prog_2": "P",
+                "prog_1": "-"
             },
             "comments": ""
         },
         {
-            "name": "Terapie - Copilul test",
+            "name": "Terapie - Copil_test",
             "type": "therapy",
             "date": "2025-11-12",
             "startTime": "08:00",
@@ -19384,37 +19352,33 @@
                 "member_1762036330730"
             ],
             "clientIds": [
-                "client_1762165001926"
+                "test"
             ],
             "programIds": [
-                "prog_1",
-                "prog_3",
-                "prog_4",
-                "prog_5",
                 "prog_6",
-                "prog_9",
-                "prog_8",
-                "prog_7"
+                "prog_5",
+                "prog_4",
+                "prog_3",
+                "prog_2",
+                "prog_1"
             ],
             "repeating": [
                 2,
                 4
             ],
-            "id": "evt1762165048889y757yfemh",
+            "id": "evt1762167456542y3d22721c",
             "programScores": {
-                "prog_1": "P",
-                "prog_3": "+",
-                "prog_4": "P",
+                "prog_6": "-",
                 "prog_5": "P",
-                "prog_6": "P",
-                "prog_9": "+",
-                "prog_8": "+",
-                "prog_7": "P"
+                "prog_4": "P",
+                "prog_3": "-",
+                "prog_2": "P",
+                "prog_1": "P"
             },
             "comments": ""
         },
         {
-            "name": "Terapie - Copilul test",
+            "name": "Terapie - Copil_test",
             "type": "therapy",
             "date": "2025-11-17",
             "startTime": "08:00",
@@ -19425,37 +19389,33 @@
                 "member_1762036330730"
             ],
             "clientIds": [
-                "client_1762165001926"
+                "test"
             ],
             "programIds": [
-                "prog_1",
-                "prog_3",
-                "prog_4",
-                "prog_5",
                 "prog_6",
-                "prog_9",
-                "prog_8",
-                "prog_7"
+                "prog_5",
+                "prog_4",
+                "prog_3",
+                "prog_2",
+                "prog_1"
             ],
             "repeating": [
                 2,
                 4
             ],
-            "id": "evt1762165048889la4yx2a8g",
+            "id": "evt17621674565420lzlji6rj",
             "programScores": {
-                "prog_1": "+",
-                "prog_3": "+",
-                "prog_4": "+",
+                "prog_6": "P",
                 "prog_5": "P",
-                "prog_6": "+",
-                "prog_9": "+",
-                "prog_8": "P",
-                "prog_7": "+"
+                "prog_4": "P",
+                "prog_3": "+",
+                "prog_2": "P",
+                "prog_1": "P"
             },
             "comments": ""
         },
         {
-            "name": "Terapie - Copilul test",
+            "name": "Terapie - Copil_test",
             "type": "therapy",
             "date": "2025-11-19",
             "startTime": "08:00",
@@ -19466,37 +19426,24 @@
                 "member_1762036330730"
             ],
             "clientIds": [
-                "client_1762165001926"
+                "test"
             ],
             "programIds": [
-                "prog_1",
-                "prog_3",
-                "prog_4",
-                "prog_5",
                 "prog_6",
-                "prog_9",
-                "prog_8",
-                "prog_7"
+                "prog_5",
+                "prog_4",
+                "prog_3",
+                "prog_2",
+                "prog_1"
             ],
             "repeating": [
                 2,
                 4
             ],
-            "id": "evt1762165048889odlbrbmam",
-            "programScores": {
-                "prog_1": "+",
-                "prog_3": "+",
-                "prog_4": "+",
-                "prog_5": "+",
-                "prog_6": "+",
-                "prog_9": "+",
-                "prog_8": "+",
-                "prog_7": "+"
-            },
-            "comments": ""
+            "id": "evt17621674565429kyerqzor"
         },
         {
-            "name": "Terapie - Copilul test",
+            "name": "Terapie - Copil_test",
             "type": "therapy",
             "date": "2025-11-24",
             "startTime": "08:00",
@@ -19507,26 +19454,33 @@
                 "member_1762036330730"
             ],
             "clientIds": [
-                "client_1762165001926"
+                "test"
             ],
             "programIds": [
-                "prog_1",
-                "prog_3",
-                "prog_4",
-                "prog_5",
                 "prog_6",
-                "prog_9",
-                "prog_8",
-                "prog_7"
+                "prog_5",
+                "prog_4",
+                "prog_3",
+                "prog_2",
+                "prog_1"
             ],
             "repeating": [
                 2,
                 4
             ],
-            "id": "evt1762165048889zyy1tag6k"
+            "id": "evt1762167456542g4f3gduch",
+            "programScores": {
+                "prog_6": "+",
+                "prog_5": "+",
+                "prog_4": "P",
+                "prog_3": "+",
+                "prog_2": "+",
+                "prog_1": "P"
+            },
+            "comments": ""
         },
         {
-            "name": "Terapie - Copilul test",
+            "name": "Terapie - Copil_test",
             "type": "therapy",
             "date": "2025-11-26",
             "startTime": "08:00",
@@ -19537,23 +19491,30 @@
                 "member_1762036330730"
             ],
             "clientIds": [
-                "client_1762165001926"
+                "test"
             ],
             "programIds": [
-                "prog_1",
-                "prog_3",
-                "prog_4",
-                "prog_5",
                 "prog_6",
-                "prog_9",
-                "prog_8",
-                "prog_7"
+                "prog_5",
+                "prog_4",
+                "prog_3",
+                "prog_2",
+                "prog_1"
             ],
             "repeating": [
                 2,
                 4
             ],
-            "id": "evt1762165048889n6usivigr"
+            "id": "evt1762167456542teulqcyqw",
+            "programScores": {
+                "prog_6": "+",
+                "prog_5": "+",
+                "prog_4": "+",
+                "prog_3": "+",
+                "prog_2": "+",
+                "prog_1": "+"
+            },
+            "comments": ""
         }
     ],
     "programs": [
@@ -20345,6 +20306,306 @@
                     "eventId": "evt1762165048889odlbrbmam"
                 }
             ]
+        },
+        "test": {
+            "name": "Copil_test",
+            "evaluations": [],
+            "programHistory": [
+                {
+                    "date": "2025-11-26",
+                    "programId": "prog_6",
+                    "programTitle": "Motricitate",
+                    "score": "+",
+                    "eventId": "evt1762167456542teulqcyqw"
+                },
+                {
+                    "date": "2025-11-26",
+                    "programId": "prog_5",
+                    "programTitle": "Receptiv obiecte",
+                    "score": "+",
+                    "eventId": "evt1762167456542teulqcyqw"
+                },
+                {
+                    "date": "2025-11-26",
+                    "programId": "prog_4",
+                    "programTitle": "Imitare motorie cu și fără obiect",
+                    "score": "+",
+                    "eventId": "evt1762167456542teulqcyqw"
+                },
+                {
+                    "date": "2025-11-26",
+                    "programId": "prog_3",
+                    "programTitle": "Instrucțiuni functionale",
+                    "score": "+",
+                    "eventId": "evt1762167456542teulqcyqw"
+                },
+                {
+                    "date": "2025-11-26",
+                    "programId": "prog_2",
+                    "programTitle": "Stimulare de limbaj",
+                    "score": "+",
+                    "eventId": "evt1762167456542teulqcyqw"
+                },
+                {
+                    "date": "2025-11-26",
+                    "programId": "prog_1",
+                    "programTitle": "Imitare orala",
+                    "score": "+",
+                    "eventId": "evt1762167456542teulqcyqw"
+                },
+                {
+                    "date": "2025-11-24",
+                    "programId": "prog_6",
+                    "programTitle": "Motricitate",
+                    "score": "+",
+                    "eventId": "evt1762167456542g4f3gduch"
+                },
+                {
+                    "date": "2025-11-24",
+                    "programId": "prog_5",
+                    "programTitle": "Receptiv obiecte",
+                    "score": "+",
+                    "eventId": "evt1762167456542g4f3gduch"
+                },
+                {
+                    "date": "2025-11-24",
+                    "programId": "prog_4",
+                    "programTitle": "Imitare motorie cu și fără obiect",
+                    "score": "P",
+                    "eventId": "evt1762167456542g4f3gduch"
+                },
+                {
+                    "date": "2025-11-24",
+                    "programId": "prog_3",
+                    "programTitle": "Instrucțiuni functionale",
+                    "score": "+",
+                    "eventId": "evt1762167456542g4f3gduch"
+                },
+                {
+                    "date": "2025-11-24",
+                    "programId": "prog_2",
+                    "programTitle": "Stimulare de limbaj",
+                    "score": "+",
+                    "eventId": "evt1762167456542g4f3gduch"
+                },
+                {
+                    "date": "2025-11-24",
+                    "programId": "prog_1",
+                    "programTitle": "Imitare orala",
+                    "score": "P",
+                    "eventId": "evt1762167456542g4f3gduch"
+                },
+                {
+                    "date": "2025-11-17",
+                    "programId": "prog_6",
+                    "programTitle": "Motricitate",
+                    "score": "P",
+                    "eventId": "evt17621674565420lzlji6rj"
+                },
+                {
+                    "date": "2025-11-17",
+                    "programId": "prog_5",
+                    "programTitle": "Receptiv obiecte",
+                    "score": "P",
+                    "eventId": "evt17621674565420lzlji6rj"
+                },
+                {
+                    "date": "2025-11-17",
+                    "programId": "prog_4",
+                    "programTitle": "Imitare motorie cu și fără obiect",
+                    "score": "P",
+                    "eventId": "evt17621674565420lzlji6rj"
+                },
+                {
+                    "date": "2025-11-17",
+                    "programId": "prog_3",
+                    "programTitle": "Instrucțiuni functionale",
+                    "score": "+",
+                    "eventId": "evt17621674565420lzlji6rj"
+                },
+                {
+                    "date": "2025-11-17",
+                    "programId": "prog_2",
+                    "programTitle": "Stimulare de limbaj",
+                    "score": "P",
+                    "eventId": "evt17621674565420lzlji6rj"
+                },
+                {
+                    "date": "2025-11-17",
+                    "programId": "prog_1",
+                    "programTitle": "Imitare orala",
+                    "score": "P",
+                    "eventId": "evt17621674565420lzlji6rj"
+                },
+                {
+                    "date": "2025-11-12",
+                    "programId": "prog_6",
+                    "programTitle": "Motricitate",
+                    "score": "-",
+                    "eventId": "evt1762167456542y3d22721c"
+                },
+                {
+                    "date": "2025-11-12",
+                    "programId": "prog_5",
+                    "programTitle": "Receptiv obiecte",
+                    "score": "P",
+                    "eventId": "evt1762167456542y3d22721c"
+                },
+                {
+                    "date": "2025-11-12",
+                    "programId": "prog_4",
+                    "programTitle": "Imitare motorie cu și fără obiect",
+                    "score": "P",
+                    "eventId": "evt1762167456542y3d22721c"
+                },
+                {
+                    "date": "2025-11-12",
+                    "programId": "prog_3",
+                    "programTitle": "Instrucțiuni functionale",
+                    "score": "-",
+                    "eventId": "evt1762167456542y3d22721c"
+                },
+                {
+                    "date": "2025-11-12",
+                    "programId": "prog_2",
+                    "programTitle": "Stimulare de limbaj",
+                    "score": "P",
+                    "eventId": "evt1762167456542y3d22721c"
+                },
+                {
+                    "date": "2025-11-12",
+                    "programId": "prog_1",
+                    "programTitle": "Imitare orala",
+                    "score": "P",
+                    "eventId": "evt1762167456542y3d22721c"
+                },
+                {
+                    "date": "2025-11-10",
+                    "programId": "prog_6",
+                    "programTitle": "Motricitate",
+                    "score": "-",
+                    "eventId": "evt1762167456542ymhdont7h"
+                },
+                {
+                    "date": "2025-11-10",
+                    "programId": "prog_5",
+                    "programTitle": "Receptiv obiecte",
+                    "score": "-",
+                    "eventId": "evt1762167456542ymhdont7h"
+                },
+                {
+                    "date": "2025-11-10",
+                    "programId": "prog_4",
+                    "programTitle": "Imitare motorie cu și fără obiect",
+                    "score": "P",
+                    "eventId": "evt1762167456542ymhdont7h"
+                },
+                {
+                    "date": "2025-11-10",
+                    "programId": "prog_3",
+                    "programTitle": "Instrucțiuni functionale",
+                    "score": "-",
+                    "eventId": "evt1762167456542ymhdont7h"
+                },
+                {
+                    "date": "2025-11-10",
+                    "programId": "prog_2",
+                    "programTitle": "Stimulare de limbaj",
+                    "score": "P",
+                    "eventId": "evt1762167456542ymhdont7h"
+                },
+                {
+                    "date": "2025-11-10",
+                    "programId": "prog_1",
+                    "programTitle": "Imitare orala",
+                    "score": "-",
+                    "eventId": "evt1762167456542ymhdont7h"
+                },
+                {
+                    "date": "2025-11-05",
+                    "programId": "prog_6",
+                    "programTitle": "Motricitate",
+                    "score": "0",
+                    "eventId": "evt1762167456542yqxux0ozo"
+                },
+                {
+                    "date": "2025-11-05",
+                    "programId": "prog_5",
+                    "programTitle": "Receptiv obiecte",
+                    "score": "-",
+                    "eventId": "evt1762167456542yqxux0ozo"
+                },
+                {
+                    "date": "2025-11-05",
+                    "programId": "prog_4",
+                    "programTitle": "Imitare motorie cu și fără obiect",
+                    "score": "-",
+                    "eventId": "evt1762167456542yqxux0ozo"
+                },
+                {
+                    "date": "2025-11-05",
+                    "programId": "prog_3",
+                    "programTitle": "Instrucțiuni functionale",
+                    "score": "0",
+                    "eventId": "evt1762167456542yqxux0ozo"
+                },
+                {
+                    "date": "2025-11-05",
+                    "programId": "prog_2",
+                    "programTitle": "Stimulare de limbaj",
+                    "score": "-",
+                    "eventId": "evt1762167456542yqxux0ozo"
+                },
+                {
+                    "date": "2025-11-05",
+                    "programId": "prog_1",
+                    "programTitle": "Imitare orala",
+                    "score": "0",
+                    "eventId": "evt1762167456542yqxux0ozo"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_6",
+                    "programTitle": "Motricitate",
+                    "score": "0",
+                    "eventId": "evt1762167456542byjzsowjt"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_5",
+                    "programTitle": "Receptiv obiecte",
+                    "score": "0",
+                    "eventId": "evt1762167456542byjzsowjt"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_4",
+                    "programTitle": "Imitare motorie cu și fără obiect",
+                    "score": "0",
+                    "eventId": "evt1762167456542byjzsowjt"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_3",
+                    "programTitle": "Instrucțiuni functionale",
+                    "score": "0",
+                    "eventId": "evt1762167456542byjzsowjt"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_2",
+                    "programTitle": "Stimulare de limbaj",
+                    "score": "0",
+                    "eventId": "evt1762167456542byjzsowjt"
+                },
+                {
+                    "date": "2025-11-03",
+                    "programId": "prog_1",
+                    "programTitle": "Imitare orala",
+                    "score": "0",
+                    "eventId": "evt1762167456542byjzsowjt"
+                }
+            ]
         }
     },
     "activeFilters": [
@@ -20356,7 +20617,7 @@
     ],
     "editingEventId": null,
     "editingMemberId": null,
-    "editingClientId": null,
+    "editingClientId": "test",
     "selectedClientIds": [],
     "selectedProgramIds": []
 }
