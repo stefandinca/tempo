@@ -2130,6 +2130,38 @@ textarea.form-input {
   background: #1e293b;
 }
 
+/* ... (după .evolution-table:hover) ... */
+
+/* NOU: Titlu pentru lista de rapoarte (înlocuiește titlul h3 din .evolution-summary) */
+.evolution-summary-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* NOU: Lista de butoane pentru rapoarte */
+.evaluation-report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+/* NOU: Buton individual de raport */
+.evaluation-report-button {
+  width: 100%;
+  justify-content: flex-start; /* Aliniază textul la stânga */
+}
+.evaluation-report-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* --- Program History --- */
+/* ... (restul stilurilor continuă de aici) ... */
 
 /* ==========================================================
    9.5 COMPONENTS (BILLING)

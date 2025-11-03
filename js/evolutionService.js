@@ -47,7 +47,7 @@ export async function showEvolutionModal(clientId) {
 
     // Randează componentele (acestea vor gestiona starea goală)
     renderEvolutionChart(clientData);
-    renderPortageSummary(clientData, client);
+    renderEvaluationReportsList(clientData, client);
     renderProgramHistory(clientData);
     
     // Pregătește modalul de evaluare
@@ -142,64 +142,562 @@ function renderEvolutionChart(clientData) {
 
 // În fișierul: js/evolutionService.js
 
-function renderPortageSummary(clientData, client) {
-    const summaryEl = $('evolutionSummary');
-    if (!summaryEl || !client.birthDate || !clientData.evaluations) {
-        if (summaryEl) summaryEl.innerHTML = '';
+/**
+ * NOU: Randează lista de butoane pentru rapoartele de evaluare (înlocuiește renderPortageSummary)
+ */
+function renderEvaluationReportsList(clientData, client) {
+    const container = $('evolutionSummary');
+    if (!container) return;
+
+    const allEvaluations = [];
+
+    // 1. Adaugă evaluările Portage
+    // Grupăm după dată, deoarece o evaluare Portage conține mai multe domenii la aceeași dată
+    if (clientData.evaluations) {
+        Object.keys(clientData.evaluations).forEach(domain => {
+            Object.keys(clientData.evaluations[domain]).forEach(date => {
+                // Adăugăm data doar o singură dată
+                if (!allEvaluations.some(e => e.type === 'portage' && e.date === date)) {
+                    allEvaluations.push({
+                        type: 'portage',
+                        date: date,
+                        title: 'Evaluare Portage'
+                    });
+                }
+            });
+        });
+    }
+
+    // 2. Adaugă evaluările Logopedice
+    if (clientData.evaluationsLogopedica) {
+        Object.keys(clientData.evaluationsLogopedica).forEach(date => {
+            allEvaluations.push({
+                type: 'logopedica',
+                date: date,
+                title: 'Evaluare Logopedică'
+            });
+        });
+    }
+
+    // 3. Sortează evaluările (cele mai noi primele)
+    allEvaluations.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // 4. Generează HTML
+    if (allEvaluations.length === 0) {
+        container.innerHTML = `
+            <h3 class="evolution-summary-title">Rapoarte Evaluări Salvate</h3>
+            <p class="empty-list-message" style="margin-top: 1rem; text-align: center;">Nu există evaluări salvate pentru acest client.</p>
+        `;
         return;
     }
 
-    const birthDate = new Date(client.birthDate);
-    const allDates = new Set();
-    Object.values(clientData.evaluations).forEach(domain => {
-        Object.keys(domain).forEach(date => allDates.add(date));
-    });
-    const sortedDates = Array.from(allDates).sort((a, b) => new Date(a) - new Date(b));
-    
-    const results = [];
-    sortedDates.forEach(date => {
-        const evalValues = Object.values(clientData.evaluations)
-            .map(domain => domain[date])
-            .filter(v => typeof v === 'number' && !isNaN(v));
-        if (evalValues.length === 0) return;
+    const buttonsHTML = allEvaluations.map(ev => {
+        const formattedDate = new Date(ev.date).toLocaleDateString('ro-RO', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+        // Pictograme diferite pentru fiecare tip de raport
+        const icon = ev.type === 'portage' 
+            ? '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9l-5 5-4-4-6 6"/></svg>'
+            : '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5a2.5 2.5 0 0 1 5 0v1.7a(2.5,2.5,0,0,1,-5,0)v-1.7a(2.5,2.5,0,0,1,5,0)z"/><path d="M12 15.5a2.5 2.5 0 0 1 5 0v1.7a(2.5,2.5,0,0,1,-5,0)v-1.7a(2.5,2.5,0,0,1,5,0)z"/><path d="M4 8v-1.7a(2.5,2.5,0,0,1,5,0)v1.7a(2.5,2.5,0,0,1,-5,0)z"/><path d="M4 17v-1.7a(2.5,2.5,0,0,1,5,0)v1.7a(2.5,2.5,0,0,1,-5,0)z"/></svg>';
 
-        const avgDevAge = evalValues.reduce((a, b) => a + b, 0) / evalValues.length;
-        // Folosim funcția getAgeInMonths() deja existentă în fișier
-        const chronoAge = getAgeInMonths(birthDate, date); 
-        if (chronoAge === 0) return; // Evităm împărțirea la zero
-        const dq = (avgDevAge / chronoAge) * 100;
-        results.push({ date, avgDevAge, chronoAge, dq });
-    });
+        return `
+            <button class="btn btn-action-text evaluation-report-button" data-type="${ev.type}" data-date="${eval.date}">
+                ${icon}
+                <span>${ev.title} - ${formattedDate}</span>
+            </button>
+        `;
+    }).join('');
 
-    if (results.length === 0) {
-        summaryEl.innerHTML = '';
-        return;
-    }
-
-    // --- MODIFICARE AICI ---
-    // Am eliminat div-ul .evolution-summary și am adăugat stiluri 
-    // direct pe titlu pentru a se potrivi cu restul modalului.
-    summaryEl.innerHTML = `
-        <h3 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem; margin-top: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">Evoluție generală Portage (DQ)</h3>
-        <div class="evolution-table-container">
-            <table class="evolution-table">
-                <thead><tr><th>Data</th><th>Vârstă cronologică</th><th>Vârstă mentală</th><th>Indice dezvoltare (DQ)</th></tr></thead>
-                <tbody>
-                    ${results.map(r => {
-                        const color = r.dq < 70 ? '#e74c3c' : r.dq < 85 ? '#f39c12' : '#27ae60';
-                        // Adăugăm atributele data-label pentru CSS-ul responsiv
-                        return `<tr>
-                            <td data-label="Data">${r.date}</td>
-                            <td data-label="Vârstă cronologică">${r.chronoAge.toFixed(1)} luni</td>
-                            <td data-label="Vârstă mentală">${r.avgDevAge.toFixed(1)} luni</td>
-                            <td data-label="Indice dezvoltare (DQ)" style="font-weight:600;color:${color};">${r.dq.toFixed(1)}</td>
-                        </tr>`;
-                    }).join('')}
-                </tbody>
-            </table>
+    container.innerHTML = `
+        <h3 class="evolution-summary-title">Rapoarte Evaluări Salvate</h3>
+        <div class="evaluation-report-list">
+            ${buttonsHTML}
         </div>
     `;
-    // --- SFÂRȘIT MODIFICARE ---
+
+    // 5. Adaugă event listener (delegare)
+    // Asigură-te că nu adaugi listeneri multipli
+    container.removeEventListener('click', handleEvaluationReportDownload); 
+    container.addEventListener('click', handleEvaluationReportDownload);
+}
+
+/**
+ * NOU: Handler pentru click pe butoanele de descărcare
+ */
+async function handleEvaluationReportDownload(e) {
+    const button = e.target.closest('.evaluation-report-button');
+    if (!button) return;
+
+    // Dezactivează butonul temporar pentru a preveni click-uri duble
+    button.disabled = true;
+    button.querySelector('span').textContent = 'Se generează...';
+
+    const type = button.dataset.type;
+    const date = button.dataset.date;
+    
+    const { evolutionData } = calendarState.getState();
+    const client = calendarState.getClientById(currentClientId);
+    const clientData = evolutionData[currentClientId];
+
+    if (!client || !clientData) {
+        showCustomAlert('Eroare: Datele clientului nu au fost găsite.', 'Eroare');
+        button.disabled = false; // Reactivează butonul
+        return;
+    }
+
+    let htmlContent = '';
+    let fileName = `Raport_${client.name.replace(/\s+/g, '_')}_${date}.html`;
+
+    try {
+        if (type === 'portage') {
+            htmlContent = generatePortageReportHTML(client, clientData, date);
+            fileName = `Raport_Portage_${fileName}`;
+        } else if (type === 'logopedica') {
+            htmlContent = generateLogopedicaReportHTML(client, clientData, date);
+            fileName = `Raport_Logopedic_${fileName}`;
+        } else {
+            return;
+        }
+
+        // Generează și descarcă fișierul
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+    } catch (err) {
+        console.error('Eroare la generarea raportului:', err);
+        showCustomAlert('A apărut o eroare la generarea fișierului HTML.', 'Eroare');
+    } finally {
+        // Reactivează butonul
+        button.disabled = false;
+        const formattedDate = new Date(date).toLocaleDateString('ro-RO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        button.querySelector('span').textContent = `${type === 'portage' ? 'Evaluare Portage' : 'Evaluare Logopedică'} - ${formattedDate}`;
+    }
+}
+
+/**
+ * NOU: Generator HTML pentru Raport Portage Individual (printabil)
+ */
+function generatePortageReportHTML(client, clientData, date) {
+    const birthDate = new Date(client.birthDate);
+    const evalDate = new Date(date);
+    const chronoAge = getAgeInMonths(birthDate, evalDate);
+    const domains = clientData.evaluations;
+
+    let domainRows = '';
+    let totalDA = 0;
+    let domainCount = 0;
+
+    // Iterăm doar domeniile care au o intrare pentru data respectivă
+    Object.keys(domains).forEach(domainName => {
+        if (domains[domainName] && domains[domainName][date] !== undefined) {
+            const da = domains[domainName][date];
+            const dq = chronoAge > 0 ? (da / chronoAge) * 100 : 0;
+            const color = dq < 70 ? '#e74c3c' : dq < 85 ? '#f39c12' : '#27ae60';
+            
+            domainRows += `
+                <tr>
+                    <td>${domainName.replace('Portrige - ', '')}</td>
+                    <td style="text-align: right;">${da.toFixed(1)} luni</td>
+                    <td style="text-align: right; color: ${color}; font-weight: 600;">${dq.toFixed(1)}</td>
+                </tr>
+            `;
+            totalDA += da;
+            domainCount++;
+        }
+    });
+
+    const avgDA = domainCount > 0 ? totalDA / domainCount : 0;
+    const avgDQ = chronoAge > 0 ? (avgDA / chronoAge) * 100 : 0;
+    const avgColor = avgDQ < 70 ? '#e74c3c' : avgDQ < 85 ? '#f39c12' : '#27ae60';
+
+    return `
+        <!DOCTYPE html>
+        <html lang="ro">
+        <head>
+            <meta charset="UTF-8">
+            <title>Raport Portage - ${client.name}</title>
+            <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 2rem; color: #333; line-height: 1.5; }
+                .container { max-width: 800px; margin: auto; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+                .header { background: #4A90E2; color: white; padding: 1.5rem; border-radius: 8px 8px 0 0; }
+                .header h1 { margin: 0; font-size: 1.8rem; }
+                .header p { margin: 0.25rem 0 0; font-size: 1rem; opacity: 0.9; }
+                .content { padding: 1.5rem; }
+                .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; background: #f9f9f9; padding: 1rem; border-radius: 8px; }
+                .info-item { display: flex; flex-direction: column; }
+                .info-label { font-size: 0.8rem; color: #666; text-transform: uppercase; font-weight: 600; }
+                .info-value { font-size: 1.1rem; font-weight: 500; }
+                h2 { font-size: 1.3rem; color: #4A90E2; border-bottom: 2px solid #eee; padding-bottom: 0.5rem; margin-top: 2rem; }
+                table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+                th, td { padding: 0.75rem 1rem; border-bottom: 1px solid #eee; text-align: left; }
+                th { background: #f4f4f4; font-weight: 600; }
+                tr:last-child td { border: 0; }
+                tfoot td { font-weight: 700; font-size: 1.1rem; background: #f9f9f9; border-top: 2px solid #ddd; }
+                @media print {
+                    body { padding: 0; }
+                    .container { border: 0; box-shadow: none; max-width: 100%; }
+                    .header { background: #4A90E2 !important; color: white !important; -webkit-print-color-adjust: exact; }
+                    th, tfoot td, .info-grid { background: #f9f9f9 !important; -webkit-print-color-adjust: exact; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Raport Evaluare Portage</h1>
+                    <p>Client: ${client.name}</p>
+                </div>
+                <div class="content">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Data Evaluării</span>
+                            <span class="info-value">${evalDate.toLocaleDateString('ro-RO')}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Data Nașterii</span>
+                            <span class="info-value">${birthDate.toLocaleDateString('ro-RO')}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Vârstă Cronologică (CA)</span>
+                            <span class="info-value">${chronoAge.toFixed(1)} luni</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Vârstă Mentală (Medie DA)</span>
+                            <span class="info-value">${avgDA.toFixed(1)} luni</span>
+                        </div>
+                    </div>
+                    
+                    <h2>Rezultate pe Domenii</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Domeniu</th>
+                                <th style="text-align: right;">Vârstă Dezvoltare (DA)</th>
+                                <th style="text-align: right;">Indice Dezvoltare (DQ)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${domainRows}
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td>Total (Medie)</td>
+                                <td style="text-align: right;">${avgDA.toFixed(1)} luni</td>
+                                <td style="text-align: right; color: ${avgColor};">${avgDQ.toFixed(1)}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+}
+
+/**
+ * NOU: Generator HTML pentru Raport Logopedic Individual (printabil)
+ */
+function generateLogopedicaReportHTML(client, clientData, date) {
+    const evalData = clientData.evaluationsLogopedica?.[date];
+    if (!evalData) return '<h1>Eroare: Evaluarea logopedică nu a fost găsită.</h1>';
+
+    const scores = evalData.scores || {};
+    const comments = evalData.comments || 'Niciun comentariu.';
+    
+    // Funcție helper pentru a obține scorul
+    const getScore = (id) => {
+        const score = scores[id];
+        return score ? `<span class="logo-score">${score}</span>` : '—';
+    };
+
+    return `
+        <!DOCTYPE html>
+        <html lang="ro">
+        <head>
+            <meta charset="UTF-8">
+            <title>Evaluare Logopedică - ${client.name}</title>
+            <style>
+                body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; padding: 2rem; color: #333; line-height: 1.5; }
+                .container { max-width: 800px; margin: auto; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+                .header { background: #9B59B6; color: white; padding: 1.5rem; border-radius: 8px 8px 0 0; }
+                .header h1 { margin: 0; font-size: 1.8rem; }
+                .header p { margin: 0.25rem 0 0; font-size: 1rem; opacity: 0.9; }
+                .content { padding: 1.5rem; }
+                .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; background: #f9f9f9; padding: 1rem; border-radius: 8px; }
+                .info-item { display: flex; flex-direction: column; }
+                .info-label { font-size: 0.8rem; color: #666; text-transform: uppercase; font-weight: 600; }
+                .info-value { font-size: 1.1rem; font-weight: 500; }
+                h2 { font-size: 1.3rem; color: #9B59B6; border-bottom: 2px solid #eee; padding-bottom: 0.5rem; margin-top: 2rem; }
+                .comments-section p { white-space: pre-wrap; background: #f9f9f9; padding: 1rem; border-radius: 8px; line-height: 1.6; }
+                .logopedica-table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.9rem; }
+                .logopedica-table th, .logopedica-table td { padding: 0.5rem; border: 1px solid #ddd; text-align: center; vertical-align: middle; }
+                .logopedica-table th { background: #f4f4f4; font-weight: 600; }
+                .logopedica-table td:first-child { font-weight: 700; font-size: 1.25rem; width: 80px; }
+                .logo-example-text { display: block; font-size: 0.75rem; color: #777; font-style: italic; }
+                .logo-score { font-weight: 600; font-size: 1rem; color: #4A90E2; }
+                @media print {
+                    body { padding: 0; }
+                    .container { border: 0; box-shadow: none; max-width: 100%; }
+                    .header { background: #9B59B6 !important; color: white !important; -webkit-print-color-adjust: exact; }
+                    th, .info-grid, .comments-section p { background: #f9f9f9 !important; -webkit-print-color-adjust: exact; }
+                    .logopedica-table th, .logopedica-table td { border: 1px solid #ccc; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Evaluare Logopedică</h1>
+                    <p>Client: ${client.name}</p>
+                </div>
+                <div class="content">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Data Evaluării</span>
+                            <span class="info-value">${new Date(date).toLocaleDateString('ro-RO')}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Data Nașterii</span>
+                            <span class="info-value">${client.birthDate ? new Date(client.birthDate).toLocaleDateString('ro-RO') : 'N/A'}</span>
+                        </div>
+                    </div>
+
+                    <h2>Rezultate Evaluare</h2>
+                    <div class="logopedica-table-container">
+                        <table class="logopedica-table">
+                            <thead>
+                                <tr>
+                                    <th>Sunet</th>
+                                    <th>Poziție Inițială</th>
+                                    <th>Poziție Mediană</th>
+                                    <th>Poziție Finală</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>A</td>
+                                    <td><span class="logo-example-text">arici</span>${getScore('logo_A_init')}</td>
+                                    <td><span class="logo-example-text">vaca</span>${getScore('logo_A_med')}</td>
+                                    <td><span class="logo-example-text">perdea</span>${getScore('logo_A_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>O</td>
+                                    <td><span class="logo-example-text">olita</span>${getScore('logo_O_init')}</td>
+                                    <td><span class="logo-example-text">foc</span>${getScore('logo_O_med')}</td>
+                                    <td><span class="logo-example-text">radio</span>${getScore('logo_O_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>U</td>
+                                    <td><span class="logo-example-text">umbrela</span>${getScore('logo_U_init')}</td>
+                                    <td><span class="logo-example-text">pui</span>${getScore('logo_U_med')}</td>
+                                    <td><span class="logo-example-text">cadou</span>${getScore('logo_U_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>E</td>
+                                    <td><span class="logo-example-text">elefant</span>${getScore('logo_E_init')}</td>
+                                    <td><span class="logo-example-text">peste</span>${getScore('logo_E_med')}</td>
+                                    <td><span class="logo-example-text">rosie</span>${getScore('logo_E_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>I</td>
+                                    <td><span class="logo-example-text">iepure</span>${getScore('logo_I_init')}</td>
+                                    <td><span class="logo-example-text">lingura</span>${getScore('logo_I_med')}</td>
+                                    <td><span class="logo-example-text">ardei</span>${getScore('logo_I_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>Ă</td>
+                                    <td><span class="logo-example-text">ăla</span>${getScore('logo_A2_init')}</td>
+                                    <td><span class="logo-example-text">mănuși</span>${getScore('logo_A2_med')}</td>
+                                    <td><span class="logo-example-text">casă</span>${getScore('logo_A2_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>Â/Î</td>
+                                    <td><span class="logo-example-text">îngeraș</span>${getScore('logo_A3_init')}</td>
+                                    <td><span class="logo-example-text">pâine</span>${getScore('logo_A3_med')}</td>
+                                    <td><span class="logo-example-text">a coborî</span>${getScore('logo_A3_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>P</td>
+                                    <td><span class="logo-example-text">pară</span>${getScore('logo_P_init')}</td>
+                                    <td><span class="logo-example-text">șarpe</span>${getScore('logo_P_med')}</td>
+                                    <td><span class="logo-example-text">dulap</span>${getScore('logo_P_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>B</td>
+                                    <td><span class="logo-example-text">balon</span>${getScore('logo_B_init')}</td>
+                                    <td><span class="logo-example-text">albină</span>${getScore('logo_B_med')}</td>
+                                    <td><span class="logo-example-text">cerb</span>${getScore('logo_B_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>M</td>
+                                    <td><span class="logo-example-text">mașină</span>${getScore('logo_M_init')}</td>
+                                    <td><span class="logo-example-text">bomboană</span>${getScore('logo_M_med')}</td>
+                                    <td><span class="logo-example-text">pom</span>${getScore('logo_M_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>T</td>
+                                    <td><span class="logo-example-text">tobă</span>${getScore('logo_T_init')}</td>
+                                    <td><span class="logo-example-text">autobuz</span>${getScore('logo_T_med')}</td>
+                                    <td><span class="logo-example-text">pat</span>${getScore('logo_T_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>D</td>
+                                    <td><span class="logo-example-text">dinozaur</span>${getScore('logo_D_init')}</td>
+                                    <td><span class="logo-example-text">crocodil</span>${getScore('logo_D_med')}</td>
+                                    <td><span class="logo-example-text">brad</span>${getScore('logo_D_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>N</td>
+                                    <td><span class="logo-example-text">nor</span>${getScore('logo_N_init')}</td>
+                                    <td><span class="logo-example-text">cană</span>${getScore('logo_N_med')}</td>
+                                    <td><span class="logo-example-text">scaun</span>${getScore('logo_N_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>L</td>
+                                    <td><span class="logo-example-text">leu</span>${getScore('logo_L_init')}</td>
+                                    <td><span class="logo-example-text">melc</span>${getScore('logo_L_med')}</td>
+                                    <td><span class="logo-example-text">cal</span>${getScore('logo_L_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>F</td>
+                                    <td><span class="logo-example-text">floare</span>${getScore('logo_F_init')}</td>
+                                    <td><span class="logo-example-text">telefon</span>${getScore('logo_F_med')}</td>
+                                    <td><span class="logo-example-text">cartof</span>${getScore('logo_F_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>V</td>
+                                    <td><span class="logo-example-text">vapor</span>${getScore('logo_V_init')}</td>
+                                    <td><span class="logo-example-text">avion</span>${getScore('logo_V_med')}</td>
+                                    <td><span class="logo-example-text">morcov</span>${getScore('logo_V_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>S</td>
+                                    <td><span class="logo-example-text">sanie</span>${getScore('logo_S_init')}</td>
+                                    <td><span class="logo-example-text">pisică</span>${getScore('logo_S_med')}</td>
+                                    <td><span class="logo-example-text">urs</span>${getScore('logo_S_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>Z</td>
+                                    <td><span class="logo-example-text">zebră</span>${getScore('logo_Z_init')}</td>
+                                    <td><span class="logo-example-text">frunză</span>${getScore('logo_Z_med')}</td>
+                                    <td><span class="logo-example-text">autobuz</span>${getScore('logo_Z_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>Ț</td>
+                                    <td><span class="logo-example-text">țap</span>${getScore('logo_T2_init')}</td>
+                                    <td><span class="logo-example-text">maimuță</span>${getScore('logo_T2_med')}</td>
+                                    <td><span class="logo-example-text">căluț</span>${getScore('logo_T2_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>Ș</td>
+                                    <td><span class="logo-example-text">șervețel</span>${getScore('logo_S2_init')}</td>
+                                    <td><span class="logo-example-text">ușă</span>${getScore('logo_S2_med')}</td>
+                                    <td><span class="logo-example-text">cocoș</span>${getScore('logo_S2_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>J</td>
+                                    <td><span class="logo-example-text">jucării</span>${getScore('logo_J_init')}</td>
+                                    <td><span class="logo-example-text">păianjen</span>${getScore('logo_J_med')}</td>
+                                    <td><span class="logo-example-text">ruj</span>${getScore('logo_J_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>C</td>
+                                    <td><span class="logo-example-text">câine</span>${getScore('logo_C_init')}</td>
+                                    <td><span class="logo-example-text">muscă</span>${getScore('logo_C_med')}</td>
+                                    <td><span class="logo-example-text">porc</span>${getScore('logo_C_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>G</td>
+                                    <td><span class="logo-example-text">găină</span>${getScore('logo_G_init')}</td>
+                                    <td><span class="logo-example-text">papagal</span>${getScore('logo_G_med')}</td>
+                                    <td><span class="logo-example-text">steag</span>${getScore('logo_G_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>H</td>
+                                    <td><span class="logo-example-text">hipopotam</span>${getScore('logo_H_init')}</td>
+                                    <td><span class="logo-example-text">pahar</span>${getScore('logo_H_med')}</td>
+                                    <td><span class="logo-example-text">șah</span>${getScore('logo_H_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>R</td>
+                                    <td><span class="logo-example-text">rață</span>${getScore('logo_R_init')}</td>
+                                    <td><span class="logo-example-text">carte</span>${getScore('logo_R_med')}</td>
+                                    <td><span class="logo-example-text">fular</span>${getScore('logo_R_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>X</td>
+                                    <td><span class="logo-example-text">xilofon</span>${getScore('logo_X_init')}</td>
+                                    <td><span class="logo-example-text">boxer</span>${getScore('logo_X_med')}</td>
+                                    <td><span class="logo-example-text">pix</span>${getScore('logo_X_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>ce</td>
+                                    <td><span class="logo-example-text">ceas</span>${getScore('logo_CE_init')}</td>
+                                    <td><span class="logo-example-text">rinocer</span>${getScore('logo_CE_med')}</td>
+                                    <td><span class="logo-example-text">șoarece</span>${getScore('logo_CE_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>ci</td>
+                                    <td><span class="logo-example-text">citește</span>${getScore('logo_CI_init')}</td>
+                                    <td><span class="logo-example-text">bicicletă</span>${getScore('logo_CI_med')}</td>
+                                    <td><span class="logo-example-text">papuci</span>${getScore('logo_CI_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>ge</td>
+                                    <td><span class="logo-example-text">geam</span>${getScore('logo_GE_init')}</td>
+                                    <td><span class="logo-example-text">deget</span>${getScore('logo_GE_med')}</td>
+                                    <td><span class="logo-example-text">minge</span>${getScore('logo_GE_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>gi</td>
+                                    <td><span class="logo-example-text">girafă</span>${getScore('logo_GI_init')}</td>
+                                    <td><span class="logo-example-text">frigider</span>${getScore('logo_GI_med')}</td>
+                                    <td><span class="logo-example-text">covrigi</span>${getScore('logo_GI_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>che</td>
+                                    <td><span class="logo-example-text">cheie</span>${getScore('logo_CHE_init')}</td>
+                                    <td><span class="logo-example-text">ochelari</span>${getScore('logo_CHE_med')}</td>
+                                    <td><span class="logo-example-text">ridiche</span>${getScore('logo_CHE_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>chi</td>
+                                    <td><span class="logo-example-text">chibrituri</span>${getScore('logo_CHI_init')}</td>
+                                    <td><span class="logo-example-text">rochie</span>${getScore('logo_CHI_med')}</td>
+                                    <td><span class="logo-example-text">ochi</span>${getScore('logo_CHI_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>ghe</td>
+                                    <td><span class="logo-example-text">ghete</span>${getScore('logo_GHE_init')}</td>
+                                    <td><span class="logo-example-text">înghețată</span>${getScore('logo_GHE_med')}</td>
+                                    <td><span class="logo-example-text">Gheorghe</span>${getScore('logo_GHE_fin')}</td>
+                                </tr>
+                                <tr>
+                                    <td>ghi</td>
+                                    <td><span class="logo-example-text">ghiozdan</span>${getScore('logo_GHI_init')}</td>
+                                    <td><span class="logo-example-text">unghie</span>${getScore('logo_GHI_med')}</td>
+                                    <td><span class="logo-example-text">triunghi</span>${getScore('logo_GHI_fin')}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                        
+                    <div class="comments-section">
+                        <h2>Comentarii Evaluare Logopedică</h2>
+                        <p>${comments}</p>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
 }
 
 // --- Secțiunea Istoric Programe ---
@@ -591,9 +1089,10 @@ async function savePortageEvaluation() {
             window.logActivity("Evaluare salvată", client.name, 'evaluation', currentClientId);
         }
         
-        // Re-randează graficele și închide
-        renderEvolutionChart(evolutionData[currentClientId]);
-        renderPortageSummary(evolutionData[currentClientId], client);
+        // Nu rerandăm graficele (Portage), dar actualizăm lista de rapoarte
+        // și închidem tab-ul de evaluare.
+        const client = calendarState.getClientById(currentClientId); // Asigurăm că avem clientul
+        renderEvaluationReportsList(evolutionData[currentClientId], client); // <-- ADĂUGAT
         activateTab('tabGrafice');
 
     } catch (err) {
