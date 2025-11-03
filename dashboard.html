@@ -735,17 +735,535 @@
                         </div>
 
                         <div id="logopedicaFormContainer" style="display: none;">
-                            <div class="form-group">
-                                <label for="logoInput1">Numele testului</label>
-                                <input type="text" id="logoInput1" class="form-input" placeholder="Ex: Scala de evaluare a limbajului...">
+                            
+                            <div class="logopedica-table-container">
+                                <table class="logopedica-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Sunet</th>
+                                            <th>Poziție Inițială</th>
+                                            <th>Poziție Mediană</th>
+                                            <th>Poziție Finală</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>A</td>
+                                            <td>
+                                                <span class="logo-example-text">arici</span>
+                                                <input type="text" class="logo-input" id="logo_A_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">vaca</span>
+                                                <input type="text" class="logo-input" id="logo_A_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">perdea</span>
+                                                <input type="text" class="logo-input" id="logo_A_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>O</td>
+                                            <td>
+                                                <span class="logo-example-text">olita</span>
+                                                <input type="text" class="logo-input" id="logo_O_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">foc</span>
+                                                <input type="text" class="logo-input" id="logo_O_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">radio</span>
+                                                <input type="text" class="logo-input" id="logo_O_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>U</td>
+                                            <td>
+                                                <span class="logo-example-text">umbrela</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">pui</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">cadou</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>E</td>
+                                            <td>
+                                                <span class="logo-example-text">elefant</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">peste</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">rosie</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>I</td>
+                                            <td>
+                                                <span class="logo-example-text">iepure</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">lingura</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">ardei</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Ă</td>
+                                            <td>
+                                                <span class="logo-example-text">ăla, ăsta (pe care ursulet il vrei?)</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">mănuși</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">casă</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Â/Î</td>
+                                            <td>
+                                                <span class="logo-example-text">îngeraș</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">pâine</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">a coborî (Daca nu e a urca e...)</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>P</td>
+                                            <td>
+                                                <span class="logo-example-text">pară</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">șarpe</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">dulap</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>B</td>
+                                            <td>
+                                                <span class="logo-example-text">balon</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">albină</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">cerb</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>M</td>
+                                            <td>
+                                                <span class="logo-example-text">mașină</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">bomboană</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">pom</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>T</td>
+                                            <td>
+                                                <span class="logo-example-text">tobă</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">autobuz</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">pat</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>D</td>
+                                            <td>
+                                                <span class="logo-example-text">dinozaur</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">crocodil</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">brad</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>N</td>
+                                            <td>
+                                                <span class="logo-example-text">nor</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">cană</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">scaun</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>L</td>
+                                            <td>
+                                                <span class="logo-example-text">leu</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">melc</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">cal</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>F</td>
+                                            <td>
+                                                <span class="logo-example-text">floare</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">telefon</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">cartof</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>V</td>
+                                            <td>
+                                                <span class="logo-example-text">vapor</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">avion</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">morcov</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>S</td>
+                                            <td>
+                                                <span class="logo-example-text">sanie</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">pisică</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">urs</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Z</td>
+                                            <td>
+                                                <span class="logo-example-text">zebră</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">frunză</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">autobuz</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Ț</td>
+                                            <td>
+                                                <span class="logo-example-text">țap</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">maimuță</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">căluț-leagăn</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Ș</td>
+                                            <td>
+                                                <span class="logo-example-text">șervețel</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">ușă</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">cocoș</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>J</td>
+                                            <td>
+                                                <span class="logo-example-text">jucării</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">păianjen</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">ruj</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>C</td>
+                                            <td>
+                                                <span class="logo-example-text">câine</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">muscă</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">porc</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>G</td>
+                                            <td>
+                                                <span class="logo-example-text">găină</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">papagal</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">steag</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>H</td>
+                                            <td>
+                                                <span class="logo-example-text">hipopotam</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">pahar</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">șah</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>R</td>
+                                            <td>
+                                                <span class="logo-example-text">rață</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">carte</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">fular</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>X</td>
+                                            <td>
+                                                <span class="logo-example-text">xilofon</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">boxer</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">pix</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>ce</td>
+                                            <td>
+                                                <span class="logo-example-text">ceas</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">rinocer</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">șoarece</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>ci</td>
+                                            <td>
+                                                <span class="logo-example-text">citește</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">bicicletă</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">papuci</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>ge</td>
+                                            <td>
+                                                <span class="logo-example-text">geam</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">deget</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">minge</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>gi</td>
+                                            <td>
+                                                <span class="logo-example-text">girafă</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">frigider</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">covrigi</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>che</td>
+                                            <td>
+                                                <span class="logo-example-text">cheie</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">ochelari</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">ridiche</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>chi</td>
+                                            <td>
+                                                <span class="logo-example-text">chibrituri</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">rochie</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">ochi</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>ghe</td>
+                                            <td>
+                                                <span class="logo-example-text">ghete</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">înghețată</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">Gheorghe (Cum il cheama pe baietel? Gheor...?)</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>ghi</td>
+                                            <td>
+                                                <span class="logo-example-text">ghiozdan</span>
+                                                <input type="text" class="logo-input" id="logo_U_init">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">unghie</span>
+                                                <input type="text" class="logo-input" id="logo_U_med">
+                                            </td>
+                                            <td>
+                                                <span class="logo-example-text">triunghi</span>
+                                                <input type="text" class="logo-input" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="form-group">
-                                <label for="logoInput2">Rezultat obținut</label>
-                                <input type="text" id="logoInput2" class="form-input" placeholder="Ex: Vârsta limbajului 2 ani și 4 luni...">
-                            </div>
-                            <div class="form-group">
-                                <label for="logoInput3">Observații</label>
-                                <textarea id="logoInput3" class="form-input" rows="4" placeholder="Observații suplimentare..."></textarea>
+                            
+                            <div class="form-group" style="margin-top: 1.5rem;">
+                                <label for="logoComentarii">Comentarii Evaluare Logopedică</label>
+                                <textarea id="logoComentarii" class="form-input" rows="4" placeholder="Observații suplimentare..."></textarea>
                             </div>
                         </div>
                         
