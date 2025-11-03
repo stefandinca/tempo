@@ -463,7 +463,27 @@ function addProgramScoreListeners(eventId, canModify = true) {
                 const score = button.dataset.score;
                 const programId = container.dataset.programId;
                 
-                // ... rest of the function continues as before
+                const event = calendarState.getEventById(eventId);
+                if (!event.programScores) event.programScores = {};
+                
+                // Toggle: dacă același scor e deja selectat, îl ștergem
+                if (event.programScores[programId] === score) {
+                    delete event.programScores[programId];
+                } else {
+                    event.programScores[programId] = score;
+                }
+                
+                calendarState.saveEvent(event);
+                await api.saveData(calendarState.getState());
+                
+                // Actualizează istoricul
+                await updateProgramHistory(event, programId, event.programScores[programId] || null);
+                
+                // Actualizează UI
+                container.querySelectorAll('.score-btn').forEach(b => b.classList.remove('active'));
+                if (event.programScores[programId]) {
+                    button.classList.add('active');
+                }
             } catch (err) {
                 console.error("Eroare la salvarea scorului:", err);
                 showCustomAlert("A apărut o eroare la salvarea scorului. Vă rugăm reîncercați.", "Eroare");
