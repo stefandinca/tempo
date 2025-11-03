@@ -23,6 +23,7 @@ const dom = {
     prevBtn: $('billingPrevMonth'),
     nextBtn: $('billingNextMonth'),
     currentMonthLabel: $('billingCurrentMonth'),
+    billingSearchBar: $('billingSearchBar'),
     
     // Modal Plată
     paymentModal: $('paymentModal'),
@@ -46,6 +47,7 @@ export function init() {
 
     dom.prevBtn.addEventListener('click', () => navigateBillingMonth(-1));
     dom.nextBtn.addEventListener('click', () => navigateBillingMonth(1));
+    dom.billingSearchBar.addEventListener('input', () => renderBillingView());
 
     // Ascultători pentru modalul de plată
     dom.closePaymentModalBtn.addEventListener('click', closePaymentModal);
@@ -74,6 +76,7 @@ export function init() {
     });
 }
 
+
 /**
  * Randează întreaga vizualizare de facturare pentru luna selectată.
  */
@@ -91,17 +94,29 @@ export function renderBillingView() {
     
     dom.clientList.innerHTML = ''; // Curăță lista
 
-    if (clients.length === 0) {
-        dom.clientList.innerHTML = '<p class="empty-list-message">Nu există clienți în sistem.</p>';
+    // Obține termenul de căutare
+    const searchTerm = dom.billingSearchBar.value.toLowerCase();
+    
+    // Filtrează clienții
+    const filteredClients = clients.filter(client => {
+        // 1. Filtrează după nume
+        const nameMatch = client.name.toLowerCase().includes(searchTerm);
+        // 2. Nu afișa clienți "speciali" (ex: Pauza, Sedinta)
+        const isSpecial = ['Pauza de masa', 'Sedinta', 'Concediu'].includes(client.name);
+        
+        return nameMatch && !isSpecial;
+    });
+
+    if (filteredClients.length === 0) {
+        if (searchTerm) {
+            dom.clientList.innerHTML = `<p class="empty-list-message">Niciun client nu corespunde termenului "${dom.billingSearchBar.value}".</p>`;
+        } else {
+            dom.clientList.innerHTML = '<p class="empty-list-message">Nu există clienți în sistem.</p>';
+        }
         return;
     }
 
-    clients.forEach(client => {
-        // Nu afișa clienți "speciali" (ex: Pauza, Sedinta)
-        if (['Pauza de masa', 'Sedinta', 'Concediu'].includes(client.name)) {
-            return;
-        }
-
+    filteredClients.forEach(client => {
         const hoursData = calculateClientHoursForMonth(client.id, year, month, events);
         const totalDue = hoursData.billableHours * BILLING_RATE_PER_HOUR;
         
@@ -120,7 +135,12 @@ export function renderBillingView() {
             </div>
             <div class="billing-actions">
                 <button class="btn btn-primary btn-sm" data-action="add-payment">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5 12h14M12 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-cash-coin" viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M11 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8m5-4a5 5 0 1 1-10 0 5 5 0 0 1 10 0"/>
+  <path d="M9.438 11.944c.047.596.518 1.06 1.363 1.116v.44h.375v-.443c.875-.061 1.386-.529 1.386-1.207 0-.618-.39-.936-1.09-1.1l-.296-.07v-1.2c.376.043.614.248.671.532h.658c-.047-.575-.54-1.024-1.329-1.073V8.5h-.375v.45c-.747.073-1.255.522-1.255 1.158 0 .562.378.92 1.007 1.066l.248.061v1.272c-.384-.058-.639-.27-.696-.563h-.668zm1.36-1.354c-.369-.085-.569-.26-.569-.522 0-.294.216-.514.572-.578v1.1zm.432.746c.449.104.655.272.655.569 0 .339-.257.571-.709.614v-1.195z"/>
+  <path d="M1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.083q.088-.517.258-1H3a2 2 0 0 0-2-2V3a2 2 0 0 0 2-2h10a2 2 0 0 0 2 2v3.528c.38.34.717.728 1 1.154V1a1 1 0 0 0-1-1z"/>
+  <path d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 6 6 0 0 1 3.13-1.567"/>
+</svg>
                     Adaugă Încasare
                 </button>
             </div>
