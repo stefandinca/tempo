@@ -1,6 +1,6 @@
 {
     "isAdminView": true,
-    "currentDate": "2025-11-03T11:21:00.499Z",
+    "currentDate": "2025-11-03T15:32:39.861Z",
     "currentView": "month",
     "teamMembers": [
         {
@@ -41,7 +41,7 @@
     ],
     "clients": [
         {
-            "id": "client_1761405694424",
+            "id": "cezar",
             "name": "Cezar Dinca",
             "email": "stefan.dinca07@gmail.com",
             "phone": "+40746060987",
@@ -390,7 +390,6 @@
             "phone": "",
             "birthDate": "2021-02-18"
         },
-       
         {
             "id": "test",
             "name": "Copil_test",
@@ -398,8 +397,6 @@
             "phone": "",
             "birthDate": "2021-02-21"
         }
-        
-        
     ],
     "events": [
         {
@@ -420,7 +417,7 @@
             "comments": "",
             "details": "Miercuri, 29.10, de la ora 11-13 vom avea FESTIVALUL TOAMNEI!🍁🍂\nNu se vor face ore individule, in cadrul festivalului vom avea generalizare, socializare si activitati de grup. \nContributia pentru materialele necesare este de 20 de lei pentru copil.",
             "clientIds": [
-                "client_1761405694424",
+                "cezar",
                 "client_1761406223085",
                 "client_1761406229857"
             ],
@@ -437,7 +434,7 @@
                 "member_1761412178080"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "coordination",
             "isPublic": false,
@@ -479,7 +476,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -861,7 +858,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -871,7 +868,8 @@
             "duration": 60,
             "repeating": [
                 1
-            ]
+            ],
+            "comments": ""
         },
         {
             "id": "evt1761645494449_wdvvee1ie",
@@ -880,7 +878,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -899,7 +897,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -918,7 +916,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -1811,7 +1809,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -1831,7 +1829,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -1850,7 +1848,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -1869,7 +1867,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -2050,7 +2048,8 @@
             "duration": 60,
             "repeating": [
                 1
-            ]
+            ],
+            "comments": ""
         },
         {
             "id": "evt1761654984966_hsevx3ibl",
@@ -2358,7 +2357,8 @@
             "duration": 60,
             "repeating": [
                 1
-            ]
+            ],
+            "comments": "Private note"
         },
         {
             "id": "evt1761655131883_zoyfugf0a",
@@ -2434,7 +2434,8 @@
             "duration": 60,
             "repeating": [
                 1
-            ]
+            ],
+            "comments": ""
         },
         {
             "id": "evt1761655155699_dwzeubmkz",
@@ -3798,7 +3799,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -3817,7 +3818,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -3836,7 +3837,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -3855,7 +3856,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -4178,7 +4179,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -4197,7 +4198,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -4216,7 +4217,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -4235,7 +4236,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -5094,7 +5095,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -5113,7 +5114,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -5132,7 +5133,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -5151,7 +5152,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -5550,7 +5551,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -5569,7 +5570,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -5588,7 +5589,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -5607,7 +5608,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -6714,7 +6715,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -6733,7 +6734,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -6752,7 +6753,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -6771,7 +6772,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -7094,7 +7095,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -7113,7 +7114,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -7132,7 +7133,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -7151,7 +7152,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -7322,7 +7323,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -7341,7 +7342,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -7360,7 +7361,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -7379,7 +7380,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -7862,7 +7863,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -7881,7 +7882,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -7900,7 +7901,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -7919,7 +7920,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -9815,7 +9816,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -9834,7 +9835,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -9853,7 +9854,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -9872,7 +9873,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -10763,7 +10764,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -10782,7 +10783,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -10801,7 +10802,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -10820,7 +10821,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -12757,7 +12758,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -12776,7 +12777,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -12795,7 +12796,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -12814,7 +12815,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -13137,7 +13138,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -13156,7 +13157,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -13175,7 +13176,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -13194,7 +13195,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -14057,7 +14058,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -14076,7 +14077,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -14095,7 +14096,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -14114,7 +14115,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -14513,7 +14514,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -14532,7 +14533,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -14551,7 +14552,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -14570,7 +14571,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -15669,7 +15670,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -15688,7 +15689,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -15707,7 +15708,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -15726,7 +15727,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -16049,7 +16050,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -16068,7 +16069,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -16087,7 +16088,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -16106,7 +16107,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -16277,7 +16278,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -16296,7 +16297,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -16315,7 +16316,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -16334,7 +16335,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -16813,7 +16814,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -16832,7 +16833,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -16851,7 +16852,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -16870,7 +16871,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -18454,7 +18455,7 @@
                 "daniela"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -18547,7 +18548,7 @@
                 "alexandra"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -18606,7 +18607,7 @@
                 "dana"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -18764,7 +18765,7 @@
                 "corina"
             ],
             "clientIds": [
-                "client_1761405694424"
+                "cezar"
             ],
             "type": "therapy",
             "isPublic": false,
@@ -19233,7 +19234,7 @@
             "name": "Terapie - Copil_test",
             "type": "therapy",
             "date": "2025-11-03",
-            "startTime": "08:00",
+            "startTime": "19:00",
             "duration": 60,
             "isPublic": false,
             "isBillable": true,
@@ -19810,506 +19811,34 @@
                 }
             ]
         },
-        "client_1761900123672": {
-            "name": "Copilul test3 test",
-            "evaluations": [],
-            "programHistory": [
-                {
-                    "date": "2025-10-30",
-                    "programId": "prog_7",
-                    "programTitle": "Răspuns la nume",
-                    "score": "+",
-                    "eventId": "evt17620234153093e8eer5da"
-                },
-                {
-                    "date": "2025-10-30",
-                    "programId": "prog_8",
-                    "programTitle": "Așteaptă",
-                    "score": "+",
-                    "eventId": "evt17620234153093e8eer5da"
-                },
-                {
-                    "date": "2025-10-30",
-                    "programId": "prog_4",
-                    "programTitle": "Imitare motorie cu și fără obiect",
-                    "score": "+",
-                    "eventId": "evt17620234153093e8eer5da"
-                },
-                {
-                    "date": "2025-10-30",
-                    "programId": "prog_3",
-                    "programTitle": "Instrucțiuni functionale",
-                    "score": "P",
-                    "eventId": "evt17620234153093e8eer5da"
-                },
-                {
-                    "date": "2025-10-30",
-                    "programId": "prog_5",
-                    "programTitle": "Receptiv obiecte",
-                    "score": "P",
-                    "eventId": "evt17620234153093e8eer5da"
-                },
-                {
-                    "date": "2025-10-30",
-                    "programId": "prog_1",
-                    "programTitle": "Imitare orala",
-                    "score": "-",
-                    "eventId": "evt17620234153093e8eer5da"
-                },
-                {
-                    "date": "2025-10-21",
-                    "programId": "prog_7",
-                    "programTitle": "Răspuns la nume",
-                    "score": "0",
-                    "eventId": "evt1762023415309vrvbzk9xs"
-                },
-                {
-                    "date": "2025-10-21",
-                    "programId": "prog_8",
-                    "programTitle": "Așteaptă",
-                    "score": "0",
-                    "eventId": "evt1762023415309vrvbzk9xs"
-                },
-                {
-                    "date": "2025-10-21",
-                    "programId": "prog_4",
-                    "programTitle": "Imitare motorie cu și fără obiect",
-                    "score": "0",
-                    "eventId": "evt1762023415309vrvbzk9xs"
-                },
-                {
-                    "date": "2025-10-21",
-                    "programId": "prog_3",
-                    "programTitle": "Instrucțiuni functionale",
-                    "score": "0",
-                    "eventId": "evt1762023415309vrvbzk9xs"
-                },
-                {
-                    "date": "2025-10-21",
-                    "programId": "prog_5",
-                    "programTitle": "Receptiv obiecte",
-                    "score": "0",
-                    "eventId": "evt1762023415309vrvbzk9xs"
-                },
-                {
-                    "date": "2025-10-21",
-                    "programId": "prog_1",
-                    "programTitle": "Imitare orala",
-                    "score": "0",
-                    "eventId": "evt1762023415309vrvbzk9xs"
-                }
-            ]
-        },
-        "client_1762029840903": {
-            "name": "copilul test 0",
-            "evaluations": {
-                "Portrige - Motricitate fina": {
-                    "2025-11-01": 3
-                },
-                "Portrige - Motricitate grosieră": {
-                    "2025-11-01": 0
-                },
-                "Portrige - Limbaj receptiv": {
-                    "2025-11-01": 0
-                },
-                "Portrige - Limbaj expresiv": {
-                    "2025-11-01": 0
-                },
-                "Portrige - Socializare": {
-                    "2025-11-01": 0
-                },
-                "Portrige - Autonomie personală": {
-                    "2025-11-01": 0
-                }
-            },
-            "programHistory": [
-                {
-                    "date": "2025-11-02",
-                    "programId": "prog_2",
-                    "programTitle": "Stimulare de limbaj",
-                    "score": "0",
-                    "eventId": "evt1762036411764dsfwcbwtr"
-                },
-                {
-                    "date": "2025-11-02",
-                    "programId": "prog_1",
-                    "programTitle": "Imitare orala",
-                    "score": "-",
-                    "eventId": "evt1762036411764dsfwcbwtr"
-                },
-                {
-                    "date": "2025-11-02",
-                    "programId": "prog_3",
-                    "programTitle": "Instrucțiuni functionale",
-                    "score": "-",
-                    "eventId": "evt1762036411764dsfwcbwtr"
-                }
-            ]
-        },
-        "client_1762165001926": {
-            "name": "Copilul test",
-            "evaluations": {
-                "Portrige - Motricitate fina": {
-                    "2025-11-03": 3
-                },
-                "Portrige - Motricitate grosieră": {
-                    "2025-11-03": 3
-                },
-                "Portrige - Limbaj receptiv": {
-                    "2025-11-03": 6
-                },
-                "Portrige - Limbaj expresiv": {
-                    "2025-11-03": 12
-                },
-                "Portrige - Socializare": {
-                    "2025-11-03": 15
-                },
-                "Portrige - Autonomie personală": {
-                    "2025-11-03": 27
-                }
-            },
-            "programHistory": [
-                {
-                    "date": "2025-11-03",
-                    "programId": "prog_1",
-                    "programTitle": "Imitare orala",
-                    "score": "0",
-                    "eventId": "evt17621650488899gwg023y8"
-                },
-                {
-                    "date": "2025-11-03",
-                    "programId": "prog_3",
-                    "programTitle": "Instrucțiuni functionale",
-                    "score": "-",
-                    "eventId": "evt17621650488899gwg023y8"
-                },
-                {
-                    "date": "2025-11-03",
-                    "programId": "prog_4",
-                    "programTitle": "Imitare motorie cu și fără obiect",
-                    "score": "0",
-                    "eventId": "evt17621650488899gwg023y8"
-                },
-                {
-                    "date": "2025-11-03",
-                    "programId": "prog_5",
-                    "programTitle": "Receptiv obiecte",
-                    "score": "0",
-                    "eventId": "evt17621650488899gwg023y8"
-                },
-                {
-                    "date": "2025-11-03",
-                    "programId": "prog_6",
-                    "programTitle": "Motricitate",
-                    "score": "-",
-                    "eventId": "evt17621650488899gwg023y8"
-                },
-                {
-                    "date": "2025-11-03",
-                    "programId": "prog_9",
-                    "programTitle": "Joc social",
-                    "score": "0",
-                    "eventId": "evt17621650488899gwg023y8"
-                },
-                {
-                    "date": "2025-11-03",
-                    "programId": "prog_8",
-                    "programTitle": "Așteaptă",
-                    "score": "-",
-                    "eventId": "evt17621650488899gwg023y8"
-                },
-                {
-                    "date": "2025-11-03",
-                    "programId": "prog_7",
-                    "programTitle": "Răspuns la nume",
-                    "score": "-",
-                    "eventId": "evt17621650488899gwg023y8"
-                },
-                {
-                    "date": "2025-11-05",
-                    "programId": "prog_1",
-                    "programTitle": "Imitare orala",
-                    "score": "-",
-                    "eventId": "evt1762165048889glokumv4z"
-                },
-                {
-                    "date": "2025-11-05",
-                    "programId": "prog_3",
-                    "programTitle": "Instrucțiuni functionale",
-                    "score": "-",
-                    "eventId": "evt1762165048889glokumv4z"
-                },
-                {
-                    "date": "2025-11-05",
-                    "programId": "prog_4",
-                    "programTitle": "Imitare motorie cu și fără obiect",
-                    "score": "0",
-                    "eventId": "evt1762165048889glokumv4z"
-                },
-                {
-                    "date": "2025-11-05",
-                    "programId": "prog_5",
-                    "programTitle": "Receptiv obiecte",
-                    "score": "-",
-                    "eventId": "evt1762165048889glokumv4z"
-                },
-                {
-                    "date": "2025-11-05",
-                    "programId": "prog_6",
-                    "programTitle": "Motricitate",
-                    "score": "-",
-                    "eventId": "evt1762165048889glokumv4z"
-                },
-                {
-                    "date": "2025-11-05",
-                    "programId": "prog_9",
-                    "programTitle": "Joc social",
-                    "score": "0",
-                    "eventId": "evt1762165048889glokumv4z"
-                },
-                {
-                    "date": "2025-11-05",
-                    "programId": "prog_8",
-                    "programTitle": "Așteaptă",
-                    "score": "P",
-                    "eventId": "evt1762165048889glokumv4z"
-                },
-                {
-                    "date": "2025-11-05",
-                    "programId": "prog_7",
-                    "programTitle": "Răspuns la nume",
-                    "score": "-",
-                    "eventId": "evt1762165048889glokumv4z"
-                },
-                {
-                    "date": "2025-11-10",
-                    "programId": "prog_1",
-                    "programTitle": "Imitare orala",
-                    "score": "-",
-                    "eventId": "evt1762165048889axb9t7lr4"
-                },
-                {
-                    "date": "2025-11-10",
-                    "programId": "prog_3",
-                    "programTitle": "Instrucțiuni functionale",
-                    "score": "P",
-                    "eventId": "evt1762165048889axb9t7lr4"
-                },
-                {
-                    "date": "2025-11-10",
-                    "programId": "prog_4",
-                    "programTitle": "Imitare motorie cu și fără obiect",
-                    "score": "P",
-                    "eventId": "evt1762165048889axb9t7lr4"
-                },
-                {
-                    "date": "2025-11-10",
-                    "programId": "prog_5",
-                    "programTitle": "Receptiv obiecte",
-                    "score": "-",
-                    "eventId": "evt1762165048889axb9t7lr4"
-                },
-                {
-                    "date": "2025-11-10",
-                    "programId": "prog_6",
-                    "programTitle": "Motricitate",
-                    "score": "P",
-                    "eventId": "evt1762165048889axb9t7lr4"
-                },
-                {
-                    "date": "2025-11-10",
-                    "programId": "prog_9",
-                    "programTitle": "Joc social",
-                    "score": "P",
-                    "eventId": "evt1762165048889axb9t7lr4"
-                },
-                {
-                    "date": "2025-11-10",
-                    "programId": "prog_8",
-                    "programTitle": "Așteaptă",
-                    "score": "P",
-                    "eventId": "evt1762165048889axb9t7lr4"
-                },
-                {
-                    "date": "2025-11-10",
-                    "programId": "prog_7",
-                    "programTitle": "Răspuns la nume",
-                    "score": "-",
-                    "eventId": "evt1762165048889axb9t7lr4"
-                },
-                {
-                    "date": "2025-11-12",
-                    "programId": "prog_1",
-                    "programTitle": "Imitare orala",
-                    "score": "P",
-                    "eventId": "evt1762165048889y757yfemh"
-                },
-                {
-                    "date": "2025-11-12",
-                    "programId": "prog_3",
-                    "programTitle": "Instrucțiuni functionale",
-                    "score": "+",
-                    "eventId": "evt1762165048889y757yfemh"
-                },
-                {
-                    "date": "2025-11-12",
-                    "programId": "prog_4",
-                    "programTitle": "Imitare motorie cu și fără obiect",
-                    "score": "P",
-                    "eventId": "evt1762165048889y757yfemh"
-                },
-                {
-                    "date": "2025-11-12",
-                    "programId": "prog_5",
-                    "programTitle": "Receptiv obiecte",
-                    "score": "P",
-                    "eventId": "evt1762165048889y757yfemh"
-                },
-                {
-                    "date": "2025-11-12",
-                    "programId": "prog_6",
-                    "programTitle": "Motricitate",
-                    "score": "P",
-                    "eventId": "evt1762165048889y757yfemh"
-                },
-                {
-                    "date": "2025-11-12",
-                    "programId": "prog_9",
-                    "programTitle": "Joc social",
-                    "score": "+",
-                    "eventId": "evt1762165048889y757yfemh"
-                },
-                {
-                    "date": "2025-11-12",
-                    "programId": "prog_8",
-                    "programTitle": "Așteaptă",
-                    "score": "+",
-                    "eventId": "evt1762165048889y757yfemh"
-                },
-                {
-                    "date": "2025-11-12",
-                    "programId": "prog_7",
-                    "programTitle": "Răspuns la nume",
-                    "score": "P",
-                    "eventId": "evt1762165048889y757yfemh"
-                },
-                {
-                    "date": "2025-11-17",
-                    "programId": "prog_1",
-                    "programTitle": "Imitare orala",
-                    "score": "+",
-                    "eventId": "evt1762165048889la4yx2a8g"
-                },
-                {
-                    "date": "2025-11-17",
-                    "programId": "prog_3",
-                    "programTitle": "Instrucțiuni functionale",
-                    "score": "+",
-                    "eventId": "evt1762165048889la4yx2a8g"
-                },
-                {
-                    "date": "2025-11-17",
-                    "programId": "prog_4",
-                    "programTitle": "Imitare motorie cu și fără obiect",
-                    "score": "+",
-                    "eventId": "evt1762165048889la4yx2a8g"
-                },
-                {
-                    "date": "2025-11-17",
-                    "programId": "prog_5",
-                    "programTitle": "Receptiv obiecte",
-                    "score": "P",
-                    "eventId": "evt1762165048889la4yx2a8g"
-                },
-                {
-                    "date": "2025-11-17",
-                    "programId": "prog_6",
-                    "programTitle": "Motricitate",
-                    "score": "+",
-                    "eventId": "evt1762165048889la4yx2a8g"
-                },
-                {
-                    "date": "2025-11-17",
-                    "programId": "prog_9",
-                    "programTitle": "Joc social",
-                    "score": "+",
-                    "eventId": "evt1762165048889la4yx2a8g"
-                },
-                {
-                    "date": "2025-11-17",
-                    "programId": "prog_8",
-                    "programTitle": "Așteaptă",
-                    "score": "P",
-                    "eventId": "evt1762165048889la4yx2a8g"
-                },
-                {
-                    "date": "2025-11-17",
-                    "programId": "prog_7",
-                    "programTitle": "Răspuns la nume",
-                    "score": "+",
-                    "eventId": "evt1762165048889la4yx2a8g"
-                },
-                {
-                    "date": "2025-11-19",
-                    "programId": "prog_1",
-                    "programTitle": "Imitare orala",
-                    "score": "+",
-                    "eventId": "evt1762165048889odlbrbmam"
-                },
-                {
-                    "date": "2025-11-19",
-                    "programId": "prog_3",
-                    "programTitle": "Instrucțiuni functionale",
-                    "score": "+",
-                    "eventId": "evt1762165048889odlbrbmam"
-                },
-                {
-                    "date": "2025-11-19",
-                    "programId": "prog_4",
-                    "programTitle": "Imitare motorie cu și fără obiect",
-                    "score": "+",
-                    "eventId": "evt1762165048889odlbrbmam"
-                },
-                {
-                    "date": "2025-11-19",
-                    "programId": "prog_5",
-                    "programTitle": "Receptiv obiecte",
-                    "score": "+",
-                    "eventId": "evt1762165048889odlbrbmam"
-                },
-                {
-                    "date": "2025-11-19",
-                    "programId": "prog_6",
-                    "programTitle": "Motricitate",
-                    "score": "+",
-                    "eventId": "evt1762165048889odlbrbmam"
-                },
-                {
-                    "date": "2025-11-19",
-                    "programId": "prog_9",
-                    "programTitle": "Joc social",
-                    "score": "+",
-                    "eventId": "evt1762165048889odlbrbmam"
-                },
-                {
-                    "date": "2025-11-19",
-                    "programId": "prog_8",
-                    "programTitle": "Așteaptă",
-                    "score": "+",
-                    "eventId": "evt1762165048889odlbrbmam"
-                },
-                {
-                    "date": "2025-11-19",
-                    "programId": "prog_7",
-                    "programTitle": "Răspuns la nume",
-                    "score": "+",
-                    "eventId": "evt1762165048889odlbrbmam"
-                }
-            ]
-        },
         "test": {
             "name": "Copil_test",
-            "evaluations": [],
+            "evaluations": {
+                "Portrige - Motricitate fina": {
+                    "2025-11-03": 3,
+                    "2025-12-01": 9
+                },
+                "Portrige - Motricitate grosieră": {
+                    "2025-11-03": 3,
+                    "2025-12-01": 15
+                },
+                "Portrige - Limbaj receptiv": {
+                    "2025-11-03": 6,
+                    "2025-12-01": 12
+                },
+                "Portrige - Limbaj expresiv": {
+                    "2025-11-03": 12,
+                    "2025-12-01": 15
+                },
+                "Portrige - Socializare": {
+                    "2025-11-03": 15,
+                    "2025-12-01": 18
+                },
+                "Portrige - Autonomie personală": {
+                    "2025-11-03": 27,
+                    "2025-12-01": 21
+                }
+            },
             "programHistory": [
                 {
                     "date": "2025-11-26",
@@ -20608,6 +20137,40 @@
             ]
         }
     },
+    "billingsData": {
+        "test": {
+            "2025-11": [
+                {
+                    "id": "pay_1762174943089",
+                    "date": "2025-11-03",
+                    "amount": 400,
+                    "notes": "aici testez o incasare"
+                },
+                {
+                    "id": "pay_1762174949074",
+                    "date": "2025-11-03",
+                    "amount": 100,
+                    "notes": "alta incasare"
+                }
+            ]
+        },
+        "cezar": {
+            "2025-11": [
+                {
+                    "id": "pay_1762175823356",
+                    "date": "2025-11-03",
+                    "amount": 1000,
+                    "notes": "- 1,000 de lei bonus de la Mos Craciun"
+                },
+                {
+                    "id": "pay_1762179163824",
+                    "date": "2025-11-03",
+                    "amount": 100,
+                    "notes": ""
+                }
+            ]
+        }
+    },
     "activeFilters": [
         "corina",
         "dana",
@@ -20617,7 +20180,7 @@
     ],
     "editingEventId": null,
     "editingMemberId": null,
-    "editingClientId": "test",
+    "editingClientId": null,
     "selectedClientIds": [],
     "selectedProgramIds": []
 }

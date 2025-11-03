@@ -224,28 +224,32 @@
             }
         ]
     },
-    
-    
     "test": {
         "name": "Copil_test",
         "evaluations": {
             "Portrige - Motricitate fina": {
-                "2025-11-03": 3
+                "2025-11-03": 3,
+                "2025-12-01": 9
             },
             "Portrige - Motricitate grosieră": {
-                "2025-11-03": 3
+                "2025-11-03": 3,
+                "2025-12-01": 15
             },
             "Portrige - Limbaj receptiv": {
-                "2025-11-03": 6
+                "2025-11-03": 6,
+                "2025-12-01": 12
             },
             "Portrige - Limbaj expresiv": {
-                "2025-11-03": 12
+                "2025-11-03": 12,
+                "2025-12-01": 15
             },
             "Portrige - Socializare": {
-                "2025-11-03": 15
+                "2025-11-03": 15,
+                "2025-12-01": 18
             },
             "Portrige - Autonomie personală": {
-                "2025-11-03": 27
+                "2025-11-03": 27,
+                "2025-12-01": 21
             }
         },
         "programHistory": [
@@ -543,6 +547,19 @@
                 "score": "0",
                 "eventId": "evt1762167456542byjzsowjt"
             }
-        ]
+        ],
+        "evaluationsLogopedica": {
+            "2025-11-03": {
+                "scores": {
+                    "logo_A_init": "aici",
+                    "logo_A_med": "waca",
+                    "logo_A_fin": "uuu",
+                    "logo_O_init": "aaa",
+                    "logo_O_med": "bbb",
+                    "logo_O_fin": "ccc"
+                },
+                "comments": "test"
+            }
+        }
     }
 }
