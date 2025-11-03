@@ -1160,9 +1160,9 @@ body.public-view {
 
 
 /* --- IMPROVED Modal Grid Layout (Event Modal) --- */
-.modal-body.modal-grid {
+.modal-body {
   display: grid;
-  grid-template-columns: 1.3fr 1fr 1fr;
+  
   gap: 2.5rem;
   padding: 2rem 2.5rem;
   max-height: 70vh;
@@ -1233,27 +1233,27 @@ body.public-view {
 }
 
 /* Enhanced form input styling within modal */
-.modal-body.modal-grid .form-input {
+.modal-body .form-input {
   background: var(--bg-hover);
   border: 1px solid transparent;
   transition: all 0.2s ease;
 }
 
-.modal-body.modal-grid .form-input:hover {
+.modal-body   .form-input:hover {
   border-color: var(--border-color);
 }
 
-.modal-body.modal-grid .form-input:focus {
+.modal-body   .form-input:focus {
   background: var(--bg-card);
   border-color: var(--accent-primary);
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
 }
 
-[data-theme="dark"] .modal-body.modal-grid .form-input {
+[data-theme="dark"] .modal-body   .form-input {
   background: var(--bg-main);
 }
 
-[data-theme="dark"] .modal-body.modal-grid .form-input:focus {
+[data-theme="dark"] .modal-body   .form-input:focus {
   background: var(--bg-hover);
 }
 
@@ -2449,8 +2449,8 @@ textarea.form-input {
     min-height: 280px;   /* Forțează o înălțime minimă pentru grafic */
 }
 
-    .modal-body.modal-grid {
-        grid-template-columns: 1fr; 
+    .modal-body {
+        
         gap: 1.5rem;
     }
     .modal-col:not(:last-child)::after {
