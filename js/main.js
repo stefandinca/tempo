@@ -86,6 +86,33 @@ const dom = {
 //useri
 let currentUser = null;
 
+/**
+ * Generate a client ID from first name + birthday (DDMM format)
+ * Format: firstname_ddmm (e.g., cezar_2102, tudor_1503)
+ * If birthday is not provided, falls back to 4 random digits
+ */
+function generateClientId(fullName, birthDate) {
+    // Clean and format the first name
+    const firstName = fullName.trim().toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+        .replace(/[^a-z\s]/g, '') // Keep only letters and spaces
+        .split(/\s+/)[0]; // Take first name only
+    
+    // Generate date suffix
+    let dateSuffix;
+    if (birthDate) {
+        const date = new Date(birthDate);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        dateSuffix = `${day}${month}`;
+    } else {
+        // Fallback to 4 random digits if no birthday
+        dateSuffix = String(Math.floor(1000 + Math.random() * 9000));
+    }
+    
+    return `${firstName}_${dateSuffix}`;
+}
+
 // --- Navigare Principală (Tab-uri) ---
 
 /**
@@ -393,12 +420,15 @@ async function handleSaveClient(e) {
     const formData = new FormData(e.target);
     
     const clientData = {
-        id: editingClientId || `client_${Date.now()}`,
-        name: formData.get('clientFullName'),
-        email: formData.get('clientEmail'),
-        phone: formData.get('clientPhone'),
-        birthDate: formData.get('clientBirthdayInput') || null
-    };
+    id: editingClientId || generateClientId(
+        formData.get('clientFullName'), 
+        formData.get('clientBirthdayInput')
+    ),
+    name: formData.get('clientFullName'),
+    email: formData.get('clientEmail'),
+    phone: formData.get('clientPhone'),
+    birthDate: formData.get('clientBirthdayInput') || null
+};
 
     calendarState.saveClient(clientData);
     await api.saveData(calendarState.getState());
