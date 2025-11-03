@@ -113,3 +113,25 @@ export async function loadPortrigeData() {
     // Logica din calendar.js (linia ~2548) încarcă prin api.php
     return apiFetch('portrige.json');
 }
+
+/**
+ * Încarcă datele de facturare (din billings.json).
+ * Apel GET la api.php?path=billings
+ */
+export async function loadBillingsData() {
+    return apiFetch('billings');
+}
+
+/**
+ * Salvează datele de facturare.
+ * Apel POST la api.php?path=billings
+ * @param {object} data - Obiectul cu datele de facturare
+ */
+export async function saveBillingsData(data) {
+    const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    };
+    return apiFetch('billings', options);
+}

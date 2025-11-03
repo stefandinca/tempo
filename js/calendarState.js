@@ -20,6 +20,7 @@ const state = {
     events: [],
     programs: [],
     evolutionData: {},
+    billingsData: {},
 
     // Starea filtrelor
     activeFilters: [], // O listă de ID-uri ale membrilor echipei
@@ -76,6 +77,13 @@ export const calendarState = {
      */
     setEvolutionData: (data) => {
         state.evolutionData = data || {};
+    },
+
+    /**
+     * Setează datele de facturare.
+     */
+    setBillingsData: (data) => {
+        state.billingsData = data || {};
     },
 
     /**

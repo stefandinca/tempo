@@ -1,0 +1,295 @@
+/**
+ * js/billingService.js
+ *
+ * Gestionează logica pentru noua secțiune de Facturare.
+ * Calculează orele, totalurile și gestionează încasările.
+ */
+
+import { calendarState } from './calendarState.js';
+import * as api from './apiService.js';
+import { showCustomAlert, showCustomConfirm } from './uiService.js';
+
+// --- Constante ---
+const BILLING_RATE_PER_HOUR = 100;
+const $ = (id) => document.getElementById(id);
+
+// --- Stare locală ---
+let currentBillingDate = new Date(); // Începe cu luna curentă
+
+// --- Elemente DOM ---
+const dom = {
+    section: $('billingSection'),
+    clientList: $('billingClientList'),
+    prevBtn: $('billingPrevMonth'),
+    nextBtn: $('billingNextMonth'),
+    currentMonthLabel: $('billingCurrentMonth'),
+    
+    // Modal Plată
+    paymentModal: $('paymentModal'),
+    paymentForm: $('paymentForm'),
+    closePaymentModalBtn: $('closePaymentModal'),
+    cancelPaymentBtn: $('cancelPaymentBtn'),
+    paymentClientId: $('paymentClientId'),
+    paymentMonthKey: $('paymentMonthKey'),
+    paymentDate: $('paymentDate'),
+    paymentAmount: $('paymentAmount'),
+    paymentNotes: $('paymentNotes'),
+    paymentModalTitle: $('paymentModalTitle'),
+};
+
+/**
+ * Inițializează ascultătorii de evenimente pentru secțiunea de facturare.
+ * Chemată din main.js.
+ */
+export function init() {
+    if (!dom.section) return; // Nu inițializa dacă secțiunea nu există
+
+    dom.prevBtn.addEventListener('click', () => navigateBillingMonth(-1));
+    dom.nextBtn.addEventListener('click', () => navigateBillingMonth(1));
+
+    // Ascultători pentru modalul de plată
+    dom.closePaymentModalBtn.addEventListener('click', closePaymentModal);
+    dom.cancelPaymentBtn.addEventListener('click', closePaymentModal);
+    dom.paymentModal.addEventListener('click', (e) => {
+        if (e.target === dom.paymentModal) closePaymentModal();
+    });
+    dom.paymentForm.addEventListener('submit', handleSavePayment);
+
+    // Ascultător principal pentru acțiunile din listă (delegare evenimente)
+    dom.clientList.addEventListener('click', (e) => {
+        const actionBtn = e.target.closest('[data-action]');
+        if (!actionBtn) return;
+
+        const action = actionBtn.dataset.action;
+        const card = actionBtn.closest('.billing-card');
+        const clientId = card.dataset.clientId;
+        const monthKey = card.dataset.monthKey;
+
+        if (action === 'add-payment') {
+            openPaymentModal(clientId, monthKey);
+        } else if (action === 'delete-payment') {
+            const paymentId = actionBtn.dataset.paymentId;
+            handleDeletePayment(clientId, monthKey, paymentId);
+        }
+    });
+}
+
+/**
+ * Randează întreaga vizualizare de facturare pentru luna selectată.
+ */
+export function renderBillingView() {
+    const { clients, events } = calendarState.getState();
+    const year = currentBillingDate.getFullYear();
+    const month = currentBillingDate.getMonth();
+    const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+
+    // Actualizează eticheta lunii
+    dom.currentMonthLabel.textContent = currentBillingDate.toLocaleString('ro-RO', {
+        month: 'long',
+        year: 'numeric'
+    });
+    
+    dom.clientList.innerHTML = ''; // Curăță lista
+
+    if (clients.length === 0) {
+        dom.clientList.innerHTML = '<p class="empty-list-message">Nu există clienți în sistem.</p>';
+        return;
+    }
+
+    clients.forEach(client => {
+        // Nu afișa clienți "speciali" (ex: Pauza, Sedinta)
+        if (['Pauza de masa', 'Sedinta', 'Concediu'].includes(client.name)) {
+            return;
+        }
+
+        const hoursData = calculateClientHoursForMonth(client.id, year, month, events);
+        const totalDue = hoursData.billableHours * BILLING_RATE_PER_HOUR;
+        
+        const card = document.createElement('div');
+        card.className = 'billing-card';
+        card.dataset.clientId = client.id;
+        card.dataset.monthKey = monthKey;
+
+        card.innerHTML = `
+            <div class="billing-header">
+                <span class="client-name">${client.name}</span>
+                <span class="client-hours">${hoursData.billableHours.toFixed(1)} ore</span>
+            </div>
+            <div class="billing-body">
+                ${generatePaymentSummary(client.id, monthKey, totalDue)}
+            </div>
+            <div class="billing-actions">
+                <button class="btn btn-primary btn-sm" data-action="add-payment">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5 12h14M12 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path></svg>
+                    Adaugă Încasare
+                </button>
+            </div>
+        `;
+        dom.clientList.appendChild(card);
+    });
+}
+
+/**
+ * Generează HTML pentru rezumatul financiar (Total, Achitat, Restant) și lista plăților.
+ */
+function generatePaymentSummary(clientId, monthKey, totalDue) {
+    const { billingsData } = calendarState.getState();
+    const payments = billingsData[clientId]?.[monthKey] || [];
+    
+    const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
+    const balance = totalDue - totalPaid;
+
+    let paymentsHtml = '<p class="no-payments">Nicio încasare înregistrată.</p>';
+    if (payments.length > 0) {
+        paymentsHtml = payments.map(p => `
+            <div class="payment-item">
+                <span>📅 ${new Date(p.date).toLocaleDateString('ro-RO')}</span>
+                <span class="payment-note">${p.notes || ''}</span>
+                <span class="payment-amount">${p.amount.toFixed(2)} RON</span>
+                <button class="btn-icon btn-delete-payment" data-action="delete-payment" data-payment-id="${p.id}" title="Șterge încasarea">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg>
+                </button>
+            </div>
+        `).join('');
+    }
+
+    return `
+        <div class="financial-summary">
+            <div class="summary-item total-due">
+                <span class="label">Total de Plată</span>
+                <span class="value">${totalDue.toFixed(2)} RON</span>
+            </div>
+            <div class="summary-item total-paid">
+                <span class="label">Total Achitat</span>
+                <span class="value">${totalPaid.toFixed(2)} RON</span>
+            </div>
+            <div class="summary-item balance ${balance > 0 ? 'due' : (balance <= 0 && totalDue > 0 ? 'paid' : '')}">
+                <span class="label">Restant</span>
+                <span class="value">${balance.toFixed(2)} RON</span>
+            </div>
+        </div>
+        <div class="payments-list">
+            <h4>Istoric Încasări</h4>
+            ${paymentsHtml}
+        </div>
+    `;
+}
+
+/**
+ * Calculează orele facturabile pentru un client într-o lună specificată.
+ */
+function calculateClientHoursForMonth(clientId, year, month, allEvents) {
+    const monthEvents = allEvents.filter(event => {
+        const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
+        if (!clientIds.includes(clientId)) return false;
+        
+        const eventDate = new Date(event.date);
+        return eventDate.getFullYear() === year && eventDate.getMonth() === month;
+    });
+
+    let billableMinutes = 0;
+    
+    monthEvents.forEach(event => {
+        // Este facturabil ȘI clientul a fost prezent
+        const attendance = (event.attendance && event.attendance[clientId]) || 'present';
+        if (event.isBillable !== false && attendance === 'present' && event.duration) {
+            billableMinutes += event.duration;
+        }
+    });
+    
+    return {
+        billableHours: billableMinutes / 60
+    };
+}
+
+// --- Navigare Lunară ---
+
+function navigateBillingMonth(direction) {
+    currentBillingDate.setMonth(currentBillingDate.getMonth() + direction);
+    renderBillingView();
+}
+
+// --- Management Plăți ---
+
+function openPaymentModal(clientId, monthKey) {
+    dom.paymentModalTitle.textContent = `Adaugă Încasare (${monthKey})`;
+    dom.paymentForm.reset();
+    dom.paymentClientId.value = clientId;
+    dom.paymentMonthKey.value = monthKey;
+    dom.paymentDate.valueAsDate = new Date(); // Setează data la ziua de azi
+    dom.paymentModal.style.display = 'flex';
+    dom.paymentAmount.focus();
+}
+
+function closePaymentModal() {
+    dom.paymentModal.style.display = 'none';
+    dom.paymentForm.reset();
+}
+
+async function handleSavePayment(e) {
+    e.preventDefault();
+    const clientId = dom.paymentClientId.value;
+    const monthKey = dom.paymentMonthKey.value;
+    const amount = parseFloat(dom.paymentAmount.value);
+    const date = dom.paymentDate.value;
+    const notes = dom.paymentNotes.value || '';
+
+    if (!clientId || !monthKey || isNaN(amount) || !date) {
+        showCustomAlert('Vă rugăm completați toate câmpurile corect.', 'Eroare');
+        return;
+    }
+
+    const { billingsData } = calendarState.getState();
+
+    // Asigură că structura există
+    if (!billingsData[clientId]) {
+        billingsData[clientId] = {};
+    }
+    if (!billingsData[clientId][monthKey]) {
+        billingsData[clientId][monthKey] = [];
+    }
+
+    // Adaugă noua plată
+    billingsData[clientId][monthKey].push({
+        id: `pay_${Date.now()}`,
+        date: date,
+        amount: amount,
+        notes: notes
+    });
+
+    // Sortează plățile după dată
+    billingsData[clientId][monthKey].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // Salvează și rerandează
+    try {
+        await api.saveBillingsData(billingsData);
+        calendarState.setBillingsData(billingsData); // Actualizează starea
+        renderBillingView(); // Rerandează lista de facturare
+        closePaymentModal();
+    } catch (err) {
+        console.error('Eroare la salvarea încasării:', err);
+        showCustomAlert('Nu s-a putut salva încasarea.', 'Eroare API');
+    }
+}
+
+async function handleDeletePayment(clientId, monthKey, paymentId) {
+    const confirmed = await showCustomConfirm('Sunteți sigur că doriți să ștergeți această încasare?', 'Confirmare Ștergere');
+    if (!confirmed) return;
+
+    const { billingsData } = calendarState.getState();
+
+    if (!billingsData[clientId] || !billingsData[clientId][monthKey]) return;
+
+    // Filtrează plata
+    billingsData[clientId][monthKey] = billingsData[clientId][monthKey].filter(p => p.id !== paymentId);
+
+    // Salvează și rerandează
+    try {
+        await api.saveBillingsData(billingsData);
+        calendarState.setBillingsData(billingsData);
+        renderBillingView();
+    } catch (err) {
+        console.error('Eroare la ștergerea încasării:', err);
+        showCustomAlert('Nu s-a putut șterge încasarea.', 'Eroare API');
+    }
+}

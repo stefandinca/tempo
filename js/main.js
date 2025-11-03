@@ -11,6 +11,7 @@ import * as ui from './uiService.js';
 import * as view from './calendarView.js';
 import * as reportService from './reportService.js';
 import * as evolutionService from './evolutionService.js';
+import * as billing from './billingService.js';
 
 // --- Variabile DOM Globale ---
 const $ = (id) => document.getElementById(id);
@@ -27,6 +28,7 @@ const dom = {
     clientSection: $('clientSection'),
     teamSection: $('teamSection'),
     dashboardSection: $('dashboardSection'),
+    billingSection: $('billingSection'),
     
     // Calendar
     currentPeriod: $('currentPeriod'),
@@ -148,6 +150,10 @@ function handleMainViewNavigation(e) {
                 renderFilters();
             }, 50); // Small delay to ensure DOM is ready
         }
+
+        if (viewName === 'billing') {
+             billing.renderBillingView();
+         }
     }
 }
 
@@ -864,6 +870,18 @@ async function init() {
         calendarState.setPrograms(programsData.programs);
         const evolutionData = await api.loadEvolutionData();
         calendarState.setEvolutionData(evolutionData);
+
+        // Încărcare date facturare
+    try {
+        const billingsData = await api.loadBillingsData();
+        calendarState.setBillingsData(billingsData);
+    } catch (e) {
+        console.warn('Nu s-au putut încărca datele de facturare.', e);
+        calendarState.setBillingsData({}); // Inițializează ca gol
+    }
+
+
+
     } catch (error) {
         console.error('Eroare critică la încărcarea datelor:', error);
         ui.showCustomAlert('Nu s-au putut încărca datele.', 'Eroare fatală');
@@ -978,6 +996,9 @@ async function init() {
         });
     }
     
+
+    // Inițializează serviciul de facturare
+    billing.init(); // 
     // --- Randare Inițială ---
     renderFilters();
     render();

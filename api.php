@@ -392,6 +392,36 @@ try {
             }
             break;
 
+            case 'billings':
+            $billingFile = __DIR__ . '/billings.json';
+
+            if ($method === 'GET') {
+                setValidationHeadersFromFile($billingFile);
+                if (file_exists($billingFile)) {
+                    $content = file_get_contents($billingFile);
+                    $decoded = json_decode($content, true);
+                    sendResponse(is_array($decoded) ? $decoded : (object)[]); // Trimite obiect gol
+                } else {
+                    sendResponse((object)[]); // Trimite obiect gol dacă fișierul nu există
+                }
+
+            } elseif ($method === 'POST') {
+                if (!$input) {
+                    sendError('Invalid JSON data', 400);
+                }
+
+                $json = json_encode($input, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+                if (file_put_contents($billingFile, $json) !== false) {
+                    sendResponse(['success' => true, 'message' => 'Billings data saved']);
+                } else {
+                    sendError('Failed to write billings data');
+                }
+
+            } else {
+                sendError('Unsupported method', 405);
+            }
+            break;
+
                     // --- Generic JSON file loader (for portrige.json, programs.json, etc.) ---
         case (preg_match('/\.json$/', $path) ? true : false):
             $file = __DIR__ . '/' . basename($path);
