@@ -327,6 +327,16 @@
                         <label for="clientBirthdayInput">Data Nasterii</label>
                         <input type="date" id="clientBirthdayInput" name="clientBirthdayInput" class="form-input">
                     </div>
+                    <div class="form-group">
+        <label for="clientId">Cod Client (ID)</label>
+        <input type="text" id="clientId" name="clientId" class="form-input" 
+               placeholder="ex: cezar_2102" 
+               pattern="[a-z0-9_]+" 
+               title="Folosește doar litere mici, cifre și underscore">
+        <small style="color: var(--text-secondary); font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+            Lasă gol pentru generare automată. Folosește format: nume_ddmm
+        </small>
+    </div>
                     <div class="modal-footer-form">
                         <button id="deleteClientBtn" type="button" class="btn btn-danger-outline">Sterge</button>
                         <button id="cancelClientBtn" type="button" class="btn btn-secondary">Anuleaza</button>

@@ -419,16 +419,43 @@ async function handleSaveClient(e) {
     const { editingClientId } = calendarState.getState();
     const formData = new FormData(e.target);
     
+    // Get manual ID or generate one
+    let clientId;
+    const manualId = formData.get('clientId')?.trim();
+    
+    if (editingClientId) {
+        // When editing, keep existing ID unless manually changed
+        clientId = manualId || editingClientId;
+    } else {
+        // When creating new, use manual ID or generate
+        clientId = manualId || generateClientId(
+            formData.get('clientFullName'), 
+            formData.get('clientBirthdayInput')
+        );
+    }
+    
+    // Validate ID format
+    if (!/^[a-z0-9_]+$/.test(clientId)) {
+        ui.showCustomAlert('Codul clientului trebuie să conțină doar litere mici, cifre și underscore.', 'ID Invalid');
+        return;
+    }
+    
+    // Check for duplicate IDs (only when creating new or changing ID)
+    if (clientId !== editingClientId) {
+        const { clients } = calendarState.getState();
+        if (clients.some(c => c.id === clientId)) {
+            ui.showCustomAlert('Acest cod de client este deja folosit. Alege un cod diferit.', 'Cod Duplicat');
+            return;
+        }
+    }
+    
     const clientData = {
-    id: editingClientId || generateClientId(
-        formData.get('clientFullName'), 
-        formData.get('clientBirthdayInput')
-    ),
-    name: formData.get('clientFullName'),
-    email: formData.get('clientEmail'),
-    phone: formData.get('clientPhone'),
-    birthDate: formData.get('clientBirthdayInput') || null
-};
+        id: clientId,
+        name: formData.get('clientFullName'),
+        email: formData.get('clientEmail'),
+        phone: formData.get('clientPhone'),
+        birthDate: formData.get('clientBirthdayInput') || null
+    };
 
     calendarState.saveClient(clientData);
     await api.saveData(calendarState.getState());

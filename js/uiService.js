@@ -693,6 +693,7 @@ export function renderClientsList(searchTerm = '') {
 export function resetClientForm() {
     $('clientForm').reset();
     $('clientFormTitle').textContent = 'Adaugă Client Nou';
+    $('clientId').value = ''; // Clear the ID field
     $('deleteClientBtn').style.display = 'none';
     calendarState.setEditingId({ clientId: null });
 }
@@ -703,6 +704,7 @@ export function editClientInModal(clientId) {
     
     calendarState.setEditingId({ clientId });
     $('clientFormTitle').textContent = 'Editează Client';
+    $('clientId').value = client.id; // Populate the ID field
     $('clientFullName').value = client.name;
     $('clientEmail').value = client.email || '';
     $('clientPhone').value = client.phone || '';
