@@ -625,9 +625,36 @@ $('evaluationDateInput')?.addEventListener('change', () => {
 });
 $('saveEvaluationBtn')?.addEventListener('click', (e) => {
     e.preventDefault();
-    savePortageEvaluation();
+    
+    const selectedType = $('evaluationTypeSelect').value;
+    
+    if (selectedType === 'portage') {
+        savePortageEvaluation(); // Apelăm funcția existentă pentru Portage
+    } else if (selectedType === 'logopedica') {
+        // Deocamdată afișăm o alertă, deoarece logica de salvare nu a fost specificată
+        showCustomAlert('Salvarea pentru evaluarea logopedică nu este încă implementată.', 'Funcționalitate în lucru');
+        // Aici s-ar adăuga logica de salvare pentru câmpurile logoInput1, 2, 3
+    }
 });
 $('cancelEvaluationBtn')?.addEventListener('click', (e) => {
     e.preventDefault();
     activateTab('tabGrafice'); // Revino la grafice
 });
+
+//Listener pentru dropdown-ul de tip evaluare
+const evalTypeSelect = $('evaluationTypeSelect');
+if (evalTypeSelect) {
+    evalTypeSelect.addEventListener('change', (e) => {
+        const selectedType = e.target.value;
+        const portageContainer = $('portageFormContainer');
+        const logopedicaContainer = $('logopedicaFormContainer');
+
+        if (selectedType === 'portage') {
+            if (portageContainer) portageContainer.style.display = 'block';
+            if (logopedicaContainer) logopedicaContainer.style.display = 'none';
+        } else if (selectedType === 'logopedica') {
+            if (portageContainer) portageContainer.style.display = 'none';
+            if (logopedicaContainer) logopedicaContainer.style.display = 'block';
+        }
+    });
+}

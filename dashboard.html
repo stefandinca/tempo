@@ -721,8 +721,33 @@
                             </div>
                         </div>
                         
-                        <div id="portageDomainsContainer">
+                        <div class="form-group">
+                            <label for="evaluationTypeSelect">Tip evaluare</label>
+                            <select id="evaluationTypeSelect" class="form-input">
+                                <option value="portage" selected>Portage</option>
+                                <option value="logopedica">Evaluare logopedică</option>
+                            </select>
+                        </div>
+                        
+                        <div id="portageFormContainer">
+                            <div id="portageDomainsContainer">
+                                </div>
+                        </div>
+
+                        <div id="logopedicaFormContainer" style="display: none;">
+                            <div class="form-group">
+                                <label for="logoInput1">Numele testului</label>
+                                <input type="text" id="logoInput1" class="form-input" placeholder="Ex: Scala de evaluare a limbajului...">
                             </div>
+                            <div class="form-group">
+                                <label for="logoInput2">Rezultat obținut</label>
+                                <input type="text" id="logoInput2" class="form-input" placeholder="Ex: Vârsta limbajului 2 ani și 4 luni...">
+                            </div>
+                            <div class="form-group">
+                                <label for="logoInput3">Observații</label>
+                                <textarea id="logoInput3" class="form-input" rows="4" placeholder="Observații suplimentare..."></textarea>
+                            </div>
+                        </div>
                         
                         <div class="modal-footer">
                             <button id="cancelEvaluationBtn" type="button" class="btn btn-secondary">Anuleaza</button>
