@@ -152,8 +152,27 @@ function handleMainViewNavigation(e) {
         }
 
         if (viewName === 'billing') {
-             billing.renderBillingView();
-         }
+    if (auth.isAdmin()) {
+        billing.renderBillingView();
+    } else {
+        // Dacă un non-admin (ex: Terapeut) încearcă să acceseze
+        console.warn('Acces restricționat la secțiunea Facturare.');
+        e.preventDefault(); // Oprește navigarea
+
+        // Asigură-te că secțiunea curentă rămâne vizibilă
+        const currentActiveSection = document.querySelector('.main-section.active');
+        if (currentActiveSection) {
+            currentActiveSection.style.display = 'flex';
+        }
+        // Resetează link-ul din meniu
+        menuItem.classList.remove('active');
+        const currentActiveLink = document.querySelector('.sidebar-menu .menu-item.active');
+        if (currentActiveLink) {
+            currentActiveLink.classList.add('active');
+        }
+        return; // Oprește execuția funcției
+    }
+}
     }
 }
 
@@ -853,6 +872,19 @@ async function init() {
         
         // Update UI with user info
         updateUserInterface();
+
+        if (!auth.isAdmin()) {
+        // Ascunde link-ul de Facturare din sidebar
+        const billingLink = document.querySelector('.menu-item[data-view="billing"]');
+        if (billingLink) {
+            billingLink.style.display = 'none';
+        }
+        
+        // Ascunde fizic secțiunea de Facturare
+        if (dom.billingSection) {
+            dom.billingSection.style.display = 'none';
+        }
+    }
         
     } catch (error) {
         console.error('Eroare critică la încărcarea datelor:', error);
@@ -998,7 +1030,9 @@ async function init() {
     
 
     // Inițializează serviciul de facturare
-    billing.init(); // 
+    if (auth.isAdmin()) {
+        billing.init();
+    }
     // --- Randare Inițială ---
     renderFilters();
     render();
