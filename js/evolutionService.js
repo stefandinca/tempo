@@ -602,6 +602,79 @@ async function savePortageEvaluation() {
     }
 }
 
+/**
+ * NOU: Salvează datele evaluării Logopedice.
+ */
+async function saveLogopedicEvaluation() {
+    const { evolutionData } = calendarState.getState();
+    const evalDate = $('evaluationDateInput').value;
+    const client = calendarState.getClientById(currentClientId);
+
+    if (!client || !evalDate) {
+        showCustomAlert('Completați data nașterii și data evaluării.', 'Eroare');
+        return;
+    }
+
+    // 1. Colectează datele din tabel
+    const sunete = {
+        A: {
+            init: $('logo_A_init').value,
+            med: $('logo_A_med').value,
+            fin: $('logo_A_fin').value
+        },
+        O: {
+            init: $('logo_O_init').value,
+            med: $('logo_O_med').value,
+            fin: $('logo_O_fin').value
+        },
+        U: {
+            init: $('logo_U_init').value,
+            med: $('logo_U_med').value,
+            fin: $('logo_U_fin').value
+        }
+    };
+
+    // 2. Colectează comentariile
+    const comentarii = $('logoComentarii').value;
+
+    // 3. Creează obiectul de salvare
+    const evaluationEntry = {
+        sunete: sunete,
+        comentarii: comentarii
+    };
+
+    // 4. Actualizează starea locală
+    if (!evolutionData[currentClientId]) {
+        evolutionData[currentClientId] = { name: client.name, evaluations: {}, programHistory: [], logopedicEvaluations: {} };
+    }
+    if (!evolutionData[currentClientId].logopedicEvaluations) {
+        evolutionData[currentClientId].logopedicEvaluations = {};
+    }
+    
+    // Suprascrie sau adaugă evaluarea pentru data respectivă
+    evolutionData[currentClientId].logopedicEvaluations[evalDate] = evaluationEntry;
+    calendarState.setEvolutionData(evolutionData);
+
+    // 5. Salvează pe server
+    try {
+        await api.saveEvolutionData(evolutionData);
+        showCustomAlert('Evaluarea logopedică a fost salvată cu succes!', 'Succes');
+
+        if (window.logActivity) {
+            window.logActivity("Evaluare logopedică salvată", client.name, 'evaluation', currentClientId);
+        }
+        
+        // Re-randează graficele (pentru a prelua orice alte modificări) și închide
+        renderEvolutionChart(evolutionData[currentClientId]);
+        renderPortageSummary(evolutionData[currentClientId], client);
+        activateTab('tabGrafice'); // Revino la tabul principal
+
+    } catch (err) {
+        console.error('Eroare la salvarea evaluării logopedice:', err);
+        showCustomAlert('Nu s-a putut salva evaluarea pe server.', 'Eroare');
+    }
+}
+
 
 // --- Inițializare Event Listeners ---
 
