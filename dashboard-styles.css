@@ -222,3 +222,24 @@
 #dashboardTodaySchedule .therapist-group-header:first-child {
     margin-top: 0;
 }
+
+/* Face clicabile itemele din programul zilei */
+.clickable-schedule-item {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.clickable-schedule-item:hover {
+    background-color: #f8f9fa; /* --bg-hover */
+}
+
+[data-theme="dark"] .clickable-schedule-item:hover {
+    background-color: #334155; /* dark: --bg-hover */
+}
+
+/* Stil adăugat pentru scroll în Activitate Recentă */
+#dashboardRecentActivity {
+    max-height: 200px; /* Înălțime maximă (aprox. 5-6 activități) - o poți ajusta */
+    overflow-y: auto;  /* Adaugă scrollbar vertical la nevoie */
+    padding-right: 0.5rem; /* Un mic spațiu pentru a nu lipi scrollbar-ul de conținut */
+}

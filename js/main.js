@@ -707,8 +707,8 @@ function updateDashboardSchedule() {
                         return client ? client.name : 'Fără client';
                     }).join(', ');
                     
-                    return `
-                        <div class="schedule-item">
+                   return `
+                        <div class="schedule-item clickable-schedule-item" data-event-id="${event.id}">
                             <div class="schedule-time">${event.startTime} - ${endTime}</div>
                             <div class="schedule-details">
                                 <div class="schedule-title">${event.name}</div>
@@ -740,8 +740,8 @@ function updateDashboardSchedule() {
             }).join(', ');
             
             return `
-                <div class="schedule-item">
-                    <div class="schedule-time">${event.startTime} - ${endTime}</div>
+            <div class="schedule-item clickable-schedule-item" data-event-id="${event.id}">
+                <div class="schedule-time">${event.startTime} - ${endTime}</div>
                     <div class="schedule-details">
                         <div class="schedule-title">${event.name}</div>
                         <div class="schedule-client">cu ${clientNames || 'Fără client'}</div>
@@ -965,6 +965,18 @@ async function init() {
     
     // Acțiuni pe carduri (Clienti/Echipa)
     setupAdminListeners();
+
+    // --- Adaugă listener pentru click pe programul zilei ---
+    const dashboardScheduleContainer = $('dashboardTodaySchedule');
+    if (dashboardScheduleContainer) {
+        dashboardScheduleContainer.addEventListener('click', (e) => {
+            const scheduleItem = e.target.closest('.clickable-schedule-item');
+            if (scheduleItem && scheduleItem.dataset.eventId) {
+                // Folosim funcția existentă care include deja verificările de permisiuni
+                ui.showEventDetails(scheduleItem.dataset.eventId);
+            }
+        });
+    }
     
     // --- Randare Inițială ---
     renderFilters();
