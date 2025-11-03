@@ -255,30 +255,7 @@ body {
   gap: 1rem;
 }
 
-/* Collapsed Sidebar */
-.app-container.sidebar-collapsed .sidebar {
-    width: 88px;
-}
-.app-container.sidebar-collapsed .sidebar .logo-full {
-    display: none;
-}
-.app-container.sidebar-collapsed .sidebar .logo-small {
-    display: block;
-}
-.app-container.sidebar-collapsed .sidebar .menu-item a span {
-    display: none;
-}
-.app-container.sidebar-collapsed .sidebar .menu-item a {
-    justify-content: center;
-}
-.app-container.sidebar-collapsed .sidebar .sidebar-footer {
-    justify-content: center;
-}
 
-.app-container.sidebar-collapsed .sidebar .menu-item a span,
-.app-container.sidebar-collapsed .sidebar #sidebarLogoutBtn span {
-    display: none;
-}
 
 /* ==========================================================
    3. LAYOUT (PUBLIC - index.html)

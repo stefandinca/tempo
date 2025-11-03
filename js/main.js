@@ -21,7 +21,7 @@ const dom = {
 
     // Navigare Sidebar
     sidebarLinks: document.querySelectorAll('.sidebar-menu .menu-item'),
-    sidebarToggle: $('sidebarToggle'),
+    
     
     // Secțiuni Principale
     calendarSection: $('calendarSection'),
@@ -792,35 +792,38 @@ function updateDashboardStats() {
     if (pendingReportsEl) pendingReportsEl.textContent = stats.pendingReports;
 }
 
+
 /**
- * Add user info to header
+ * Adaugă informațiile despre utilizator în sidebar.
  */
 function addUserInfoToHeader() {
-    const headers = document.querySelectorAll('.section-header, .main-header');
-    headers.forEach(header => {
-        const existing = header.querySelector('.user-info-badge');
-        if (existing) existing.remove();
-        
-        const userInfo = document.createElement('div');
-        userInfo.className = 'user-info-badge';
-        userInfo.style.cssText = 'display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 1rem; background: var(--bg-hover); border-radius: 0.5rem; border: 1px solid var(--border-color);';
-        userInfo.innerHTML = `
-            <div style="width: 32px; height: 32px; border-radius: 50%; background-color: ${currentUser.color}; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.875rem;">
-                ${currentUser.initials}
-            </div>
-            <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                <span style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary);">${currentUser.name}</span>
-                <span style="font-size: 0.75rem; color: var(--text-secondary);">${getRoleLabel(currentUser.role)}</span>
-            </div>
-        `;
-        
-        const actionsDiv = header.querySelector('.header-actions');
-        if (actionsDiv) {
-            actionsDiv.insertBefore(userInfo, actionsDiv.firstChild);
-        }
-    });
-    
-   
+    // 1. Găsește containerul din sidebar
+    const container = $('sidebarUserBadgeContainer');
+    if (!container) return;
+
+    // 2. Curăță containerul
+    container.innerHTML = '';
+
+    // 3. Creează elementul badge
+    const userInfo = document.createElement('div');
+    userInfo.className = 'user-info-badge';
+
+    // 4. Aplică stiluri flex (fără fundal/padding, preluate de containerul HTML)
+    userInfo.style.cssText = 'display: flex; align-items: center; gap: 0.75rem; width: 100%;';
+
+    // 5. Setează conținutul HTML (cu clase speciale pentru colapsare)
+    userInfo.innerHTML = `
+        <div style="width: 32px; height: 32px; border-radius: 50%; background-color: ${currentUser.color}; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.875rem; flex-shrink: 0;">
+            ${currentUser.initials}
+        </div>
+        <div class="sidebar-user-details" style="display: flex; flex-direction: column; align-items: flex-start; min-width: 0;">
+            <span style="font-weight: 600; font-size: 0.875rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;">${currentUser.name}</span>
+            <span style="font-size: 0.75rem; color: var(--text-secondary);">${getRoleLabel(currentUser.role)}</span>
+        </div>
+    `;
+
+    // 6. Adaugă badge-ul în container
+    container.appendChild(userInfo);
 }
 
 /**
@@ -929,11 +932,7 @@ async function init() {
     initThemeToggle();
     initFullscreenToggle();
 
-    if (dom.sidebarToggle && dom.appContainer) {
-        dom.sidebarToggle.addEventListener('click', () => {
-            dom.appContainer.classList.toggle('sidebar-collapsed');
-        });
-    }
+    
 
     // Logout (with null checks)
     if (dom.sidebarLogoutBtn) {
