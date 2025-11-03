@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Selectează utilizatorul - Tempo Admin</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = {
             darkMode: ['class', '[data-theme="dark"]'],
@@ -40,6 +41,14 @@
             box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
         }
         
+        .user-card.parent-card {
+            cursor: default;
+        }
+        
+        .user-card.parent-card:hover {
+            transform: translateY(-4px);
+        }
+        
         .user-avatar {
             width: 120px;
             height: 120px;
@@ -68,10 +77,287 @@
         .role-therapist { background: #dbeafe; color: #1e40af; }
         .role-coordinator { background: #fef3c7; color: #92400e; }
         .role-admin { background: #fce7f3; color: #9f1239; }
+        .role-parent { background: #dcfce7; color: #166534; }
         
         [data-theme="dark"] .role-therapist { background: #1e3a8a; color: #dbeafe; }
         [data-theme="dark"] .role-coordinator { background: #78350f; color: #fef3c7; }
         [data-theme="dark"] .role-admin { background: #831843; color: #fce7f3; }
+        [data-theme="dark"] .role-parent { background: #14532d; color: #dcfce7; }
+        
+        .parent-input-container {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .client-code-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            background: white;
+            color: #1f2937;
+        }
+        
+        .client-code-input:focus {
+            outline: none;
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+        
+        .client-code-input::placeholder {
+            color: #9ca3af;
+        }
+        
+        [data-theme="dark"] .client-code-input {
+            background: #1f2937;
+            color: #f3f4f6;
+            border-color: #4b5563;
+        }
+        
+        [data-theme="dark"] .client-code-input:focus {
+            border-color: #10b981;
+        }
+        
+        .view-profile-btn {
+            width: 100%;
+            margin-top: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .view-profile-btn:hover:not(:disabled) {
+            background: #059669;
+            transform: translateY(-1px);
+        }
+        
+        .view-profile-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        /* Parent Profile Modal */
+        .parent-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            padding: 2rem;
+            overflow-y: auto;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        
+        .parent-modal.active {
+            display: flex;
+        }
+        
+        .parent-modal-content {
+            width: 100%;
+            max-width: 1200px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        [data-theme="dark"] .parent-modal-content {
+            background: #1e293b;
+        }
+        
+        .parent-modal-header {
+            padding: 2rem;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .parent-modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        
+        .parent-modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .parent-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .parent-modal-body {
+            padding: 2rem;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        
+        .client-info-section {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e5e7eb;
+        }
+        
+        [data-theme="dark"] .client-info-section {
+            background: #0f172a;
+            border-color: #334155;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        [data-theme="dark"] .section-title {
+            color: #f3f4f6;
+            border-bottom-color: #334155;
+        }
+        
+        .client-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .info-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6b7280;
+            letter-spacing: 0.05em;
+        }
+        
+        [data-theme="dark"] .info-label {
+            color: #9ca3af;
+        }
+        
+        .info-value {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #1f2937;
+        }
+        
+        [data-theme="dark"] .info-value {
+            color: #f3f4f6;
+        }
+        
+        .error-message {
+            padding: 1rem;
+            background: #fee2e2;
+            color: #991b1b;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        [data-theme="dark"] .error-message {
+            background: #450a0a;
+            color: #fecaca;
+        }
+        
+        .chart-container-parent {
+            min-height: 400px;
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border: 1px solid #e5e7eb;
+        }
+        
+        [data-theme="dark"] .chart-container-parent {
+            background: #0f172a;
+            border-color: #334155;
+        }
+        
+        .program-history-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+        
+        [data-theme="dark"] .program-history-table {
+            background: #0f172a;
+            border-color: #334155;
+        }
+        
+        .program-history-table th,
+        .program-history-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        [data-theme="dark"] .program-history-table th,
+        [data-theme="dark"] .program-history-table td {
+            border-bottom-color: #334155;
+        }
+        
+        .program-history-table thead th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #6b7280;
+        }
+        
+        [data-theme="dark"] .program-history-table thead th {
+            background: #1e293b;
+            color: #9ca3af;
+        }
+        
+        .program-history-score {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            width: 28px;
+            height: 28px;
+            border-radius: 0.25rem;
+            border: 2px solid;
+        }
+        
+        .program-history-score[data-score="0"] { color: #ef4444; border-color: #ef4444; }
+        .program-history-score[data-score="-"] { color: #f59e0b; border-color: #f59e0b; }
+        .program-history-score[data-score="P"] { color: #3b82f6; border-color: #3b82f6; }
+        .program-history-score[data-score="+"] { color: #10b981; border-color: #10b981; }
     </style>
 </head>
 <body>
@@ -94,6 +380,21 @@
         </div>
     </div>
 
+    <!-- Parent Profile Modal -->
+    <div id="parentModal" class="parent-modal">
+        <div class="parent-modal-content">
+            <div class="parent-modal-header">
+                <h2 id="parentModalTitle">Profil Client</h2>
+                <button id="closeParentModal" class="parent-modal-close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="parent-modal-body" id="parentModalContent">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         // API Configuration
         const API_BASE = 'api.php';
@@ -109,11 +410,37 @@
             }
         }
 
+        async function loadClientData(clientId) {
+            try {
+                const [dataResponse, evolutionResponse] = await Promise.all([
+                    fetch(`${API_BASE}?path=data`),
+                    fetch(`${API_BASE}?path=evolution.json`)
+                ]);
+                
+                const data = await dataResponse.json();
+                const evolutionData = await evolutionResponse.json();
+                
+                const client = data.clients.find(c => c.id === clientId);
+                if (!client) return null;
+                
+                const clientEvolution = evolutionData[clientId] || {};
+                
+                return {
+                    client,
+                    evolution: clientEvolution
+                };
+            } catch (error) {
+                console.error('Error loading client data:', error);
+                return null;
+            }
+        }
+
         function getRoleLabel(role) {
             const labels = {
                 'therapist': 'Terapeut',
                 'coordinator': 'Coordonator',
-                'admin': 'Administrator'
+                'admin': 'Administrator',
+                'parent': 'Părinte'
             };
             return labels[role] || role;
         }
@@ -126,42 +453,269 @@
             const container = document.getElementById('userCardsContainer');
             const teamMembers = await loadTeamMembers();
 
-            if (teamMembers.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-12">
-                        <p class="text-white text-xl mb-4">Nu există membri în echipă.</p>
-                        <a href="dashboard.html" class="inline-block px-6 py-3 bg-white text-primary rounded-lg font-semibold hover:bg-opacity-90 transition-all">
-                            Mergi la Dashboard pentru a adăuga membri
-                        </a>
+            let cardsHTML = '';
+
+            // Add team member cards
+            teamMembers.forEach(member => {
+                cardsHTML += `
+                    <div class="user-card bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg" data-user-id="${member.id}">
+                        <div class="user-avatar" style="background-color: ${member.color}">
+                            ${member.initials}
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">${member.name}</h3>
+                        <span class="role-badge ${getRoleClass(member.role)}">${getRoleLabel(member.role)}</span>
                     </div>
                 `;
-                return;
-            }
+            });
 
-            container.innerHTML = teamMembers.map(member => `
-                <div class="user-card bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg" data-user-id="${member.id}">
-                    <div class="user-avatar" style="background-color: ${member.color}">
-                        ${member.initials}
+            // Add parent card
+            cardsHTML += `
+                <div class="user-card parent-card bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg">
+                    <div class="user-avatar" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%)">
+                        👨‍👩‍👧
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">${member.name}</h3>
-                    <span class="role-badge ${getRoleClass(member.role)}">${getRoleLabel(member.role)}</span>
+                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Acces Părinte</h3>
+                    <span class="role-badge role-parent">Părinte</span>
+                    <div class="parent-input-container">
+                        <input 
+                            type="text" 
+                            id="clientCodeInput" 
+                            class="client-code-input" 
+                            placeholder="Introduceți codul clientului"
+                        />
+                        <button id="viewProfileBtn" class="view-profile-btn" disabled>
+                            Vezi Profil
+                        </button>
+                    </div>
                 </div>
-            `).join('');
+            `;
 
-            // Add click handlers
-            document.querySelectorAll('.user-card').forEach(card => {
+            container.innerHTML = cardsHTML;
+
+            // Add click handlers for team members
+            document.querySelectorAll('.user-card:not(.parent-card)').forEach(card => {
                 card.addEventListener('click', () => {
                     const userId = card.dataset.userId;
                     selectUser(userId);
                 });
             });
+
+            // Add parent card functionality
+            setupParentCard();
+        }
+
+        function setupParentCard() {
+            const clientCodeInput = document.getElementById('clientCodeInput');
+            const viewProfileBtn = document.getElementById('viewProfileBtn');
+
+            clientCodeInput.addEventListener('input', (e) => {
+                const value = e.target.value.trim();
+                viewProfileBtn.disabled = value.length === 0;
+            });
+
+            viewProfileBtn.addEventListener('click', async () => {
+                const clientId = clientCodeInput.value.trim();
+                if (!clientId) return;
+
+                viewProfileBtn.disabled = true;
+                viewProfileBtn.textContent = 'Se încarcă...';
+
+                const clientData = await loadClientData(clientId);
+                
+                if (clientData) {
+                    showParentModal(clientData);
+                } else {
+                    alert('Client negăsit. Verificați codul introdus.');
+                }
+
+                viewProfileBtn.disabled = false;
+                viewProfileBtn.textContent = 'Vezi Profil';
+            });
+
+            clientCodeInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !viewProfileBtn.disabled) {
+                    viewProfileBtn.click();
+                }
+            });
+        }
+
+        function showParentModal(clientData) {
+            const modal = document.getElementById('parentModal');
+            const modalTitle = document.getElementById('parentModalTitle');
+            const modalContent = document.getElementById('parentModalContent');
+
+            modalTitle.textContent = `Profil - ${clientData.client.name}`;
+
+            let contentHTML = `
+                <div class="client-info-section">
+                    <h3 class="section-title">Informații Client</h3>
+                    <div class="client-info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Nume Complet</span>
+                            <span class="info-value">${clientData.client.name}</span>
+                        </div>
+            `;
+
+            if (clientData.client.email) {
+                contentHTML += `
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">${clientData.client.email}</span>
+                    </div>
+                `;
+            }
+
+            if (clientData.client.phone) {
+                contentHTML += `
+                    <div class="info-item">
+                        <span class="info-label">Telefon</span>
+                        <span class="info-value">${clientData.client.phone}</span>
+                    </div>
+                `;
+            }
+
+            if (clientData.client.birthDate) {
+                const birthDate = new Date(clientData.client.birthDate);
+                contentHTML += `
+                    <div class="info-item">
+                        <span class="info-label">Data Nașterii</span>
+                        <span class="info-value">${birthDate.toLocaleDateString('ro-RO')}</span>
+                    </div>
+                `;
+            }
+
+            contentHTML += `
+                    </div>
+                </div>
+            `;
+
+            // Add evolution chart if data exists
+            if (clientData.evolution && clientData.evolution.evaluations && Object.keys(clientData.evolution.evaluations).length > 0) {
+                contentHTML += `
+                    <div class="client-info-section">
+                        <h3 class="section-title">Evoluție Portage</h3>
+                        <div class="chart-container-parent">
+                            <canvas id="parentEvolutionChart"></canvas>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Add program history if exists
+            if (clientData.evolution && clientData.evolution.programHistory && clientData.evolution.programHistory.length > 0) {
+                contentHTML += `
+                    <div class="client-info-section">
+                        <h3 class="section-title">Istoric Programe Recente</h3>
+                        <div style="overflow-x: auto;">
+                            ${generateProgramHistoryTable(clientData.evolution.programHistory)}
+                        </div>
+                    </div>
+                `;
+            }
+
+            modalContent.innerHTML = contentHTML;
+            modal.classList.add('active');
+
+            // Render chart if data exists
+            if (clientData.evolution && clientData.evolution.evaluations && Object.keys(clientData.evolution.evaluations).length > 0) {
+                setTimeout(() => renderEvolutionChart(clientData.evolution.evaluations), 100);
+            }
+        }
+
+        function generateProgramHistoryTable(programHistory) {
+            if (!programHistory || programHistory.length === 0) {
+                return '<p class="error-message">Nu există istoric de programe.</p>';
+            }
+
+            const sorted = [...programHistory].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const grouped = {};
+            sorted.forEach(entry => {
+                if (!grouped[entry.programTitle]) grouped[entry.programTitle] = [];
+                grouped[entry.programTitle].push(entry);
+            });
+
+            let html = `
+                <table class="program-history-table">
+                    <thead>
+                        <tr>
+                            <th>Program</th>
+                            <th>Data</th>
+                            <th style="text-align: center;">Scor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            Object.entries(grouped).forEach(([programTitle, entries]) => {
+                entries.slice(0, 10).forEach((entry, index) => {
+                    const formattedDate = new Date(entry.date).toLocaleDateString('ro-RO');
+                    html += `<tr>`;
+                    if (index === 0) {
+                        html += `<td rowspan="${Math.min(entries.length, 10)}">${programTitle}</td>`;
+                    }
+                    html += `<td>${formattedDate}</td>`;
+                    html += `<td style="text-align: center;"><span class="program-history-score" data-score="${entry.score}">${entry.score}</span></td>`;
+                    html += `</tr>`;
+                });
+            });
+
+            html += `</tbody></table>`;
+            return html;
+        }
+
+        function renderEvolutionChart(evaluations) {
+            const canvas = document.getElementById('parentEvolutionChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const colors = ['#4A90E2', '#FF6B6B', '#12C4D9', '#9B59B6', '#1DD75B', '#FFA500', '#E91E63'];
+            const datasets = [];
+            const allDates = new Set();
+
+            Object.values(evaluations).forEach(values => {
+                Object.keys(values).forEach(date => allDates.add(date));
+            });
+            const sortedDates = Array.from(allDates).sort((a, b) => new Date(a) - new Date(b));
+
+            Object.entries(evaluations).forEach(([test, values], i) => {
+                const color = colors[i % colors.length];
+                datasets.push({
+                    label: test,
+                    data: sortedDates.map(date => values[date] ?? null),
+                    borderColor: color,
+                    backgroundColor: color,
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                });
+            });
+
+            new Chart(ctx, {
+                type: 'line',
+                data: { labels: sortedDates, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, position: 'bottom' },
+                        title: { display: true, text: 'Evoluție Scoruri Portage', font: { size: 16 } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+        }
+
+        function closeParentModal() {
+            const modal = document.getElementById('parentModal');
+            modal.classList.remove('active');
         }
 
         function selectUser(userId) {
-            // Store selected user in session storage
             sessionStorage.setItem('currentUserId', userId);
-            
-            // Redirect to dashboard
             window.location.href = 'dashboard.html';
         }
 
@@ -172,6 +726,14 @@
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             html.setAttribute('data-theme', newTheme);
             localStorage.setItem('calendar-theme', newTheme);
+        });
+
+        // Close modal handlers
+        document.getElementById('closeParentModal').addEventListener('click', closeParentModal);
+        document.getElementById('parentModal').addEventListener('click', (e) => {
+            if (e.target.id === 'parentModal') {
+                closeParentModal();
+            }
         });
 
         // Initialize theme
