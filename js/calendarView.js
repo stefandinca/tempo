@@ -341,6 +341,7 @@ function renderEventsInGrid(days, viewElement, onEventClick) {
                 }
 
                 const endTime = calculateEndTime(event.startTime, event.duration);
+                const startTime = formatTime(event.startTime);
                 
                 // --- Conținutul blocului ---
                 const initialsHtml = visibleMembers.map(m => 
@@ -353,7 +354,7 @@ function renderEventsInGrid(days, viewElement, onEventClick) {
                     
                     eventBlock.innerHTML = `
                         <div class="event-initials-container">${initialsHtml}</div>
-                        <div class="event-time">${event.startTime} - ${endTime}</div>
+                        <div class="event-time">${startTime} - ${endTime}</div>
                         <div class="event-title">${event.name}${publicBadge}${billableBadge}</div>
                     `;
                     // Click handler pentru admin
@@ -364,7 +365,7 @@ function renderEventsInGrid(days, viewElement, onEventClick) {
                     if (event.isPublic) {
                         eventBlock.innerHTML = `
                             <div class="event-initials-container">${initialsHtml}</div>
-                            <div class="event-time">${event.startTime} - ${endTime}</div>
+                            <div class="event-time">${startTime} - ${endTime}</div>
                             <div class="event-title">${event.name}</div>
                         `;
                         // Click handler pentru evenimente publice
@@ -372,7 +373,7 @@ function renderEventsInGrid(days, viewElement, onEventClick) {
                     } else {
                         eventBlock.innerHTML = `
                             <div class="event-initials-container">${initialsHtml}</div>
-                            <div class="event-time">${event.startTime} - ${endTime}</div>
+                            <div class="event-time">${startTime} - ${endTime}</div>
                             <div class="event-title" style="font-style: italic;">Ocupat</div>
                         `;
                         // Fără click handler pentru evenimente private
@@ -483,4 +484,10 @@ function calculateEndTime(startTime, durationMinutes) {
     const endHours = Math.floor(totalMinutes / 60) % 24; // % 24 pentru siguranță
     const endMinutes = totalMinutes % 60;
     return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
+}
+
+function formatTime(timeStr) {
+    if (!timeStr) return '';
+    const parts = timeStr.split(':'); // Va fi ["09", "00"] sau ["09", "00", "00"]
+    return `${parts[0]}:${parts[1]}`; // Returnează întotdeauna doar hh:mm
 }

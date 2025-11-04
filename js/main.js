@@ -304,40 +304,107 @@ function initFullscreenToggle() {
     });
 }
 
+
+
 // --- Handlers Navigare Calendar ---
 
-function handleNavigation(direction) {
+/**
+ * NOU: Funcție helper pentru a calcula intervalul și a încărca evenimentele
+ */
+async function fetchAndRenderCalendar() {
+    const { currentDate, currentView } = calendarState.getState();
+    
+    // 1. Calculează intervalul de date necesar
+    let startDate, endDate;
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    if (currentView === 'month') {
+        // Încărcăm întreaga lună (cu buffere pentru zilele din lunile adiacente)
+        startDate = new Date(year, month, -7); // O săptămână înainte
+        endDate = new Date(year, month + 1, 7); // O săptămână după
+    } else if (currentView === 'week') {
+        startDate = getWeekStart(currentDate); // Lunea săptămânii curente
+        endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 6); // Duminica
+    } else { // 'day'
+        startDate = new Date(currentDate);
+        endDate = new Date(currentDate);
+    }
+    
+    const startStr = formatDateISO(startDate);
+    const endStr = formatDateISO(endDate);
+
+    // 2. Afișează un "loading" (opțional, dar recomandat)
+    // Puteți adăuga o clasă de 'loading' pe containerul calendarului
+    
+    try {
+        // 3. Cheamă API-ul
+        const newEvents = await api.loadEventsForRange(startStr, endStr);
+        
+        // 4. Actualizează starea DOAR cu evenimentele noi
+        calendarState.setEvents(newEvents);
+        
+        // 5. Randează calendarul cu noile date
+        render();
+
+    } catch (err) {
+        console.error("Eroare la încărcarea evenimentelor:", err);
+        ui.showCustomAlert("Nu s-au putut încărca evenimentele pentru acest interval.", "Eroare API");
+    }
+    
+    // 6. Oprește "loading"
+}
+
+// MODIFICAT: handleNavigation
+async function handleNavigation(direction) {
     const { currentDate, currentView } = calendarState.getState();
     const newDate = new Date(currentDate);
     if (currentView === 'month') newDate.setMonth(newDate.getMonth() + direction);
     else if (currentView === 'week') newDate.setDate(newDate.getDate() + (7 * direction));
     else if (currentView === 'day') newDate.setDate(newDate.getDate() + direction);
+    
     calendarState.setCurrentDate(newDate);
-    render();
+    updateCurrentPeriodLabel(newDate, currentView); // Actualizează eticheta imediat
+    
+    await fetchAndRenderCalendar(); // Așteaptă noile date
 }
 
-function navigateToToday() {
+// MODIFICAT: navigateToToday
+async function navigateToToday() {
     calendarState.setCurrentDate(new Date());
-    render();
+    
+    updateCurrentPeriodLabel(calendarState.getState().currentDate, calendarState.getState().currentView);
+    
+    await fetchAndRenderCalendar();
 }
 
-function handleViewChange(e) {
+// MODIFICAT: handleViewChange
+async function handleViewChange(e) {
     const newView = e.target.dataset.view;
     if (newView) {
         calendarState.setCurrentView(newView);
         dom.viewBtns.forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
-        render();
+        
+        updateCurrentPeriodLabel(calendarState.getState().currentDate, newView);
+        
+        await fetchAndRenderCalendar();
     }
 }
 
-function handleDayClick(date) {
+// MODIFICAT: handleDayClick (trebuie să fie async)
+async function handleDayClick(date) {
     calendarState.setCurrentDate(date);
     calendarState.setCurrentView('day');
+    
     document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
     const dayBtn = document.querySelector('[data-view="day"]');
     if (dayBtn) dayBtn.classList.add('active');
-    render();
+    
+    updateCurrentPeriodLabel(date, 'day');
+    
+    await fetchAndRenderCalendar();
 }
 
 function handleEventClick(eventId) {
@@ -662,7 +729,7 @@ function createRecurringEvents(eventBase) {
         const dayOfWeek = currentDate.getDay();
         const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek;
         if (eventBase.repeating.includes(adjustedDay)) {
-            events.push({ ...eventBase, id: generateEventId(), date: formatDate(currentDate, 'iso') });
+            events.push({ ...eventBase, id: generateEventId(), date: formatDateISO(currentDate) });
         }
         currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -727,22 +794,35 @@ function formatDate(date, format = 'short') {
     return date.toLocaleDateString(ro);
 }
 
+// Funcție helper copiată din calendarView.js pentru a evita erori de fus orar
+function formatDateISO(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 
 /**
- * Update UI based on current user
+ * Update UI based on current user (Partea rapidă: Antet și Permisiuni)
  */
 function updateUserInterface() {
-    // Update dashboard schedule
-    updateDashboardSchedule();
-    
-    // Update dashboard stats
-    updateDashboardStats();
-    
     // Add user info to header
     addUserInfoToHeader();
     
     // Update permissions for buttons
     updatePermissions();
+}
+
+/**
+ * NOU: Actualizează widget-urile din Dashboard care depind de evenimente
+ */
+function updateDashboardData() {
+    // Update dashboard schedule
+    updateDashboardSchedule();
+    
+    // Update dashboard stats
+    updateDashboardStats();
 }
 
 /**
@@ -918,37 +998,22 @@ async function init() {
     console.log('Inițializare aplicație Tempo (modular)...');
 
     // === AUTHENTICATION CHECK - ADD THIS BLOCK ===
-    try {
+   try {
+        // PASUL 1: Încarcă datele statice (fără evenimente)
         const data = await api.loadData();
-        calendarState.initializeData(data);
-        
-        // Initialize authentication
-        currentUser = auth.initAuth();
-        if (!currentUser) {
-            return; // Will redirect to select-user.html
-        }
-        
-        console.log('User logged in:', currentUser.name, '-', currentUser.role);
-        
-        // Update UI with user info
-        updateUserInterface();
+        // MODIFICARE: initializeData nu mai primește evenimente
+        calendarState.initializeData({
+            teamMembers: data.teamMembers,
+            clients: data.clients
+        });
+        calendarState.setPrograms(data.programs); // Setează programele
 
-        // NOU: Setează restricțiile de UI pe bază de rol
-        setupRolePermissions();
+        const evolutionData = await api.loadEvolutionData();
+        calendarState.setEvolutionData(evolutionData);
 
-        if (!auth.isAdmin()) {
-        // Ascunde link-ul de Facturare din sidebar
-        const billingLink = document.querySelector('.menu-item[data-view="billing"]');
-        if (billingLink) {
-            billingLink.style.display = 'none';
-        }
-        
-        // Ascunde fizic secțiunea de Facturare
-        if (dom.billingSection) {
-            dom.billingSection.style.display = 'none';
-        }
-    }
-        
+        const billingsData = await api.loadBillingsData();
+        calendarState.setBillingsData(billingsData);
+
     } catch (error) {
         console.error('Eroare critică la încărcarea datelor:', error);
         ui.showCustomAlert('Nu s-au putut încărca datele.', 'Eroare fatală');
@@ -956,32 +1021,21 @@ async function init() {
     }
     // === END AUTHENTICATION BLOCK ===
     
-    calendarState.setIsAdminView(true);
-
-    try {
-        // const data = await api.loadData(); // Deja încărcat mai sus
-        // calendarState.initializeData(data); // Deja inițializat mai sus
-        const programsData = await api.loadPrograms();
-        calendarState.setPrograms(programsData.programs);
-        const evolutionData = await api.loadEvolutionData();
-        calendarState.setEvolutionData(evolutionData);
-
-        // Încărcare date facturare
-    try {
-        const billingsData = await api.loadBillingsData();
-        calendarState.setBillingsData(billingsData);
-    } catch (e) {
-        console.warn('Nu s-au putut încărca datele de facturare.', e);
-        calendarState.setBillingsData({}); // Inițializează ca gol
+    
+    currentUser = auth.initAuth();
+    if (!currentUser) {
+        // auth.initAuth() a eșuat și a redirecționat deja
+        return; 
     }
+    
+    // Setează vizualizarea corectă (Admin/Terapeut)
+    calendarState.setIsAdminView(auth.isAdmin() || auth.isCoordinator());
 
-
-
-    } catch (error) {
-        console.error('Eroare critică la încărcarea datelor:', error);
-        ui.showCustomAlert('Nu s-au putut încărca datele.', 'Eroare fatală');
-        return;
-    }
+    // Actualizează UI-ul pe baza rolului (ascunde/arată butoane)
+    setupRolePermissions();
+    
+    // Acum actualizează elementele specifice utilizatorului (panou, statistici, avatar)
+    updateUserInterface();
 
     // --- Atașare Listeners (with null checks) ---
     
@@ -1100,6 +1154,18 @@ async function init() {
     ui.renderClientsList('');
     ui.renderTeamMembersList();
 
+    renderFilters();
+// Setează eticheta pentru prima dată
+    updateCurrentPeriodLabel(calendarState.getState().currentDate, calendarState.getState().currentView);
+    
+    // Încarcă și randează calendarul
+    await fetchAndRenderCalendar(); 
+
+    // Acum că state.events este populat, actualizăm Panoul de control (Dashboard)
+    updateDashboardData();
+    
+    console.log('Inițializare completă!');
+
     // --- Adaugă ascultători pentru sincronizarea culorilor (with null checks) ---
     const memberColorPicker = $('memberColor');
     const memberColorHex = $('memberColorHex');
@@ -1119,7 +1185,7 @@ async function init() {
         });
     }
     
-    console.log('Inițializare completă!');
+    console.log('Inițializare completă! A trecut prin member color picker');
 }
 
 // --- Pornirea Aplicației ---
