@@ -122,12 +122,12 @@ try {
                     // 1. Șterge datele vechi (cu TRUNCATE pentru a reseta și auto-increment, dar necesită permisiuni)
                     // Folosim DELETE pentru compatibilitate mai largă cu cheile străine
                     $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
-                    $pdo->exec("TRUNCATE TABLE event_team_members;");
-                    $pdo->exec("TRUNCATE TABLE event_clients;");
-                    $pdo->exec("TRUNCATE TABLE event_programs;");
-                    $pdo->exec("TRUNCATE TABLE events;");
-                    $pdo->exec("TRUNCATE TABLE clients;");
-                    $pdo->exec("TRUNCATE TABLE team_members;");
+                    $pdo->exec("DELETE FROM event_team_members;");
+                    $pdo->exec("DELETE FROM event_clients;");
+                    $pdo->exec("DELETE FROM event_programs;");
+                    $pdo->exec("DELETE FROM events;");
+                    $pdo->exec("DELETE FROM clients;");
+                    $pdo->exec("DELETE FROM team_members;");
                     $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
 
                     // 2. Inserează team_members
@@ -222,10 +222,10 @@ try {
                     $pdo->beginTransaction();
                     
                     // Șterge datele vechi
-                    $pdo->exec("TRUNCATE TABLE portage_evaluations;");
-                    $pdo->exec("TRUNCATE TABLE program_history;");
-                    $pdo->exec("TRUNCATE TABLE logopedic_evaluations;");
-                    $pdo->exec("TRUNCATE TABLE monthly_themes;");
+                    $pdo->exec("DELETE FROM portage_evaluations;");
+                    $pdo->exec("DELETE FROM program_history;");
+                    $pdo->exec("DELETE FROM logopedic_evaluations;");
+                    $pdo->exec("DELETE FROM monthly_themes;");
 
                     $stmt_portage = $pdo->prepare("INSERT INTO portage_evaluations (client_id, domain, eval_date, score) VALUES (?, ?, ?, ?)");
                     $stmt_history = $pdo->prepare("INSERT INTO program_history (client_id, event_id, program_id, score, eval_date) VALUES (?, ?, ?, ?, ?)");
@@ -253,9 +253,11 @@ try {
                     $pdo->commit();
                     sendResponse(['success' => true, 'message' => 'Evolution data saved']);
                 } catch (Exception $e) {
+                    if ($pdo->inTransaction()) {
                     $pdo->rollBack();
-                    sendError('Failed to write evolution data: ' . $e->getMessage());
                 }
+                sendError('Failed to write evolution data: ' . $e->getMessage());
+            }
             }
             break;
 
@@ -284,7 +286,7 @@ try {
             } elseif ($method === 'POST') {
                 try {
                     $pdo->beginTransaction();
-                    $pdo->exec("TRUNCATE TABLE payments;");
+                    $pdo->exec("DELETE FROM payments;");
                     $stmt = $pdo->prepare("INSERT INTO payments (id, client_id, month_key, payment_date, amount, notes) VALUES (?, ?, ?, ?, ?, ?)");
                     
                     foreach ($input as $clientId => $months) {
@@ -300,9 +302,11 @@ try {
                     $pdo->commit();
                     sendResponse(['success' => true, 'message' => 'Billings data saved']);
                 } catch (Exception $e) {
+                    if ($pdo->inTransaction()) {
                     $pdo->rollBack();
-                    sendError('Failed to write billings data: ' . $e->getMessage());
                 }
+                sendError('Failed to write billings data: ' . $e->getMessage());
+            }
             }
             break;
 
@@ -345,7 +349,10 @@ try {
     }
 
 } catch (Exception $e) {
-    // Prinde erorile PDO sau altele
-    sendError('Server error: ' . $e->getMessage());
-}
+            // Verifică dacă tranzacția e activă înainte de rollback
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            sendError('Failed to write data (transaction failed): ' . $e->getMessage());
+        }
 ?>
