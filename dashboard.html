@@ -92,7 +92,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div class="header-title-group flex items-center gap-3">
-                                <button class="mobile-menu-toggle btn-icon md:hidden">
+                                <button class="mobile-menu-toggle btn-icon md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                                 </button>
                                 <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Panou de control</h1>
@@ -180,7 +180,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div class="header-title-group flex items-center gap-3">
-                                <button class="mobile-menu-toggle btn-icon md:hidden">
+                                <button class="mobile-menu-toggle btn-icon md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                                 </button>
                                 <h1 id="currentPeriod" class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Calendar</h1>
@@ -213,10 +213,10 @@
                 <div id="calendarView" class="flex-1 overflow-auto p-4"></div>
             </section>
             
-            <section id="clientSection" class="main-section hidden">
+            <section id="clientSection" class="main-section hidden flex flex-col h-full">
                 <header class="section-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6 flex-shrink-0 flex items-center justify-between gap-4">
                     <div class="header-title-group flex items-center gap-3">
-                        <button class="mobile-menu-toggle btn-icon md:hidden">
+                        <button class="mobile-menu-toggle btn-icon md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                         </button>
                         <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Clienți</h1>
@@ -232,7 +232,7 @@
                 
                 <div class="section-content-grid grid grid-cols-1 md:grid-cols-2 gap-6 p-4 md:p-6 flex-1 overflow-hidden">
                     <div class="section-col-list flex flex-col overflow-hidden h-full">
-                        <input type="search" id="clientSearchBar" class="form-input mb-4 flex-shrink-0" placeholder="Cauta client dupa nume, email...">
+                        <input type="search" id="clientSearchBar" class="form-input mb-4 flex-shrink-0 w-full" placeholder="Cauta client dupa nume, email...">
                         <div id="clientsList" class="modal-list flex-1 overflow-y-auto pr-2">
                             </div>
                     </div>
@@ -275,10 +275,10 @@
                 </div>
             </section>
 
-            <section id="teamSection" class="main-section hidden">
+            <section id="teamSection" class="main-section hidden flex flex-col h-full">
                 <header class="section-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6 flex-shrink-0 flex items-center justify-between gap-4">
                     <div class="header-title-group flex items-center gap-3">
-                        <button class="mobile-menu-toggle btn-icon md:hidden">
+                        <button class="mobile-menu-toggle btn-icon md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                         </button>
                         <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Echipa</h1>
@@ -333,10 +333,10 @@
                 </div>
             </section>
 
-            <section id="billingSection" class="main-section hidden">
+            <section id="billingSection" class="main-section hidden flex flex-col h-full">
                 <header class="section-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6 flex-shrink-0 flex items-center justify-between gap-4">
                     <div class="header-title-group flex items-center gap-3">
-                        <button class="mobile-menu-toggle btn-icon md:hidden">
+                        <button class="mobile-menu-toggle btn-icon md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                         </button>
                         <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Facturare</h1>
@@ -346,7 +346,7 @@
                             <button id="billingPrevMonth" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
                             </button>
-                            <h2 id="billingCurrentMonth" class="px-4 py-2 rounded-lg text-lg font-semibold text-gray-900 dark:text-white"></h2>
+                            <h2 id="billingCurrentMonth" class="px-4 py-2 rounded-lg text-lg font-semibold text-gray-900 dark:text-white min-w-[180px] text-center"></h2>
                             <button id="billingNextMonth" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
                             </button>
@@ -356,33 +356,34 @@
 
                 <div class="section-content-grid grid-cols-1 gap-6 p-4 md:p-6 flex-1 overflow-y-auto">
                     <div class="section-col-list h-auto">
-                        <input type="search" id="billingSearchBar" class="form-input mb-4" placeholder="Caută client după nume...">
+                        <input type="search" id="billingSearchBar" class="form-input w-full mb-4" placeholder="Caută client după nume...">
                         <div id="billingClientList" class="modal-list pr-0">
                             </div>
                     </div>
                 </div>
             </section>
-        
-        </main> </div>
 
-    <div id="eventDetailsModal" class="modal-backdrop hidden">
-        <div class="modal-content modal-lg">
-            <div class="modal-header">
-                <h2 id="eventDetailsTitle" class="modal-title">Detalii Eveniment</h2>
+        </main>
+    </div>
+    
+    <div id="eventDetailsModal" class="modal-backdrop hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm p-4 overflow-y-auto items-start justify-center">
+        <div class="modal-content w-full max-w-3xl mt-[5vh] mb-[5vh] bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden animate-modalFadeIn">
+            <div class="modal-header flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                <h2 id="eventDetailsTitle" class="modal-title text-xl font-semibold text-gray-900 dark:text-white">Detalii Eveniment</h2>
                 <button id="closeEventDetailsModal" class="btn-icon btn-close" title="Inchide">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-6 md:p-8 max-h-[70vh] overflow-y-auto">
                 <div id="eventDetailsContent">
                     </div>
                 
-                <div class="event-details-section pb-6 mb-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="event-details-section pb-0 mb-0">
                     <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-3">Comentarii (Private)</h3>
                     <textarea id="eventComments" class="form-input w-full" placeholder="Adauga notite private despre eveniment..."></textarea>
                 </div>
             </div>
-            <div class="modal-footer justify-between">
+            <div class="modal-footer flex justify-between items-center gap-3 p-6 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
                 <div>
                     <button id="deleteEventFromDetails" class="btn btn-danger-outline">Sterge</button>
                 </div>
@@ -394,11 +395,11 @@
         </div>
     </div>
     
-    <div id="eventModal" class="modal-backdrop hidden">
-        <div class="modal-content modal-xl">
+    <div id="eventModal" class="modal-backdrop hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm p-4 overflow-y-auto items-start justify-center">
+        <div class="modal-content w-full max-w-7xl mt-[5vh] mb-[5vh] bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden animate-modalFadeIn">
             <form id="eventForm">
-                <div class="modal-header">
-                    <h2 id="modalTitle" class="modal-title">Adauga/Editeaza Eveniment</h2>
+                <div class="modal-header flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                    <h2 id="modalTitle" class="modal-title text-xl font-semibold text-gray-900 dark:text-white">Adauga/Editeaza Eveniment</h2>
                     <button id="closeModal" type="button" class="btn-icon btn-close" title="Inchide">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     </button>
@@ -407,7 +408,7 @@
                 <div class="modal-body modal-grid grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 p-6 md:p-8 max-h-[70vh] overflow-y-auto">
                     
                     <div class="modal-col relative min-h-0 md:pr-5">
-                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-5 pb-3 border-b-2 border-gray-200 dark:border-gray-700 uppercase tracking-wider sticky top-0 bg-white dark:bg-gray-800 z-10">Detalii Eveniment</h3>
+                        <h3 class="text-xs font-bold text-gray-900 dark:text-white mb-5 pb-3 border-b-2 border-gray-200 dark:border-gray-700 uppercase tracking-wider sticky top-0 bg-white dark:bg-gray-800 z-10">Detalii Eveniment</h3>
                         
                         <div class="form-group mb-4">
                             <label for="eventName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nume Eveniment</label>
@@ -473,7 +474,7 @@
                         </div>
                         
                         <div class="form-group mb-4">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recurenta (in aceasta luna)</label>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Recurenta (in aceasta luna)</label>
                             <div class="repeating-days flex gap-2">
                                 <input type="checkbox" id="repeatMon" name="repeatMon" value="1" class="hidden"><label for="repeatMon" class="flex items-center justify-center w-10 h-10 border border-gray-300 dark:border-gray-600 rounded-full cursor-pointer font-medium transition-all hover:bg-gray-100 dark:hover:bg-gray-700">L</label>
                                 <input type="checkbox" id="repeatTue" name="repeatTue" value="2" class="hidden"><label for="repeatTue" class="flex items-center justify-center w-10 h-10 border border-gray-300 dark:border-gray-600 rounded-full cursor-pointer font-medium transition-all hover:bg-gray-100 dark:hover:bg-gray-700">M</label>
@@ -485,18 +486,18 @@
 
                         <div class="form-group-checkboxes flex flex-col gap-3 mt-4">
                             <div class="checkbox-item flex items-center gap-2">
-                                <input type="checkbox" id="isPublic" name="isPublic" class="w-4 h-4">
+                                <input type="checkbox" id="isPublic" name="isPublic" class="w-4 h-4 rounded text-primary focus:ring-primary">
                                 <label for="isPublic" class="text-sm font-medium text-gray-700 dark:text-gray-300">Eveniment public (vizibil in calendarul public)</label>
                             </div>
                             <div class="checkbox-item flex items-center gap-2">
-                                <input type="checkbox" id="isBillable" name="isBillable" checked class="w-4 h-4">
+                                <input type="checkbox" id="isBillable" name="isBillable" checked class="w-4 h-4 rounded text-primary focus:ring-primary">
                                 <label for="isBillable" class="text-sm font-medium text-gray-700 dark:text-gray-300">Facturabil</label>
                             </div>
                         </div>
                     </div>
                     
                     <div class="modal-col relative min-h-0 md:pl-5 md:border-l border-gray-200 dark:border-gray-700">
-                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-5 pb-3 border-b-2 border-gray-200 dark:border-gray-700 uppercase tracking-wider sticky top-0 bg-white dark:bg-gray-800 z-10">Clienti</h3>
+                        <h3 class="text-xs font-bold text-gray-900 dark:text-white mb-5 pb-3 border-b-2 border-gray-200 dark:border-gray-700 uppercase tracking-wider sticky top-0 bg-white dark:bg-gray-800 z-10">Clienti</h3>
                         <div class="form-group mb-4">
                             <input type="search" id="clientSearch" class="form-input w-full" placeholder="Cauta client...">
                         </div>
@@ -504,7 +505,7 @@
                             </div>
                         <button type="button" id="addNewClientBtnInModal" class="btn btn-secondary btn-full-width w-full">Adauga Client Nou</button>
                         
-                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-5 pb-3 border-b-2 border-gray-200 dark:border-gray-700 uppercase tracking-wider sticky top-0 bg-white dark:bg-gray-800 z-10 mt-6">Programe</h3>
+                        <h3 class="text-xs font-bold text-gray-900 dark:text-white mb-5 pb-3 border-b-2 border-gray-200 dark:border-gray-700 uppercase tracking-wider sticky top-0 bg-white dark:bg-gray-800 z-10 mt-6">Programe</h3>
                         <div class="form-group mb-4">
                             <input type="search" id="programSearch" class="form-input w-full" placeholder="Cauta program...">
                         </div>
@@ -513,14 +514,14 @@
                     </div>
                     
                     <div class="modal-col relative min-h-0 md:pl-5 md:border-l border-gray-200 dark:border-gray-700">
-                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-5 pb-3 border-b-2 border-gray-200 dark:border-gray-700 uppercase tracking-wider sticky top-0 bg-white dark:bg-gray-800 z-10">Echipa (Terapeuti)</h3>
+                        <h3 class="text-xs font-bold text-gray-900 dark:text-white mb-5 pb-3 border-b-2 border-gray-200 dark:border-gray-700 uppercase tracking-wider sticky top-0 bg-white dark:bg-gray-800 z-10">Echipa (Terapeuti)</h3>
                         <div id="teamMemberCheckboxes" class="checkbox-list max-h-[400px] overflow-y-auto">
                             </div>
                     </div>
                     
                 </div>
                 
-                <div class="modal-footer justify-between">
+                <div class="modal-footer flex justify-between items-center gap-3 p-6 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
                     <div>
                         <button id="deleteBtn" type="button" class="btn btn-danger-outline hidden">Sterge Eveniment</button>
                     </div>
@@ -536,15 +537,15 @@
     
     
     
-    <div id="evolutionModal" class="modal-backdrop hidden">
-        <div class="modal-content modal-xl">
-            <div class="modal-header">
-                <h2 id="evolutionTitle" class="modal-title">Evolutie Client</h2>
+    <div id="evolutionModal" class="modal-backdrop hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm p-4 overflow-y-auto items-start justify-center">
+        <div class="modal-content w-full max-w-7xl mt-[5vh] mb-[5vh] bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden animate-modalFadeIn">
+            <div class="modal-header flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+                <h2 id="evolutionTitle" class="modal-title text-xl font-semibold text-gray-900 dark:text-white">Evolutie Client</h2>
                 <button id="closeEvolutionModal" class="btn-icon btn-close" title="Inchide">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
-            <div class="modal-body p-0 md:p-4">
+            <div class="modal-body p-0 md:p-6">
                 <div class="tabs flex gap-2 border-b border-gray-200 dark:border-gray-700 mb-4 px-4 md:px-0">
                     <button class="tab-button active" data-tab="tabGrafice">Grafice Evolutie</button>
                     <button class="tab-button" data-tab="tabEvaluare">Adauga Evaluare</button>
@@ -555,18 +556,18 @@
                 <div id="tabGrafice" class="tab-content active p-4 md:p-0">
                     <div id="evolutionChartContainer" class="chart-container p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 min-h-[550px]">
                         <canvas id="evolutionChart"></canvas>
-                    </div>
+                        </div>
                     <div id="evolutionSummary" class="mt-4">
                         </div>
                 </div>
 
                 <div id="tabPrograme" class="tab-content hidden p-4 md:p-0">
-                    <div id="programHistoryContainer" class="p-4 bg-gray-100 dark:bg-gray-900 rounded-lg min-h-[200px]">
+                    <div id="programHistoryContainer" class="p-4 bg-gray-100 dark:bg-gray-900 rounded-lg min-h-[200px] overflow-hidden border border-gray-200 dark:border-gray-700">
                         </div>
                 </div>
 
                 <div id="tabNotite" class="tab-content hidden p-4 md:p-0">
-                    <div id="privateNotesContainer" class="private-notes-container flex flex-col gap-4 max-h-[60vh] overflow-y-auto p-1">
+                    <div id="privateNotesContainer" class="private-notes-container flex flex-col gap-4 max-h-[70vh] overflow-y-auto p-1">
                         </div>
                 </div>
 
@@ -600,7 +601,7 @@
                                 </div>
                         </div>
 
-                        <div id="logopedicaFormContainer" style="display: none;">
+                        <div id="logopedicaFormContainer" class="hidden">
                             <div class="logopedica-table-container overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
                                 <table class="logopedica-table w-full">
                                     <thead class="bg-gray-100 dark:bg-gray-700">
@@ -616,18 +617,513 @@
                                             <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">A</td>
                                             <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
                                                 <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">arici</span>
-                                                <input type="text" class="logo-input w-full max-w-20 p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_A_init">
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_A_init">
                                             </td>
                                             <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
                                                 <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">vaca</span>
-                                                <input type="text" class="logo-input w-full max-w-20 p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_A_med">
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_A_med">
                                             </td>
                                             <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
                                                 <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">perdea</span>
-                                                <input type="text" class="logo-input w-full max-w-20 p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_A_fin">
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_A_fin">
                                             </td>
                                         </tr>
-                                        </tbody>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">O</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">olita</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_O_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">foc</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_O_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">radio</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_O_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">U</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">umbrela</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_U_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">pui</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_U_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">cadou</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_U_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">E</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">elefant</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_E_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">peste</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_E_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">rosie</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_E_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">I</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">iepure</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_I_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">lingura</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_I_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">ardei</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_I_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">Ă</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">ăla, ăsta</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_Ah_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">mănuși</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_Ah_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">casă</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_Ah_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">Â/Î</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">îngeraș</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_hA_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">pâine</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_hA_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">a coborî</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_hA_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">P</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">pară</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_P_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">șarpe</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_P_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">dulap</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_P_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">B</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">balon</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_B_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">albină</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_B_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">cerb</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_B_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">M</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">mașină</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_M_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">bomboană</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_M_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">pom</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_M_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">T</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">tobă</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_T_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">autobuz</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_T_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">pat</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_T_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">D</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">dinozaur</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_D_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">crocodil</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_D_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">brad</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_D_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">N</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">nor</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_N_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">cană</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_N_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">scaun</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_N_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">L</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">leu</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_L_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">melc</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_L_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">cal</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_L_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">F</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">floare</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_F_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">telefon</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_F_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">cartof</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_F_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">V</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">vapor</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_V_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">avion</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_V_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">morcov</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_V_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">S</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">sanie</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_S_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">pisică</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_S_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">urs</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_S_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">Z</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">zebră</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_Z_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">frunză</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_Z_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">autobuz</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_Z_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">Ț</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">țap</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_Tz_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">maimuță</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_Tz_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-40A-fin0 mb-1 italic">căluț</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_Tz_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">Ș</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">șervețel</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_Sz_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">ușă</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_Sz_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">cocoș</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_Sz_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">J</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">jucării</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_J_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">păianjen</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_J_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">ruj</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_J_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">C</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">câine</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_C_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">muscă</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_C_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">porc</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_C_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">G</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">găină</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_G_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">papagal</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_G_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">steag</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_G_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">H</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">hipopotam</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_H_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">pahar</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_H_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">șah</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_H_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">R</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">rață</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_R_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">carte</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_R_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">fular</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_R_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">X</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">xilofon</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_X_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">boxer</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_X_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">pix</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_X_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">ce</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">ceas</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_CE_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">rinocer</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_CE_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">șoarece</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_CE_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">ci</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">citește</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_CI_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">bicicletă</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_CI_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">papuci</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_CI_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">ge</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">geam</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_GE_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">deget</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_GE_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">minge</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_GE_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">gi</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">girafă</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_GI_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">frigider</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_GI_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">covrigi</span>
+                                                <input type="text" class="logo-input w-full max-w-[8ax-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_GI_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">che</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">cheie</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_CHE_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">ochelari</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_CHE_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">ridiche</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_CHE_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">chi</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">chibrituri</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_CHI_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">rochie</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_CHI_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">ochi</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_CHI_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">ghe</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">ghete</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_GHE_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">înghețată</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_GHE_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">Gheorghe</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_GHE_fin">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">ghi</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">ghiozdan</span>
+                                                <input type="text" class="logo-input w-full max-w-[8D-fin0px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_GHI_init">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">unghie</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_GHI_med">
+                                            </td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">triunghi</span>
+                                                <input type="text" class="logo-input w-full max-w-[80px] p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_GHI_fin">
+                                            </td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </div>
                             
@@ -637,7 +1133,7 @@
                             </div>
                         </div>
                         
-                        <div class="modal-footer mt-6">
+                        <div class="modal-footer flex justify-end gap-2 p-6 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
                             <button id="cancelEvaluationBtn" type="button" class="btn btn-secondary">Anuleaza</button>
                             <button id="saveEvaluationBtn" type="button" class="btn btn-primary">Salveaza Evaluarea</button>
                         </div>
@@ -648,53 +1144,53 @@
         </div>
     </div>
     
-    <div id="alertModal" class="modal-backdrop modal-small hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="alertModalTitle" class="modal-title">Notificare</h2>
+    <div id="alertModal" class="modal-backdrop modal-small hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm p-4 overflow-y-auto items-start justify-center">
+        <div class="modal-content w-full max-w-md mt-[5vh] mb-[5vh] bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden animate-modalFadeIn">
+            <div class="modal-header flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 id="alertModalTitle" class="modal-title text-xl font-semibold text-gray-900 dark:text-white">Notificare</h2>
                 <button id="closeAlertModal" class="btn-icon btn-close" title="Inchide">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
-            <div class="modal-body">
-                <p id="alertModalMessage">Mesaj...</p>
+            <div class="modal-body p-6">
+                <p id="alertModalMessage" class="text-gray-700 dark:text-gray-300">Mesaj...</p>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer flex justify-end gap-3 p-6 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
                 <button id="alertModalOk" class="btn btn-primary">OK</button>
             </div>
         </div>
     </div>
     
-    <div id="confirmModal" class="modal-backdrop modal-small hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="confirmModalTitle" class="modal-title">Confirma actiunea</h2>
+    <div id="confirmModal" class="modal-backdrop modal-small hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm p-4 overflow-y-auto items-start justify-center">
+        <div class="modal-content w-full max-w-md mt-[5vh] mb-[5vh] bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden animate-modalFadeIn">
+            <div class="modal-header flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 id="confirmModalTitle" class="modal-title text-xl font-semibold text-gray-900 dark:text-white">Confirma actiunea</h2>
                 <button id="closeConfirmModal" class="btn-icon btn-close" title="Inchide">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
-            <div class="modal-body">
-                <p id="confirmModalMessage">Esti sigur?</p>
+            <div class="modal-body p-6">
+                <p id="confirmModalMessage" class="text-gray-700 dark:text-gray-300">Esti sigur?</p>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer flex justify-end gap-3 p-6 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
                 <button id="confirmModalCancel" class="btn btn-secondary">Anuleaza</button>
                 <button id="confirmModalOk" class="btn btn-danger">Confirma</button>
             </div>
         </div>
     </div>
 
-    <div id="recurringDeleteModal" class="modal-backdrop modal-small hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="recurringDeleteModalTitle" class="modal-title">Stergere Eveniment Recurent</h2>
+    <div id="recurringDeleteModal" class="modal-backdrop modal-small hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm p-4 overflow-y-auto items-start justify-center">
+        <div class="modal-content w-full max-w-md mt-[5vh] mb-[5vh] bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden animate-modalFadeIn">
+            <div class="modal-header flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 id="recurringDeleteModalTitle" class="modal-title text-xl font-semibold text-gray-900 dark:text-white">Stergere Eveniment Recurent</h2>
                 <button id="closeRecurringDeleteModal" class="btn-icon btn-close" title="Inchide">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
-            <div class="modal-body">
-                <p id="recurringDeleteModalMessage">Acesta este un eveniment recurent. Ce doresti sa stergi?</p>
+            <div class="modal-body p-6">
+                <p id="recurringDeleteModalMessage" class="text-gray-700 dark:text-gray-300">Acesta este un eveniment recurent. Ce doresti sa stergi?</p>
             </div>
-            <div class="modal-footer column-footer flex-col !gap-2">
+            <div class="modal-footer column-footer flex flex-col gap-2 p-6 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
                 <button id="recurringDeleteSingle" class="btn btn-primary w-full">Doar acest eveniment</button>
                 <button id="recurringDeleteAll" class="btn btn-danger-outline w-full">Toate evenimentele (din aceasta luna)</button>
                 <button id="recurringDeleteCancel" class="btn btn-secondary w-full">Anuleaza</button>
@@ -702,16 +1198,16 @@
         </div>
     </div>
     
-    <div id="paymentModal" class="modal-backdrop modal-small hidden">
-        <div class="modal-content">
+    <div id="paymentModal" class="modal-backdrop modal-small hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm p-4 overflow-y-auto items-start justify-center">
+        <div class="modal-content w-full max-w-md mt-[5vh] mb-[5vh] bg-white dark:bg-gray-800 rounded-lg shadow-xl overflow-hidden animate-modalFadeIn">
             <form id="paymentForm">
-                <div class="modal-header">
-                    <h2 id="paymentModalTitle" class="modal-title">Adaugă Încasare</h2>
+                <div class="modal-header flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
+                    <h2 id="paymentModalTitle" class="modal-title text-xl font-semibold text-gray-900 dark:text-white">Adaugă Încasare</h2>
                     <button id="closePaymentModal" type="button" class="btn-icon btn-close" title="Inchide">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     </button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-6">
                     <input type="hidden" id="paymentClientId">
                     <input type="hidden" id="paymentMonthKey">
 
@@ -730,7 +1226,7 @@
                         <input type="text" id="paymentNotes" class="form-input w-full" placeholder="ex: chitanța nr. 123">
                     </div>
                 </div>
-                <div class="modal-footer">
+                <div class="modal-footer flex justify-end gap-3 p-6 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-700">
                     <button id="cancelPaymentBtn" type="button" class="btn btn-secondary">Anulează</button>
                     <button type="submit" class="btn btn-primary">Salvează Încasarea</button>
                 </div>
@@ -738,14 +1234,17 @@
         </div>
     </div>
     
-    <div id="mobileMenuBackdrop" class="mobile-menu-backdrop md:hidden hidden"></div>
+    <div id="mobileMenuBackdrop" class="mobile-menu-backdrop md:hidden hidden fixed inset-0 z-[99] bg-black/50 backdrop-blur-sm"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module" src="js/main.js"></script>
+    <script typeF="module" src="js/main.js"></script>
     
     <script type="module">
+        // This is the inline script from dashboard.html, it is safe to keep.
+        // It handles dashboard-specific logic and quick-action buttons.
+        
         import { openEventModal } from './js/uiService.js';
         
         // Format time ago function
@@ -892,13 +1391,13 @@
                         document.querySelector('.menu-item[data-view="client"]').click();
                         
                         setTimeout(() => {
-                            const clientCard = document.querySelector(`.client-actions[data-client-id="${clientId}"]`);
+                            const clientCard = document.querySelector(`[data-client-id="${clientId}"] .client-actions`);
                             if(clientCard) {
-                                clientCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                const cardElement = clientCard.closest('.client-card');
+                                const cardElement = clientCard.closest('div.flex.flex-col.p-4'); // Find the refactored card
                                 if (cardElement) {
+                                    cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                     cardElement.style.transition = 'all 0.3s ease';
-                                    cardElement.style.boxShadow = '0 0 0 3px var(--accent-primary)';
+                                    cardElement.style.boxShadow = '0 0 0 3px #4A90E2'; // Using primary color hex
                                     setTimeout(() => {
                                         cardElement.style.boxShadow = '';
                                     }, 2000);
