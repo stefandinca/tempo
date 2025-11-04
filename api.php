@@ -65,7 +65,7 @@ try {
     switch ($path) {
         
         // ==========================================================
-        // CAZUL 'data' (MODIFICAT) - Acum încarcă doar datele statice
+        // CAZUL 'data' (GET) - Citește totul din DB
         // ==========================================================
         case 'data':
             if ($method === 'GET') {
@@ -76,12 +76,36 @@ try {
 
                 // 2. Obține clients
                 $data['clients'] = $pdo->query("SELECT * FROM clients")->fetchAll();
-                
-                // 3. Obține programs (adăugat aici)
-                $data['programs'] = $pdo->query("SELECT * FROM programs")->fetchAll();
-                
-                // 4. NU MAI ÎNCĂRCĂM EVENIMENTELE AICI
 
+                // 3. Obține events și legăturile lor (folosind GROUP_CONCAT)
+                $stmt = $pdo->query("
+                    SELECT 
+                        e.*,
+                        e.repeating_json as repeating,
+                        GROUP_CONCAT(DISTINCT etm.team_member_id) as teamMemberIds,
+                        GROUP_CONCAT(DISTINCT ec.client_id) as clientIds,
+                        GROUP_CONCAT(DISTINCT ep.program_id) as programIds
+                    FROM events e
+                    LEFT JOIN event_team_members etm ON e.id = etm.event_id
+                    LEFT JOIN event_clients ec ON e.id = ec.event_id
+                    LEFT JOIN event_programs ep ON e.id = ep.event_id
+                    GROUP BY e.id
+                ");
+                
+                $events = $stmt->fetchAll();
+                
+                // Procesează string-urile din GROUP_CONCAT în array-uri
+                foreach ($events as &$event) {
+                    $event['teamMemberIds'] = $event['teamMemberIds'] ? explode(',', $event['teamMemberIds']) : [];
+                    $event['clientIds'] = $event['clientIds'] ? explode(',', $event['clientIds']) : [];
+                    $event['programIds'] = $event['programIds'] ? explode(',', $event['programIds']) : [];
+                    $event['repeating'] = $event['repeating'] ? json_decode($event['repeating']) : [];
+                    // Convertim 'isPublic' și 'isBillable' înapoi în boolean pentru JS
+                    $event['isPublic'] = (bool)$event['isPublic'];
+                    $event['isBillable'] = (bool)$event['isBillable'];
+                }
+
+                $data['events'] = $events;
                 sendResponse($data);
 
             // ==========================================================
@@ -95,7 +119,8 @@ try {
                 try {
                     $pdo->beginTransaction();
 
-                    // 1. Șterge datele vechi
+                    // 1. Șterge datele vechi (cu TRUNCATE pentru a reseta și auto-increment, dar necesită permisiuni)
+                    // Folosim DELETE pentru compatibilitate mai largă cu cheile străine
                     $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
                     $pdo->exec("DELETE FROM event_team_members;");
                     $pdo->exec("DELETE FROM event_clients;");
@@ -114,6 +139,7 @@ try {
                     // 3. Inserează clients
                     $stmt_client = $pdo->prepare("INSERT INTO clients (id, name, email, phone, birthDate, medical) VALUES (?, ?, ?, ?, ?, ?)");
                     foreach ($input['clients'] as $c) {
+                        // Asigură-te că data este null dacă e goală
                         $birthDate = !empty($c['birthDate']) ? $c['birthDate'] : null;
                         $stmt_client->execute([$c['id'], $c['name'], $c['email'], $c['phone'], $birthDate, $c['medical'] ?? '']);
                     }
@@ -147,54 +173,6 @@ try {
                 }
             } else {
                 sendError('Unsupported method', 405);
-            }
-            break; // Sfârșitul lui case 'data'
-
-        // ==========================================================
-        // CAZUL 'events' (NOU) - Încarcă evenimente pe bază de interval
-        // ==========================================================
-        case 'events':
-            if ($method === 'GET') {
-                // Obține parametrii de dată din URL
-                $startDate = $_GET['start'] ?? null;
-                $endDate = $_GET['end'] ?? null;
-
-                if (!$startDate || !$endDate) {
-                    sendError('Interval de date (start/end) lipsă.', 400);
-                }
-
-                // Folosim interogarea complexă originală, dar adăugăm un filtru WHERE
-                $stmt = $pdo->prepare("
-                    SELECT 
-                        e.id, e.name, e.details, e.type, e.date, 
-                        DATE_FORMAT(e.startTime, '%H:%i') as startTime, 
-                        e.duration, e.isPublic, e.isBillable, 
-                        e.repeating_json as repeating, e.comments,
-                        GROUP_CONCAT(DISTINCT etm.team_member_id) as teamMemberIds,
-                        GROUP_CONCAT(DISTINCT ec.client_id) as clientIds,
-                        GROUP_CONCAT(DISTINCT ep.program_id) as programIds
-                    FROM events e
-                    LEFT JOIN event_team_members etm ON e.id = etm.event_id
-                    LEFT JOIN event_clients ec ON e.id = ec.event_id
-                    LEFT JOIN event_programs ep ON e.id = ep.event_id
-                    WHERE e.date BETWEEN ? AND ?  -- <-- FILTRUL NOU
-                    GROUP BY e.id
-                ");
-                
-                $stmt->execute([$startDate, $endDate]);
-                $events = $stmt->fetchAll();
-                
-                // Procesează string-urile din GROUP_CONCAT în array-uri
-                foreach ($events as &$event) {
-                    $event['teamMemberIds'] = $event['teamMemberIds'] ? explode(',', $event['teamMemberIds']) : [];
-                    $event['clientIds'] = $event['clientIds'] ? explode(',', $event['clientIds']) : [];
-                    $event['programIds'] = $event['programIds'] ? explode(',', $event['programIds']) : [];
-                    $event['repeating'] = $event['repeating'] ? json_decode($event['repeating']) : [];
-                    $event['isPublic'] = (bool)$event['isPublic'];
-                    $event['isBillable'] = (bool)$event['isBillable'];
-                }
-
-                sendResponse($events); // Trimite doar lista de evenimente
             }
             break;
 
@@ -276,10 +254,10 @@ try {
                     sendResponse(['success' => true, 'message' => 'Evolution data saved']);
                 } catch (Exception $e) {
                     if ($pdo->inTransaction()) {
-                        $pdo->rollBack();
-                    }
-                    sendError('Failed to write evolution data: ' . $e->getMessage());
+                    $pdo->rollBack();
                 }
+                sendError('Failed to write evolution data: ' . $e->getMessage());
+            }
             }
             break;
 
@@ -325,10 +303,10 @@ try {
                     sendResponse(['success' => true, 'message' => 'Billings data saved']);
                 } catch (Exception $e) {
                     if ($pdo->inTransaction()) {
-                        $pdo->rollBack();
-                    }
-                    sendError('Failed to write billings data: ' . $e->getMessage());
+                    $pdo->rollBack();
                 }
+                sendError('Failed to write billings data: ' . $e->getMessage());
+            }
             }
             break;
 
@@ -336,16 +314,16 @@ try {
         // CAZURILE .json (programs, portrige)
         // ==========================================================
         case 'programs':
-            // Acest caz este acum gestionat de GET 'data'
             $programs = $pdo->query("SELECT * FROM programs")->fetchAll();
+            // Recreează formatul JSON original
             sendResponse(['programs' => $programs]);
             break;
 
         case 'portrige.json':
-            // portrige.json este static, îl citim direct din fișier
+            // portrige.json este static, îl citim direct din fișier ca înainte
             $file = __DIR__ . '/portrige.json';
             if (file_exists($file)) {
-                setNoCacheHeaders(); 
+                setNoCacheHeaders(); // Simplu, fără validare ETag
                 header('Content-Type: application/json; charset=utf-8');
                 readfile($file);
                 exit();
@@ -355,15 +333,12 @@ try {
             break;
 
         // ==========================================================
-        // ENDPOINT-URI VECHI (Dezactivate)
+        // ENDPOINT-URI VECHI (Dezactivate, acum gestionate de 'POST /data')
         // ==========================================================
-        case 'events': // Acesta este lăsat intenționat pentru noul GET 'events'
+        case 'events':
         case 'clients':
         case 'team':
-            if ($path !== 'events' || $method !== 'GET') {
-                 sendError('This endpoint is deprecated. Use GET/POST on "data" endpoint.', 404);
-            }
-            // Dacă este GET 'events', va fi gestionat de noul 'case' de mai sus
+            sendError('This endpoint is deprecated. Use GET/POST on "data" endpoint.', 404);
             break;
 
         // ==========================================================
@@ -374,11 +349,10 @@ try {
     }
 
 } catch (Exception $e) {
-    // Verifică dacă tranzacția e activă înainte de rollback
-    if (isset($pdo) && $pdo->inTransaction()) {
-        $pdo->rollBack();
-    }
-    // Asigură-te că trimiți o eroare JSON, nu un text simplu
-    sendError('General API Error: ' . $e->getMessage(), 500);
-}
+            // Verifică dacă tranzacția e activă înainte de rollback
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            sendError('Failed to write data (transaction failed): ' . $e->getMessage());
+        }
 ?>

@@ -57,16 +57,6 @@ export async function loadData() {
 }
 
 /**
- * NOU: Încarcă evenimentele pentru un interval specificat.
- * Apel GET la api.php?path=events&start=...&end=...
- * @param {string} startDate - "YYYY-MM-DD"
- * @param {string} endDate - "YYYY-MM-DD"
- */
-export async function loadEventsForRange(startDate, endDate) {
-    return apiFetch(`events&start=${startDate}&end=${endDate}`);
-}
-
-/**
  * Salvează datele principale (teamMembers, clients, events).
  * Apel POST la api.php?path=data
  * @param {object} data - Obiectul conținând { teamMembers, clients, events }
@@ -81,7 +71,14 @@ export async function saveData(data) {
     return apiFetch('data', options);
 }
 
-
+/**
+ * Încarcă programele terapeutice.
+ * Apel GET la api.php?path=programs.json
+ */
+export async function loadPrograms() {
+    // api.php are o regulă care încarcă fișiere .json
+    return apiFetch('programs');
+}
 
 /**
  * Încarcă datele de evoluție (din evolution.json).

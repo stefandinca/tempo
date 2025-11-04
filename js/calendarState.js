@@ -73,14 +73,6 @@ export const calendarState = {
     },
 
     /**
-     * NOU: Înlocuiește evenimentele din state cu un set nou (ex: altă lună).
-     * @param {Array} newEvents - Array-ul de evenimente de la API
-     */
-    setEvents: (newEvents) => {
-        state.events = newEvents || [];
-    },
-
-    /**
      * Setează datele de evoluție.
      */
     setEvolutionData: (data) => {
