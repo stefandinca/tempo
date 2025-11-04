@@ -49,6 +49,7 @@ export async function showEvolutionModal(clientId) {
     renderEvolutionChart(clientData);
     renderEvaluationReportsList(clientData, client);
     renderProgramHistory(clientData);
+    renderPrivateNotes(client.id);
     
     // Pregătește modalul de evaluare
     await setupEvaluationTab(client);
@@ -742,6 +743,105 @@ function renderProgramHistory(clientData) {
     html += '</tbody></table>';
     container.innerHTML = html;
 }
+
+/**
+     * Randează notițele private (comentariile) pentru un client.
+     * @param {string} clientId
+     */
+    function renderPrivateNotes(clientId) {
+        const container = $('privateNotesContainer');
+        if (!container) return;
+
+        const { events } = calendarState.getState();
+
+        // 1. Filtrează evenimentele care au comentarii pentru acest client
+        const eventsWithComments = events.filter(event => {
+            const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
+            const hasClient = clientIds.includes(clientId);
+            const hasComment = event.comments && event.comments.trim() !== '';
+            return hasClient && hasComment;
+        });
+
+        // 2. Sortează (cele mai noi primele)
+        eventsWithComments.sort((a, b) => {
+            const dateA = new Date(`${a.date}T${a.startTime || '00:00'}`);
+            const dateB = new Date(`${b.date}T${b.startTime || '00:00'}`);
+            return dateB - dateA; // Sortare descrescătoare
+        });
+
+        // 3. Randează HTML-ul
+        if (eventsWithComments.length === 0) {
+            container.innerHTML = '<p class="private-notes-empty">Nu există notițe private salvate pentru acest client.</p>';
+            return;
+        }
+
+        container.innerHTML = eventsWithComments.map(event => {
+            // Găsește terapeuții
+            const memberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+            const members = memberIds
+                .map(id => calendarState.getTeamMemberById(id))
+                .filter(Boolean) // Elimină membrii negăsiți
+                .map(m => m.name)
+                .join(', ');
+
+            // Formatează data și ora
+            const formattedDate = new Date(event.date).toLocaleDateString('ro-RO', {
+                day: '2-digit', month: '2-digit', year: 'numeric'
+            });
+            const time = event.startTime || 'N/A';
+
+            // --- NOU: LOGICĂ PENTRU SCORURI ---
+            let scoresHtml = '';
+            const programIds = event.programIds || [];
+            const programScores = event.programScores || {};
+
+            if (programIds.length > 0) {
+                scoresHtml = '<div class="private-note-scores">';
+                programIds.forEach(pId => {
+                    const program = calendarState.getProgramById(pId);
+                    const score = programScores[pId];
+                    
+                    if (program) { // Afișăm doar dacă programul există
+                        scoresHtml += `
+                            <div class="note-score-item">
+                                <span class="note-program-title">${program.title}</span>
+                        `;
+                        
+                        if (score) {
+                            // Folosim stilul din programHistory
+                            scoresHtml += `<span class="program-history-score" data-score="${score}">${score}</span>`;
+                        } else {
+                            // Dacă nu e scor, punem un placeholder
+                            scoresHtml += `<span class="note-program-no-score">—</span>`;
+                        }
+                        
+                        scoresHtml += `</div>`;
+                    }
+                });
+                scoresHtml += '</div>';
+            }
+            // --- SFÂRȘIT LOGICĂ SCORURI ---
+
+            return `
+                <div class="private-note-item">
+                    <div class="private-note-header">
+                        <span class="note-meta-item">
+                            Terapeut: <strong>${members || 'Nespecificat'}</strong>
+                        </span>
+                        <span class="note-meta-item">
+                            Data: <strong>${formattedDate}</strong>
+                        </span>
+                        <span class="note-meta-item">
+                            Ora: <strong>${time}</strong>
+                        </span>
+                    </div>
+                    <div class="private-note-body">
+                        ${scoresHtml} ${event.comments}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
 
 // --- Secțiunea Evaluare (Portage) ---
 

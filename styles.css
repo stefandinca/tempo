@@ -590,7 +590,7 @@ body.public-view {
 
 #calendarView {
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: auto;
 }
 
 /* Admin calendar container */
@@ -1160,7 +1160,7 @@ body.public-view {
 
 
 /* --- IMPROVED Modal Grid Layout (Event Modal) --- */
-.modal-body {
+.modal-body.modal-grid {
   display: grid;
   
   gap: 2.5rem;
@@ -1233,27 +1233,27 @@ body.public-view {
 }
 
 /* Enhanced form input styling within modal */
-.modal-body .form-input {
+.modal-body.modal-grid .form-input {
   background: var(--bg-hover);
   border: 1px solid transparent;
   transition: all 0.2s ease;
 }
 
-.modal-body   .form-input:hover {
+.modal-body.modal-grid .form-input:hover {
   border-color: var(--border-color);
 }
 
-.modal-body   .form-input:focus {
+.modal-body.modal-grid .form-input:focus {
   background: var(--bg-card);
   border-color: var(--accent-primary);
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
 }
 
-[data-theme="dark"] .modal-body   .form-input {
+[data-theme="dark"] .modal-body.modal-grid .form-input {
   background: var(--bg-main);
 }
 
-[data-theme="dark"] .modal-body   .form-input:focus {
+[data-theme="dark"] .modal-body.modal-grid .form-input:focus {
   background: var(--bg-hover);
 }
 
@@ -2313,7 +2313,121 @@ textarea.form-input {
     font-size: 0.875rem;
 }
 
-/* Responsive pt Facturare */
+
+/* ==========================================================
+   11. COMPONENTS (EVOLUTION - PRIVATE NOTES) 
+   (SECȚIUNE NOU ADĂUGATĂ)
+   ========================================================== */
+
+   /* ... stilurile existente pentru .private-notes-container ... */
+
+/* NOU: Stiluri pentru lista de scoruri din notiță */
+.private-note-scores {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.note-score-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-hover);
+    border-radius: 0.375rem;
+}
+
+.note-program-title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .note-program-title {
+    color: var(--text-secondary);
+}
+
+.note-program-no-score {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* Folosim stilul de scor existent */
+.private-note-scores .program-history-score {
+    flex-shrink: 0;
+}
+
+.private-notes-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 0.5rem;
+  max-height: 60vh; /* Setează o înălțime maximă */
+  overflow-y: auto;  /* Adaugă scroll vertical */
+}
+
+.private-note-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent-secondary);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow);
+}
+
+[data-theme="dark"] .private-note-item {
+    border-left-color: var(--accent-primary);
+}
+
+.private-note-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.875rem;
+}
+
+.note-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.note-meta-item strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.private-note-body {
+  padding: 1rem 1.25rem;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  white-space: pre-wrap; /* Păstrează formatarea newline */
+}
+
+.private-notes-empty {
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 2rem;
+}
+
+
+
+/* ==========================================================
+   10. RESPONSIVE MEDIA QUERIES
+   ========================================================== */
+
+   /* Responsive pt Facturare */
 @media (max-width: 768px) {
     .financial-summary {
         grid-template-columns: 1fr;
@@ -2327,10 +2441,6 @@ textarea.form-input {
         margin-left: 2.5rem; /* Aliniere cu restul */
     }
 }
-
-/* ==========================================================
-   10. RESPONSIVE MEDIA QUERIES
-   ========================================================== */
 
 /* --- Admin Layout (Tablet) --- */
 @media (max-width: 1024px) {
@@ -2412,6 +2522,14 @@ textarea.form-input {
 
 /* --- Admin Layout (Mobile) & Public Layout --- */
 @media (max-width: 768px) {
+    
+    /* NOU: Forțează scroll orizontal pe calendar pe mobil */
+    .month-view,
+    .week-view {
+        min-width: 800px; /* O lățime minimă care forțează scroll-ul */
+        
+    }
+    
     /* --- Admin --- */
     .section-content-grid {
         grid-template-columns: 1fr;
@@ -2449,7 +2567,7 @@ textarea.form-input {
     min-height: 280px;   /* Forțează o înălțime minimă pentru grafic */
 }
 
-    .modal-body {
+    .modal-body.modal-grid {
         
         gap: 1.5rem;
     }
