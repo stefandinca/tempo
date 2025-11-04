@@ -213,7 +213,7 @@ function calculateClientHoursForMonth(clientId, year, month, allEvents) {
         // Este facturabil ȘI clientul a fost prezent
         const attendance = (event.attendance && event.attendance[clientId]) || 'present';
         if (event.isBillable !== false && attendance === 'present' && event.duration) {
-            billableMinutes += event.duration;
+          billableMinutes += (Number(event.duration) || 0);
         }
     });
     
