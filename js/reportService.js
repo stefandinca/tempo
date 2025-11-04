@@ -316,7 +316,8 @@ async function generateClientHTML(reportData) { // <-- Add async
                 ${client.email ? `<p><strong>Email:</strong> ${client.email}</p>` : ''}
                 ${client.phone ? `<p><strong>Telefon:</strong> ${client.phone}</p>` : ''}
                 ${client.birthDate ? `<p><strong>Data nașterii:</strong> ${new Date(client.birthDate).toLocaleDateString('ro-RO')}</p>` : ''}
-            </div>
+                ${client.medical ? `<p><strong>Alergii/Medicatie:</strong> ${client.medical}</p>` : ''}
+                </div>
 
             <h2 style="color: #3b82f6; border-bottom-color: #3b82f650;">Rezumat Sesiuni (${monthName})</h2>
             ${billableSection}

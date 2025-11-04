@@ -458,6 +458,15 @@
                 `;
             }
 
+            if (clientData.client.medical) {
+                contentHTML += `
+                    <div class="info-item">
+                        <span class="info-label">Alergii sau medicatie</span>
+                        <span class="info-value">${clientData.client.medical}</span>
+                    </div>
+                `;
+            }
+
             contentHTML += `
                     </div>
                 </div>

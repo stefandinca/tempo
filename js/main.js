@@ -510,7 +510,8 @@ async function handleSaveClient(e) {
         name: formData.get('clientFullName'),
         email: formData.get('clientEmail'),
         phone: formData.get('clientPhone'),
-        birthDate: formData.get('clientBirthdayInput') || null
+        birthDate: formData.get('clientBirthdayInput') || null,
+        medical: formData.get('clientMedical') || ''
     };
 
     calendarState.saveClient(clientData);
