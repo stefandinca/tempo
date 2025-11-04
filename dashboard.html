@@ -671,6 +671,31 @@
                     <button class="tab-button" data-tab="tabEvaluare">Adauga Evaluare</button>
                     <button class="tab-button" data-tab="tabPrograme">Istoric Programe</button>
                     <button class="tab-button" data-tab="tabNotite">Notițe Private</button>
+                    <button class="tab-button" data-tab="tabTemaLunara">Temă Lunară</button>
+                </div>
+
+                <div id="tabTemaLunara" class="tab-content">
+                    <div class="monthly-theme-form">
+                        <h3>Adaugă Temă pentru Luna Curentă</h3>
+                        <div class="form-group">
+                            <label for="monthlyThemeMonth">Selectează Luna</label>
+                            <input type="month" id="monthlyThemeMonth" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label for="monthlyThemeText">Tema Lunară</label>
+                            <textarea id="monthlyThemeText" class="form-input" rows="4" placeholder="Introduceți tema pentru această lună..."></textarea>
+                        </div>
+                        <div class="modal-footer" style="justify-content: flex-end;">
+                            <button id="saveMonthlyThemeBtn" type="button" class="btn btn-primary">Salvează Tema</button>
+                        </div>
+                    </div>
+                    
+                    <div class="monthly-theme-history">
+                        <h3>Istoric Teme Lunare</h3>
+                        <div id="monthlyThemeHistoryContainer">
+                            <!-- Monthly themes will be rendered here -->
+                        </div>
+                    </div>
                 </div>
                 
                 <div id="tabGrafice" class="tab-content active">
