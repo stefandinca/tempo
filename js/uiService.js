@@ -311,9 +311,10 @@ function buildEventDetailsHTML(event) {
     // If user cannot modify, add a note at the top
     let permissionNotice = '';
     if (!canModify) {
+        // REFACTORED: Using Tailwind for notice
         permissionNotice = `
-            <div class="event-details-section" style="background: #fef3c7; padding: 1rem; border-radius: 0.5rem; border: 1px solid #fbbf24;">
-                <p style="color: #92400e; font-weight: 500; margin: 0;">
+            <div classclass="p-4 mb-4 bg-yellow-100 dark:bg-yellow-900/30 border-l-4 border-yellow-400 rounded">
+                <p class="font-medium text-yellow-800 dark:text-yellow-200">
                     ℹ️ Acest eveniment este în modul doar vizualizare. Nu aveți permisiunea să îl modificați.
                 </p>
             </div>
@@ -322,23 +323,35 @@ function buildEventDetailsHTML(event) {
     
     // Start with permission notice, then add main content
     let html = permissionNotice + `
-        <div class="event-details-section">
-            <h3>Informații generale</h3>
-            <div class="event-details-grid">
-                <div class="event-detail-item"><div class="event-detail-label">Nume</div><div class="event-detail-value">${event.name}</div></div>
-                <div class="event-detail-item"><div class="event-detail-label">Tip</div><div class="event-detail-value">${getEventTypeLabel(event.type)}</div></div>
-                <div class="event-detail-item"><div class="event-detail-label">Data</div><div class="event-detail-value">${formattedDate}</div></div>
-                <div class="event-detail-item"><div class="event-detail-label">Ora</div><div class="event-detail-value">${event.startTime} - ${endTime}</div></div>
+        <div class="pb-6 mb-6 border-b border-gray-200 dark:border-gray-700">
+            <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-3">Informații generale</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="flex flex-col gap-0.5">
+                    <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nume</div>
+                    <div class="text-base font-medium text-gray-900 dark:text-white break-words">${event.name}</div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                    <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tip</div>
+                    <div class="text-base font-medium text-gray-900 dark:text-white break-words">${getEventTypeLabel(event.type)}</div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                    <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Data</div>
+                    <div class="text-base font-medium text-gray-900 dark:text-white break-words">${formattedDate}</div>
+                </div>
+                <div class="flex flex-col gap-0.5">
+                    <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Ora</div>
+                    <div class="text-base font-medium text-gray-900 dark:text-white break-words">${event.startTime} - ${endTime}</div>
+                </div>
             </div>
         </div>
     `;
 
     if (eventMembers.length > 0) {
         html += `
-            <div class="event-details-section">
-                <h3>Terapeuți</h3>
-                <div class="event-therapists-list">
-                    ${eventMembers.map(m => `<div class="therapist-badge" style="background-color: ${m.color};">${m.name}</div>`).join('')}
+            <div class="pb-6 mb-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-3">Terapeuți</h3>
+                <div class="flex flex-wrap gap-2 mt-2">
+                    ${eventMembers.map(m => `<div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium text-white" style="background-color: ${m.color};">${m.name}</div>`).join('')}
                 </div>
             </div>
         `;
@@ -346,17 +359,18 @@ function buildEventDetailsHTML(event) {
 
     if (eventClients.length > 0) {
         html += `
-            <div class="event-details-section">
-                <h3>Clienți & Prezență</h3>
-                <div class="attendance-list">
+            <div class="pb-6 mb-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-3">Clienți & Prezență</h3>
+                <div class="flex flex-col gap-4 mt-3">
                     ${eventClients.map(c => {
                         const attendance = (event.attendance && event.attendance[c.id]) || 'present';
+                        // REFACTORED: Replaced .attendance-item, .attendance-toggle, .attendance-btn
                         return `
-                            <div class="attendance-item">
-                                <div class="client-name-attendance">${c.name}</div>
-                                <div class="attendance-toggle" data-event-id="${event.id}" data-client-id="${c.id}">
-                                    <button class="attendance-btn ${attendance === 'present' ? 'active' : ''}" data-status="present">Prezent</button>
-                                    <button class="attendance-btn ${attendance === 'absent' ? 'active' : ''}" data-status="absent">Absent</button>
+                            <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-3 p-3 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                                <div class="font-semibold text-gray-900 dark:text-white text-base">${c.name}</div>
+                                <div class="flex gap-2" data-event-id="${event.id}" data-client-id="${c.id}">
+                                    <button class="flex-1 sm:flex-none justify-center attendance-btn flex items-center gap-1.5 px-3.5 py-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-md font-medium text-sm cursor-pointer transition-all ${attendance === 'present' ? 'active' : ''}" data-status="present">Prezent</button>
+                                    <button class="flex-1 sm:flex-none justify-center attendance-btn flex items-center gap-1.5 px-3.5 py-2 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-md font-medium text-sm cursor-pointer transition-all ${attendance === 'absent' ? 'active' : ''}" data-status="absent">Absent</button>
                                 </div>
                             </div>
                         `;
@@ -368,19 +382,20 @@ function buildEventDetailsHTML(event) {
 
     if (eventPrograms.length > 0) {
         html += `
-            <div class="event-details-section">
-                <h3>Programe terapeutice & Evaluare</h3>
-                <div id="programScoresContainer">
+            <div class="pb-6 mb-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-3">Programe terapeutice & Evaluare</h3>
+                <div id="programScoresContainer" class="flex flex-col gap-2">
                     ${eventPrograms.map(p => {
                         const currentScore = (event.programScores && event.programScores[p.id]) || '';
+                        // REFACTORED: Replaced .program-score-item, .score-btn
                         return `
-                            <div class="program-score-item">
-                                <div class="program-score-name">${p.title}</div>
-                                <div class="program-score-buttons" data-event-id="${event.id}" data-program-id="${p.id}">
-                                    <button class="score-btn ${currentScore === '0' ? 'active' : ''}" data-score="0">0</button>
-                                    <button class="score-btn ${currentScore === '-' ? 'active' : ''}" data-score="-">-</button>
-                                    <button class="score-btn ${currentScore === 'P' ? 'active' : ''}" data-score="P">P</button>
-                                    <button class="score-btn ${currentScore === '+' ? 'active' : ''}" data-score="+">+</button>
+                            <div class="flex justify-between items-center p-3 bg-gray-100 dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                                <div class="font-semibold text-gray-900 dark:text-white text-sm flex-1">${p.title}</div>
+                                <div class="flex gap-1.5" data-event-id="${event.id}" data-program-id="${p.id}">
+                                    <button class="score-btn w-9 h-9 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-md font-bold text-sm cursor-pointer transition-all flex items-center justify-center ${currentScore === '0' ? 'active' : ''}" data-score="0">0</button>
+                                    <button class="score-btn w-9 h-9 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-md font-bold text-sm cursor-pointer transition-all flex items-center justify-center ${currentScore === '-' ? 'active' : ''}" data-score="-">-</button>
+                                    <button class="score-btn w-9 h-9 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-md font-bold text-sm cursor-pointer transition-all flex items-center justify-center ${currentScore === 'P' ? 'active' : ''}" data-score="P">P</button>
+                                    <button class="score-btn w-9 h-9 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-md font-bold text-sm cursor-pointer transition-all flex items-center justify-center ${currentScore === '+' ? 'active' : ''}" data-score="+">+</button>
                                 </div>
                             </div>
                         `;
@@ -402,9 +417,9 @@ function buildEventDetailsHTML(event) {
 
     if (additionalInfo.length > 0) {
         html += `
-            <div class="event-details-section">
-                <h3>Informații suplimentare</h3>
-                <div class="event-detail-value">${additionalInfo.join(' ⦁ ')}</div>
+            <div class="pb-6 mb-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-3">Informații suplimentare</h3>
+                <div class="text-base font-medium text-gray-900 dark:text-white break-words">${additionalInfo.join(' ⦁ ')}</div>
             </div>
         `;
     }
@@ -595,7 +610,7 @@ function saveEventComments() {
 export function renderClientsList(searchTerm = '') {
     const { clients, events, currentDate } = calendarState.getState();
     const container = $('clientsList');
-    container.innerHTML = '<h3>Clienți existenți</h3>';
+    container.innerHTML = '<h3 class="text-xl font-semibold mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Clienți existenți</h3>';
 
     const term = searchTerm.toLowerCase();
     const filteredClients = term
@@ -603,34 +618,34 @@ export function renderClientsList(searchTerm = '') {
         : clients;
 
     if (filteredClients.length === 0) {
-        container.innerHTML += '<p class="empty-list-message">Nu s-au găsit clienți.</p>';
+        container.innerHTML += '<p class="text-gray-500 dark:text-gray-400 p-4 text-center">Nu s-au găsit clienți.</p>';
         return;
     }
 
     filteredClients.forEach(client => {
         const monthHours = calculateClientHours(client.id, events, currentDate);
         const card = document.createElement('div');
-        card.className = 'client-card';
+        card.className = 'flex flex-col p-4 md:p-6 border border-gray-300 dark:border-gray-700 rounded-lg mb-4 bg-white dark:bg-gray-800 transition-all hover:shadow-lg hover:border-primary gap-4';
         card.innerHTML = `
-                <div class="client-card-content">
-                    <div class="client-info">
-                        <div class="client-avatar">${client.name.substring(0, 2).toUpperCase()}</div>
-                        <div class="client-details">
-                            <div class="client-name">${client.name}</div>
-                            <div class="client-contact">
-                                ${client.email ? `<span class="client-info-item">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div class="flex justify-between items-start gap-4">
+                    <div class="flex items-start gap-4 flex-1 min-w-0">
+                        <div class="w-14 h-14 rounded-full flex items-center justify-center font-bold text-white text-xl bg-gradient-to-r from-blue-500 to-indigo-600 flex-shrink-0">${client.name.substring(0, 2).toUpperCase()}</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold text-lg text-gray-900 dark:text-white mb-2 leading-tight truncate">${client.name}</div>
+                            <div class="flex flex-col gap-1.5 text-sm">
+                                ${client.email ? `<span class="flex items-center gap-2 text-gray-500 dark:text-gray-400 truncate">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 opacity-70">
                                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                                         <polyline points="22,6 12,13 2,6"/>
-                                    </svg>${client.email}
+                                    </svg><span class="truncate">${client.email}</span>
                                 </span>` : ''}
-                                ${client.phone ? `<span class="client-info-item">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                ${client.phone ? `<span class="flex items-center gap-2 text-gray-500 dark:text-gray-400 truncate">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 opacity-70">
                                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
                                     </svg>${client.phone}
                                 </span>` : ''}
-                                ${client.birthDate ? `<span class="client-info-item">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                ${client.birthDate ? `<span class="flex items-center gap-2 text-gray-500 dark:text-gray-400 truncate">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 opacity-70">
                                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
                                         <line x1="16" y1="2" x2="16" y2="6"/>
                                         <line x1="8" y1="2" x2="8" y2="6"/>
@@ -640,49 +655,31 @@ export function renderClientsList(searchTerm = '') {
                             </div>
                         </div>
                     </div>
-                    <div class="client-stats">
-                        <div class="client-hours">${monthHours}</div>
-                        <div class="client-hours-label">ore luna aceasta</div>
+                    <div class="text-right flex-shrink-0">
+                        <div class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-none">${monthHours}</div>
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1 whitespace-nowrap">ore luna aceasta</div>
                     </div>
                 </div>
-                <div class="client-actions" data-client-id="${client.id}">
-                    <button class="btn btn-action btn-action-text" data-action="evolutie" title="Evoluție">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 3v18h18"/>
-                            <path d="M18 17V9l-5 5-4-4-6 6"/>
-                        </svg>
-                        <span>Evoluție</span>
+                <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-200 dark:border-gray-700" data-client-id="${client.id}">
+                    <button class="flex-1 sm:flex-auto btn btn-action-text" data-action="evolutie" title="Evoluție">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9l-5 5-4-4-6 6"/></svg>
+                        <span class="hidden sm:inline">Evoluție</span>
                     </button>
-                    <button class="btn btn-action btn-action-text" data-action="raport" title="Descarcă Raport">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                            <polyline points="7 10 12 15 17 10"/>
-                            <line x1="12" y1="15" x2="12" y2="3"/>
-                        </svg>
-                        <span>Descarcă Raport</span>
+                    <button class="flex-1 sm:flex-auto btn btn-action-text" data-action="raport" title="Descarcă Raport">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span class="hidden sm:inline">Raport</span>
                     </button>
-                    <button class="btn btn-action btn-action-text" data-action="email" title="Trimite Raport">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                            <polyline points="22,6 12,13 2,6"/>
-                        </svg>
-                        <span>Trimite Raport</span>
+                    <button class="flex-1 sm:flex-auto btn btn-action-text" data-action="email" title="Trimite Raport">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        <span class="hidden sm:inline">Email</span>
                     </button>
-                    <button class="btn btn-action btn-action-text" data-action="editeaza" title="Editează">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                        </svg>
-                        <span>Editează</span>
+                    <button class="flex-1 sm:flex-auto btn btn-action-text" data-action="editeaza" title="Editează">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        <span class="hidden sm:inline">Editează</span>
                     </button>
-                    <button class="btn btn-action btn-action-text btn-delete" data-action="sterge" title="Șterge">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="3 6 5 6 21 6"/>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                            <line x1="10" y1="11" x2="10" y2="17"/>
-                            <line x1="14" y1="11" x2="14" y2="17"/>
-                        </svg>
-                        <span>Șterge</span>
+                    <button class="flex-1 sm:flex-auto btn btn-action-text btn-delete" data-action="sterge" title="Șterge">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                        <span class="hidden sm:inline">Șterge</span>
                     </button>
                 </div>
             `;
@@ -721,11 +718,11 @@ export function renderTeamMembersList() {
     const canManage = auth.isAdmin() || auth.isCoordinator();
 
     const container = $('teamMembersList');
-    container.innerHTML = '<h3>Echipa curentă</h3>';
+    container.innerHTML = '<h3 class="text-xl font-semibold mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Echipa curentă</h3>';
 
     teamMembers.forEach(member => {
         const card = document.createElement('div');
-        card.className = 'team-member-card';
+        card.className = 'flex flex-col p-4 md:p-6 border border-gray-300 dark:border-gray-700 rounded-lg mb-4 bg-white dark:bg-gray-800 transition-all hover:shadow-lg hover:border-primary gap-4';
 
         // NOU: Construiește HTML-ul pentru acțiuni în mod condiționat
         let actionsHtml = '';
@@ -762,20 +759,16 @@ export function renderTeamMembersList() {
         }
 
         card.innerHTML = `
-                <div class="team-member-card-content">
-                    <div class="team-member-info">
-                        <div class="team-member-avatar" style="background-color: ${member.color}">${member.initials}</div>
-                        <div class="team-member-details">
-                            <div class="team-member-name">${member.name}</div>
-                            <div class="team-member-role">${getRoleLabel(member.role)}</div>
+                <div class="flex justify-between items-start gap-4">
+                    <div class="flex items-start gap-4 flex-1 min-w-0">
+                        <div class="w-14 h-14 rounded-full flex items-center justify-center font-bold text-white text-xl flex-shrink-0" style="background-color: ${member.color}">${member.initials}</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="font-bold text-lg text-gray-900 dark:text-white mb-1 leading-tight truncate">${member.name}</div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400">${getRoleLabel(member.role)}</div>
                         </div>
                     </div>
-                    <div class="team-member-stats">
-                        <div class="team-member-hours"></div>
-                        <div class="team-member-hours-label"></div>
                     </div>
-                </div>
-                <div class="team-member-actions" data-member-id="${member.id}">${actionsHtml}</div>
+                <div class="flex flex-wrap gap-2 pt-4 border-t border-gray-200 dark:border-gray-700" data-member-id="${member.id}">${actionsHtml}</div>
             `;
         container.appendChild(card);
     });

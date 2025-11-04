@@ -18,16 +18,12 @@
             }
         }
     </script>
-   <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="dashboard-styles.css">
-    <link rel="stylesheet" href="tailwind-custom.css">
-    <link rel="icon" href="icon.png" type="image/png">
+   <link rel="stylesheet" href="tailwind-custom.css"> <link rel="icon" href="icon.png" type="image/png">
     
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
     <div class="app-container flex flex-col md:flex-row h-screen overflow-hidden" id="appContainer">
         
-        <!-- Sidebar -->
         <nav class="sidebar bg-white dark:bg-gray-800 border-b md:border-r border-gray-200 dark:border-gray-700 flex md:flex-col w-full md:w-64 flex-shrink-0">
             <div class="sidebar-header flex items-center justify-center md:justify-center p-4 md:mb-8">
                 <img src="logo.png" alt="Tempo Logo" class="logo-full h-8 md:h-10">
@@ -91,22 +87,17 @@
         
         <main class="main-content flex-1 flex flex-col overflow-hidden">
             
-            <!-- Dashboard Section -->
             <section id="dashboardSection" class="main-section active flex flex-col h-full">
                 <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6 flex-shrink-0">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <!--- HAMBURGER MENU-->
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            <div class="header-title-group">
+                            <div class="header-title-group flex items-center gap-3">
                                 <button class="mobile-menu-toggle btn-icon md:hidden">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                                 </button>
-                                <h1  class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Panou de control</h1>
+                                <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Panou de control</h1>
                             </div>
-                            
-                            
                         </div>
-                        
                         <div class="flex items-center gap-2">
                             <button id="addEventBtn" class="btn btn-primary flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors text-sm md:text-base">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
@@ -114,149 +105,87 @@
                                 <span class="sm:hidden">Adauga</span>
                             </button>
                         </div> 
-
-
-                        
                     </div>
                 </header>
 
                 <div class="flex-1 overflow-y-auto p-4 md:p-6">
-                    <!-- Mobile-first Grid: 1 column on mobile, 2 on tablet, 3 on desktop -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         
-                        <!-- Programul Zilei - Full width on mobile, spans 2 cols on desktop -->
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-700 shadow-sm lg:col-span-2">
                             <div class="flex items-center gap-3 pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-gray-600 dark:text-gray-400"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
                                 <h2 class="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Programul Zilei (Dvs.)</h2>
                             </div>
-                            <div id="dashboardTodaySchedule" class="space-y-0">
-                                <div class="schedule-item">
-                                    <div class="schedule-time">09:00 - 10:00</div>
-                                    <div class="schedule-details">
-                                        <div class="schedule-title">Terapie - Amalia</div>
-                                        <div class="schedule-client">cu Amalia</div>
-                                    </div>
+                            <div id="dashboardTodaySchedule" class="max-h-[450px] overflow-y-auto pr-2">
                                 </div>
-                                <div class="schedule-item">
-                                    <div class="schedule-time">10:00 - 11:00</div>
-                                    <div class="schedule-details">
-                                        <div class="schedule-title">Terapie - Alex</div>
-                                        <div class="schedule-client">cu Alex</div>
-                                    </div>
-                                </div>
-                                <div class="schedule-item">
-                                    <div class="schedule-time">11:00 - 12:00</div>
-                                    <div class="schedule-details">
-                                        <div class="schedule-title">Terapie - Tudor</div>
-                                        <div class="schedule-client">cu Tudor</div>
-                                    </div>
-                                </div>
-                                <div class="empty-schedule hidden text-center py-8 text-gray-500 dark:text-gray-400">
-                                    <p>Nicio sesiune programată pentru astăzi.</p>
-                                </div>
-                            </div>
                         </div>
 
-                        <!-- Acțiuni Rapide -->
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
                             <div class="flex items-center gap-3 pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-gray-600 dark:text-gray-400"><polyline points="9 18 15 12 9 6"/></svg>
                                 <h2 class="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Acțiuni Rapide</h2>
                             </div>
                             <div class="flex flex-col gap-3">
-                                <button class="btn btn-primary w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors" id="quickAddEventBtn">
+                                <button class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary hover:bg-blue-600 text-white rounded-lg transition-colors" id="quickAddEventBtn">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                                     <span>Adaugă Sesiune</span>
                                 </button>
-                                <button class="btn btn-secondary w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors" id="quickAddClientBtn">
+                                <button class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors" id="quickAddClientBtn">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
                                     <span>Adaugă Client Nou</span>
                                 </button>
-                                <button class="btn btn-secondary w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors" id="quickAddTeamBtn">
+                                <button class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors" id="quickAddTeamBtn">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
                                     <span>Adaugă Membru Echipă</span>
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Statistici Rapide -->
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
                             <div class="flex items-center gap-3 pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-gray-600 dark:text-gray-400"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20V16"/></svg>
                                 <h2 class="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Statistici Rapide</h2>
                             </div>
-                            <div id="dashboardQuickStats" class="space-y-0">
-                                <div class="stat-item">
-                                    <span class="stat-label">Sesiuni Totale</span>
-                                    <span class="stat-value" id="statTotalSessions">120</span>
+                            <div id="dashboardQuickStats">
+                                <div class="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
+                                    <span class="font-medium text-gray-600 dark:text-gray-400 text-sm">Sesiuni Totale</span>
+                                    <span class="text-2xl md:text-3xl font-bold text-primary" id="statTotalSessions">0</span>
                                 </div>
-                                <div class="stat-item">
-                                    <span class="stat-label">Prezență Centru</span>
-                                    <span class="stat-value" id="statAttendance">95%</span>
+                                <div class="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
+                                    <span class="font-medium text-gray-600 dark:text-gray-400 text-sm">Prezență Centru</span>
+                                    <span class="text-2xl md:text-3xl font-bold text-primary" id="statAttendance">0%</span>
                                 </div>
-                                <div class="stat-item">
-                                    <span class="stat-label">Rapoarte În Așteptare</span>
-                                    <span class="stat-value" id="statPendingReports">3</span>
+                                <div class="flex items-center justify-between py-3">
+                                    <span class="font-medium text-gray-600 dark:text-gray-400 text-sm">Rapoarte În Așteptare</span>
+                                    <span class="text-2xl md:text-3xl font-bold text-primary" id="statPendingReports">0</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Activitate Recentă - Full width on mobile, spans 2 cols on desktop -->
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-700 shadow-sm lg:col-span-2">
                             <div class="flex items-center gap-3 pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-gray-600 dark:text-gray-400"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                                 <h2 class="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Activitate Recentă</h2>
                             </div>
-                            <div id="dashboardRecentActivity" class="space-y-0 overflow-x-auto">
-                                <div class="activity-item">
-                                    <div class="activity-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600 dark:text-gray-400"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                    </div>
-                                    <div class="activity-text">
-                                        <strong>Evaluare salvată</strong>: Tudor
-                                    </div>
-                                    <div class="activity-time">acum 45 min</div>
-                                    <div class="activity-action">
-                                        <button class="px-3 py-1.5 text-xs md:text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors whitespace-nowrap" data-action="goToClientEvolution" data-client-id="client_1761643441294">Vezi Evoluție</button>
-                                    </div>
+                            <div id="dashboardRecentActivity" class="max-h-[200px] overflow-y-auto pr-2">
                                 </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600 dark:text-gray-400"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
-                                    </div>
-                                    <div class="activity-text">
-                                        <strong>Eveniment adăugat</strong>: Terapie - Stefan Negru
-                                    </div>
-                                    <div class="activity-time">acum 2 ore</div>
-                                    <div class="activity-action">
-                                        <button class="px-3 py-1.5 text-xs md:text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors whitespace-nowrap" data-action="goToDate" data-date="2025-11-03">Vezi Ziua</button>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                     </div>
                 </div>
             </section>
 
-            <!-- Calendar Section (placeholder) -->
             <section id="calendarSection" class="main-section hidden">
                 <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <!--- HAMBURGER MENU-->
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            <div class="header-title-group">
+                            <div class="header-title-group flex items-center gap-3">
                                 <button class="mobile-menu-toggle btn-icon md:hidden">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                                 </button>
-                                <h1 id="currentPeriod" class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Panou de control</h1>
+                                <h1 id="currentPeriod" class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Calendar</h1>
                             </div>
-                            
-                            
-                            
                         </div>
-                        
                         <div class="flex flex-wrap items-center gap-2">
                             <div class="flex items-center gap-1">
                                 <button id="prevBtn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -277,213 +206,166 @@
                                 <span class="hidden sm:inline">Adauga</span>
                             </button>
                         </div>
-
-                        
                     </div>
                 </header>
                 
                 <div id="filters" class="filters-container p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700"></div>
                 <div id="calendarView" class="flex-1 overflow-auto p-4"></div>
             </section>
-
-            <section id="clientSection" class="main-section">
-        <header class="section-header">
-            <!--- HAMBURGER MENU-->
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            <div class="header-title-group">
-                                <button class="mobile-menu-toggle btn-icon md:hidden">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                                </button>
-                                <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Panou de control</h1>
-                            </div>
-                            
-                            
-                        </div>
-            <div class="header-actions">
-                <button id="addNewClientBtn" class="btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                    <span>Adauga Client Nou</span>
-                </button>
-            </div>
-        </header>
-        
-        <div class="section-content-grid">
-            <div class="section-col-list">
-                <input type="search" id="clientSearchBar" class="form-input" placeholder="Cauta client dupa nume, email...">
-                <div id="clientsList" class="modal-list">
-                    </div>
-            </div>
-            <div class="section-col-form">
-                <form id="clientForm">
-                    <h3 id="clientFormTitle">Adauga Client Nou</h3>
-                    <div class="form-group">
-                        <label for="clientFullName">Nume Complet</label>
-                        <input type="text" id="clientFullName" name="clientFullName" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="clientEmail">Email</label>
-                        <input type="email" id="clientEmail" name="clientEmail" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="clientPhone">Telefon</label>
-                        <input type="tel" id="clientPhone" name="clientPhone" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="clientBirthdayInput">Data Nasterii</label>
-                        <input type="date" id="clientBirthdayInput" name="clientBirthdayInput" class="form-input">
-                    </div>
-                    <div class="form-group">
-        <label for="clientId">Cod Client (ID)</label>
-        <input type="text" id="clientId" name="clientId" class="form-input" 
-               placeholder="ex: cezar_2102" 
-               pattern="[a-z0-9_]+" 
-               title="Folosește doar litere mici, cifre și underscore">
-        <small style="color: var(--text-secondary); font-size: 0.75rem; display: block; margin-top: 0.25rem;">
-            Lasă gol pentru generare automată. Folosește format: nume_ddmm
-        </small>
-    </div>
-                    <div class="modal-footer-form">
-                        <button id="deleteClientBtn" type="button" class="btn btn-danger-outline">Sterge</button>
-                        <button id="cancelClientBtn" type="button" class="btn btn-secondary">Anuleaza</button>
-                        <button type="submit" class="btn btn-primary">Salveaza</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <section id="teamSection" class="main-section">
-        <header class="section-header">
-            <!--- HAMBURGER MENU-->
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            <div class="header-title-group">
-                                <button class="mobile-menu-toggle btn-icon md:hidden">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                                </button>
-                                <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Panou de control</h1>
-                            </div>
-                            
-                            
-                        </div>
-            <div class="header-actions">
-                <button id="addNewTeamMemberBtn" class="btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                    <span>Adauga Membru Nou</span>
-                </button>
-            </div>
-        </header>
-
-        <div class="section-content-grid">
-            <div class="section-col-list">
-                <div id="teamMembersList" class="modal-list">
-                    </div>
-            </div>
-            <div class="section-col-form">
-                <form id="teamMemberForm">
-                    <h3 id="teamFormTitle">Adauga Membru Nou</h3>
-                    <div class="form-group">
-                        <label for="memberName">Nume</label>
-                        <input type="text" id="memberName" name="memberName" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="memberInitials">Initiale (max 3)</label>
-                        <input type="text" id="memberInitials" name="memberInitials" class="form-input" required maxlength="3">
-                    </div>
-                    <div class="form-group">
-                        <label for="memberRole">Rol</label>
-                        <select id="memberRole" name="memberRole" class="form-input" required>
-                            <option value="therapist">Terapeut</option>
-                            <option value="coordinator">Coordonator</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="memberColor">Culoare</label>
-                        <div class="color-picker-group">
-                            <input type="color" id="memberColor" name="memberColor" class="form-input-color" value="#4f46e5">
-                            <input type="text" id="memberColorHex" name="memberColorHex" class="form-input" value="#4F46E5" maxlength="7">
-                        </div>
-                    </div>
-                    <div class="modal-footer-form">
-                        <button id="deleteMemberBtn" type="button" class="btn btn-danger-outline">Sterge</button>
-                        <button id="cancelMemberBtn" type="button" class="btn btn-secondary">Anuleaza</button>
-                        <button type="submit" class="btn btn-primary">Salveaza</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <section id="billingSection" class="main-section">
-    <header class="section-header">
-        <div class="header-title-group">
-            <button class="mobile-menu-toggle btn-icon md:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-            </button>
-            <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Facturare</h1>
-        </div>
-        <div class="header-actions">
-            <div class="flex items-center gap-1">
-                <button id="billingPrevMonth" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-                </button>
-                <h2 id="billingCurrentMonth" class="px-4 py-2 rounded-lg text-lg font-semibold"></h2>
-                <button id="billingNextMonth" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <div class="section-content-grid" style="grid-template-columns: 1fr; overflow-y: auto;">
-        <div class="section-col-list" style="height: auto;">
-            <input type="search" id="billingSearchBar" class="form-input" placeholder="Caută client după nume..." style="margin-bottom: 1.5rem;">
-            <div id="billingClientList" class="modal-list" style="padding-right: 0;">
-                </div>
-        </div>
-    </div>
-</section>
-
-<div id="paymentModal" class="modal-backdrop modal-small">
-    <div class="modal-content">
-        <form id="paymentForm">
-            <div class="modal-header">
-                <h2 id="paymentModalTitle" class="modal-title">Adaugă Încasare</h2>
-                <button id="closePaymentModal" type="button" class="btn-icon btn-close" title="Inchide">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="paymentClientId">
-                <input type="hidden" id="paymentMonthKey">
-
-                <div class="form-group">
-                    <label for="paymentDate">Data Încasării</label>
-                    <input type="date" id="paymentDate" class="form-input" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="paymentAmount">Sumă (RON)</label>
-                    <input type="number" id="paymentAmount" class="form-input" required min="1" step="1">
-                </div>
-
-                <div class="form-group">
-                    <label for="paymentNotes">Notițe (Opțional)</label>
-                    <input type="text" id="paymentNotes" class="form-input" placeholder="ex: chitanța nr. 123">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button id="cancelPaymentBtn" type="button" class="btn btn-secondary">Anulează</button>
-                <button type="submit" class="btn btn-primary">Salvează Încasarea</button>
-            </div>
-        </form>
-    </div>
-</div>
             
-        </main>
-    </div>
-    
-    <div id="eventDetailsModal" class="modal-backdrop">
+            <section id="clientSection" class="main-section hidden">
+                <header class="section-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6 flex-shrink-0 flex items-center justify-between gap-4">
+                    <div class="header-title-group flex items-center gap-3">
+                        <button class="mobile-menu-toggle btn-icon md:hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        </button>
+                        <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Clienți</h1>
+                    </div>
+                    <div class="header-actions">
+                        <button id="addNewClientBtn" class="btn btn-primary flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            <span class="hidden sm:inline">Adauga Client Nou</span>
+                            <span class="sm:hidden">Adauga</span>
+                        </button>
+                    </div>
+                </header>
+                
+                <div class="section-content-grid grid grid-cols-1 md:grid-cols-2 gap-6 p-4 md:p-6 flex-1 overflow-hidden">
+                    <div class="section-col-list flex flex-col overflow-hidden h-full">
+                        <input type="search" id="clientSearchBar" class="form-input mb-4 flex-shrink-0" placeholder="Cauta client dupa nume, email...">
+                        <div id="clientsList" class="modal-list flex-1 overflow-y-auto pr-2">
+                            </div>
+                    </div>
+                    <div class="section-col-form flex flex-col bg-white dark:bg-gray-800 rounded-lg p-6 overflow-y-auto border border-gray-200 dark:border-gray-700 h-full">
+                        <form id="clientForm">
+                            <h3 id="clientFormTitle" class="text-xl font-semibold mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Adauga Client Nou</h3>
+                            <div class="form-group mb-4">
+                                <label for="clientFullName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nume Complet</label>
+                                <input type="text" id="clientFullName" name="clientFullName" class="form-input w-full" required>
+                            </div>
+                            <div class="form-group mb-4">
+                                <label for="clientEmail" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                                <input type="email" id="clientEmail" name="clientEmail" class="form-input w-full">
+                            </div>
+                            <div class="form-group mb-4">
+                                <label for="clientPhone" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Telefon</label>
+                                <input type="tel" id="clientPhone" name="clientPhone" class="form-input w-full">
+                            </div>
+                            <div class="form-group mb-4">
+                                <label for="clientBirthdayInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data Nasterii</label>
+                                <input type="date" id="clientBirthdayInput" name="clientBirthdayInput" class="form-input w-full">
+                            </div>
+                            <div class="form-group mb-4">
+                                <label for="clientId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cod Client (ID)</label>
+                                <input type="text" id="clientId" name="clientId" class="form-input w-full" 
+                                       placeholder="ex: cezar_2102" 
+                                       pattern="[a-z0-9_]+" 
+                                       title="Folosește doar litere mici, cifre și underscore">
+                                <small class="text-gray-500 dark:text-gray-400 text-xs block mt-1">
+                                    Lasă gol pentru generare automată. Folosește format: nume_ddmm
+                                </small>
+                            </div>
+                            <div class="modal-footer-form flex justify-end gap-2 mt-6">
+                                <button id="deleteClientBtn" type="button" class="btn btn-danger-outline hidden">Sterge</button>
+                                <button id="cancelClientBtn" type="button" class="btn btn-secondary">Anuleaza</button>
+                                <button type="submit" class="btn btn-primary">Salveaza</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <section id="teamSection" class="main-section hidden">
+                <header class="section-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6 flex-shrink-0 flex items-center justify-between gap-4">
+                    <div class="header-title-group flex items-center gap-3">
+                        <button class="mobile-menu-toggle btn-icon md:hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        </button>
+                        <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Echipa</h1>
+                    </div>
+                    <div class="header-actions">
+                        <button id="addNewTeamMemberBtn" class="btn btn-primary flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            <span class="hidden sm:inline">Adauga Membru Nou</span>
+                            <span class="sm:hidden">Adauga</span>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="section-content-grid grid grid-cols-1 md:grid-cols-2 gap-6 p-4 md:p-6 flex-1 overflow-hidden">
+                    <div class="section-col-list flex flex-col overflow-hidden h-full">
+                        <div id="teamMembersList" class="modal-list flex-1 overflow-y-auto pr-2">
+                            </div>
+                    </div>
+                    <div class="section-col-form flex flex-col bg-white dark:bg-gray-800 rounded-lg p-6 overflow-y-auto border border-gray-200 dark:border-gray-700 h-full">
+                        <form id="teamMemberForm">
+                            <h3 id="teamFormTitle" class="text-xl font-semibold mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">Adauga Membru Nou</h3>
+                            <div class="form-group mb-4">
+                                <label for="memberName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nume</label>
+                                <input type="text" id="memberName" name="memberName" class="form-input w-full" required>
+                            </div>
+                            <div class="form-group mb-4">
+                                <label for="memberInitials" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Initiale (max 3)</label>
+                                <input type="text" id="memberInitials" name="memberInitials" class="form-input w-full" required maxlength="3">
+                            </div>
+                            <div class="form-group mb-4">
+                                <label for="memberRole" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Rol</label>
+                                <select id="memberRole" name="memberRole" class="form-input w-full" required>
+                                    <option value="therapist">Terapeut</option>
+                                    <option value="coordinator">Coordonator</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <div class="form-group mb-4">
+                                <label for="memberColor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Culoare</label>
+                                <div class="color-picker-group flex gap-2">
+                                    <input type="color" id="memberColor" name="memberColor" class="form-input-color w-12 h-11 p-1 border-gray-300 dark:border-gray-600 rounded" value="#4f46e5">
+                                    <input type="text" id="memberColorHex" name="memberColorHex" class="form-input flex-1" value="#4F46E5" maxlength="7">
+                                </div>
+                            </div>
+                            <div class="modal-footer-form flex justify-end gap-2 mt-6">
+                                <button id="deleteMemberBtn" type="button" class="btn btn-danger-outline hidden">Sterge</button>
+                                <button id="cancelMemberBtn" type="button" class="btn btn-secondary">Anuleaza</button>
+                                <button type="submit" class="btn btn-primary">Salveaza</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <section id="billingSection" class="main-section hidden">
+                <header class="section-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6 flex-shrink-0 flex items-center justify-between gap-4">
+                    <div class="header-title-group flex items-center gap-3">
+                        <button class="mobile-menu-toggle btn-icon md:hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        </button>
+                        <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Facturare</h1>
+                    </div>
+                    <div class="header-actions">
+                        <div class="flex items-center gap-1">
+                            <button id="billingPrevMonth" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                            </button>
+                            <h2 id="billingCurrentMonth" class="px-4 py-2 rounded-lg text-lg font-semibold text-gray-900 dark:text-white"></h2>
+                            <button id="billingNextMonth" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="section-content-grid grid-cols-1 gap-6 p-4 md:p-6 flex-1 overflow-y-auto">
+                    <div class="section-col-list h-auto">
+                        <input type="search" id="billingSearchBar" class="form-input mb-4" placeholder="Caută client după nume...">
+                        <div id="billingClientList" class="modal-list pr-0">
+                            </div>
+                    </div>
+                </div>
+            </section>
+        
+        </main> </div>
+
+    <div id="eventDetailsModal" class="modal-backdrop hidden">
         <div class="modal-content modal-lg">
             <div class="modal-header">
                 <h2 id="eventDetailsTitle" class="modal-title">Detalii Eveniment</h2>
@@ -495,9 +377,9 @@
                 <div id="eventDetailsContent">
                     </div>
                 
-                <div class="event-details-section">
-                    <h3>Comentarii (Private)</h3>
-                    <textarea id="eventComments" class="form-input" placeholder="Adauga notite private despre eveniment..."></textarea>
+                <div class="event-details-section pb-6 mb-6 border-b border-gray-200 dark:border-gray-700">
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-3">Comentarii (Private)</h3>
+                    <textarea id="eventComments" class="form-input w-full" placeholder="Adauga notite private despre eveniment..."></textarea>
                 </div>
             </div>
             <div class="modal-footer justify-between">
@@ -512,7 +394,7 @@
         </div>
     </div>
     
-    <div id="eventModal" class="modal-backdrop">
+    <div id="eventModal" class="modal-backdrop hidden">
         <div class="modal-content modal-xl">
             <form id="eventForm">
                 <div class="modal-header">
@@ -522,24 +404,24 @@
                     </button>
                 </div>
                 
-                <div class="modal-body modal-grid">
+                <div class="modal-body modal-grid grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-10 p-6 md:p-8 max-h-[70vh] overflow-y-auto">
                     
-                    <div class="modal-col">
-                        <h3>Detalii Eveniment</h3>
+                    <div class="modal-col relative min-h-0 md:pr-5">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-5 pb-3 border-b-2 border-gray-200 dark:border-gray-700 uppercase tracking-wider sticky top-0 bg-white dark:bg-gray-800 z-10">Detalii Eveniment</h3>
                         
-                        <div class="form-group">
-                            <label for="eventName">Nume Eveniment</label>
-                            <input type="text" id="eventName" name="eventName" class="form-input" required>
+                        <div class="form-group mb-4">
+                            <label for="eventName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nume Eveniment</label>
+                            <input type="text" id="eventName" name="eventName" class="form-input w-full" required>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="eventDetails">Detalii Eveniment (Optionale)</label>
-                            <textarea id="eventDetails" name="eventDetails" class="form-input" rows="3"></textarea>
+                        <div class="form-group mb-4">
+                            <label for="eventDetails" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Detalii Eveniment (Optionale)</label>
+                            <textarea id="eventDetails" name="eventDetails" class="form-input w-full" rows="3"></textarea>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="eventType">Tip Eveniment</label>
-                            <select id="eventType" name="eventType" class="form-input" required>
+                        <div class="form-group mb-4">
+                            <label for="eventType" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tip Eveniment</label>
+                            <select id="eventType" name="eventType" class="form-input w-full" required>
                                 <option value="therapy">Terapie</option>
                                 <option value="group-therapy">Terapie de grup</option>
                                 <option value="coordination">Coordonare</option>
@@ -549,14 +431,14 @@
                             </select>
                         </div>
                         
-                        <div class="form-grid-2">
+                        <div class="form-grid-2 grid grid-cols-2 gap-4 mb-4">
                             <div class="form-group">
-                                <label for="eventDate">Data</label>
-                                <input type="date" id="eventDate" name="eventDate" class="form-input" required>
+                                <label for="eventDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data</label>
+                                <input type="date" id="eventDate" name="eventDate" class="form-input w-full" required>
                             </div>
                             <div class="form-group">
-                                <label for="startTime">Ora Inceput</label>
-                                <select id="startTime" name="startTime" class="form-input" required>
+                                <label for="startTime" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ora Inceput</label>
+                                <select id="startTime" name="startTime" class="form-input w-full" required>
                                     <option value="08:00">08:00</option>
                                     <option value="08:30">08:30</option>
                                     <option value="09:00">09:00</option>
@@ -584,58 +466,55 @@
                                     <option value="20:00">20:00</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label for="duration">Durata (minute)</label>
-                                <input type="number" id="duration" name="duration" class="form-input" value="60" step="15" min="15" required>
+                            <div class="form-group col-span-2">
+                                <label for="duration" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Durata (minute)</label>
+                                <input type="number" id="duration" name="duration" class="form-input w-full" value="60" step="15" min="15" required>
                             </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label>Recurenta (in aceasta luna)</label>
-                            <div class="repeating-days">
-                                <input type="checkbox" id="repeatMon" name="repeatMon" value="1"><label for="repeatMon">L</label>
-                                <input type="checkbox" id="repeatTue" name="repeatTue" value="2"><label for="repeatTue">M</label>
-                                <input type="checkbox" id="repeatWed" name="repeatWed" value="3"><label for="repeatWed">M</label>
-                                <input type="checkbox" id="repeatThu" name="repeatThu" value="4"><label for="repeatThu">J</label>
-                                <input type="checkbox" id="repeatFri" name="repeatFri" value="5"><label for="repeatFri">V</label>
+                        <div class="form-group mb-4">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Recurenta (in aceasta luna)</label>
+                            <div class="repeating-days flex gap-2">
+                                <input type="checkbox" id="repeatMon" name="repeatMon" value="1" class="hidden"><label for="repeatMon" class="flex items-center justify-center w-10 h-10 border border-gray-300 dark:border-gray-600 rounded-full cursor-pointer font-medium transition-all hover:bg-gray-100 dark:hover:bg-gray-700">L</label>
+                                <input type="checkbox" id="repeatTue" name="repeatTue" value="2" class="hidden"><label for="repeatTue" class="flex items-center justify-center w-10 h-10 border border-gray-300 dark:border-gray-600 rounded-full cursor-pointer font-medium transition-all hover:bg-gray-100 dark:hover:bg-gray-700">M</label>
+                                <input type="checkbox" id="repeatWed" name="repeatWed" value="3" class="hidden"><label for="repeatWed" class="flex items-center justify-center w-10 h-10 border border-gray-300 dark:border-gray-600 rounded-full cursor-pointer font-medium transition-all hover:bg-gray-100 dark:hover:bg-gray-700">M</label>
+                                <input type="checkbox" id="repeatThu" name="repeatThu" value="4" class="hidden"><label for="repeatThu" class="flex items-center justify-center w-10 h-10 border border-gray-300 dark:border-gray-600 rounded-full cursor-pointer font-medium transition-all hover:bg-gray-100 dark:hover:bg-gray-700">J</label>
+                                <input type="checkbox" id="repeatFri" name="repeatFri" value="5" class="hidden"><label for="repeatFri" class="flex items-center justify-center w-10 h-10 border border-gray-300 dark:border-gray-600 rounded-full cursor-pointer font-medium transition-all hover:bg-gray-100 dark:hover:bg-gray-700">V</label>
                             </div>
                         </div>
 
-                        <div class="form-group-checkboxes">
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="isPublic" name="isPublic">
-                                <label for="isPublic">Eveniment public (vizibil in calendarul public)</label>
+                        <div class="form-group-checkboxes flex flex-col gap-3 mt-4">
+                            <div class="checkbox-item flex items-center gap-2">
+                                <input type="checkbox" id="isPublic" name="isPublic" class="w-4 h-4">
+                                <label for="isPublic" class="text-sm font-medium text-gray-700 dark:text-gray-300">Eveniment public (vizibil in calendarul public)</label>
                             </div>
-                            <div class="checkbox-item">
-                                <input type="checkbox" id="isBillable" name="isBillable" checked>
-                                <label for="isBillable">Facturabil</label>
+                            <div class="checkbox-item flex items-center gap-2">
+                                <input type="checkbox" id="isBillable" name="isBillable" checked class="w-4 h-4">
+                                <label for="isBillable" class="text-sm font-medium text-gray-700 dark:text-gray-300">Facturabil</label>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="modal-col">
-                        <h3>Clienti</h3>
-                        <div class="form-group">
-                            <input type="search" id="clientSearch" class="form-input" placeholder="Cauta client...">
+                    <div class="modal-col relative min-h-0 md:pl-5 md:border-l border-gray-200 dark:border-gray-700">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-5 pb-3 border-b-2 border-gray-200 dark:border-gray-700 uppercase tracking-wider sticky top-0 bg-white dark:bg-gray-800 z-10">Clienti</h3>
+                        <div class="form-group mb-4">
+                            <input type="search" id="clientSearch" class="form-input w-full" placeholder="Cauta client...">
                         </div>
-                        <div id="clientCheckboxes" class="checkbox-list">
+                        <div id="clientCheckboxes" class="checkbox-list max-h-48 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md p-2 mb-4">
                             </div>
-                        <button type="button" id="addNewClientBtnInModal" class="btn btn-secondary btn-full-width">Adauga Client Nou</button>
+                        <button type="button" id="addNewClientBtnInModal" class="btn btn-secondary btn-full-width w-full">Adauga Client Nou</button>
                         
-                        <h3 style="margin-top: 1.5rem;">Programe</h3>
-                        <div class="form-group">
-                            <input type="search" id="programSearch" class="form-input" placeholder="Cauta program...">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-5 pb-3 border-b-2 border-gray-200 dark:border-gray-700 uppercase tracking-wider sticky top-0 bg-white dark:bg-gray-800 z-10 mt-6">Programe</h3>
+                        <div class="form-group mb-4">
+                            <input type="search" id="programSearch" class="form-input w-full" placeholder="Cauta program...">
                         </div>
-                        <div id="programCheckboxes" class="checkbox-list program-list">
+                        <div id="programCheckboxes" class="checkbox-list program-list max-h-48 overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-md p-2">
                             </div>
                     </div>
                     
-                    <div class="modal-col">
-                        <h3>Echipa (Terapeuti)</h3>
-                        <div class="form-group">
-                            <label>Selecteaza membrii echipei</label>
-                        </div>
-                        <div id="teamMemberCheckboxes" class="checkbox-list">
+                    <div class="modal-col relative min-h-0 md:pl-5 md:border-l border-gray-200 dark:border-gray-700">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-5 pb-3 border-b-2 border-gray-200 dark:border-gray-700 uppercase tracking-wider sticky top-0 bg-white dark:bg-gray-800 z-10">Echipa (Terapeuti)</h3>
+                        <div id="teamMemberCheckboxes" class="checkbox-list max-h-[400px] overflow-y-auto">
                             </div>
                     </div>
                     
@@ -643,7 +522,7 @@
                 
                 <div class="modal-footer justify-between">
                     <div>
-                        <button id="deleteBtn" type="button" class="btn btn-danger-outline">Sterge Eveniment</button>
+                        <button id="deleteBtn" type="button" class="btn btn-danger-outline hidden">Sterge Eveniment</button>
                     </div>
                     <div>
                         <button id="cancelBtn" type="button" class="btn btn-secondary">Anuleaza</button>
@@ -657,7 +536,7 @@
     
     
     
-    <div id="evolutionModal" class="modal-backdrop">
+    <div id="evolutionModal" class="modal-backdrop hidden">
         <div class="modal-content modal-xl">
             <div class="modal-header">
                 <h2 id="evolutionTitle" class="modal-title">Evolutie Client</h2>
@@ -665,615 +544,100 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
-            <div class="modal-body">
-                <div class="tabs">
+            <div class="modal-body p-0 md:p-4">
+                <div class="tabs flex gap-2 border-b border-gray-200 dark:border-gray-700 mb-4 px-4 md:px-0">
                     <button class="tab-button active" data-tab="tabGrafice">Grafice Evolutie</button>
                     <button class="tab-button" data-tab="tabEvaluare">Adauga Evaluare</button>
                     <button class="tab-button" data-tab="tabPrograme">Istoric Programe</button>
                     <button class="tab-button" data-tab="tabNotite">Notițe Private</button>
                 </div>
                 
-                <div id="tabGrafice" class="tab-content active">
-                    <div id="evolutionChartContainer" class="chart-container">
+                <div id="tabGrafice" class="tab-content active p-4 md:p-0">
+                    <div id="evolutionChartContainer" class="chart-container p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 min-h-[550px]">
                         <canvas id="evolutionChart"></canvas>
-                        </div>
-                    <div id="evolutionSummary">
-                        </div>
-                    <div id="evolutionEditor" style="display:none;">
-                        <table class="form-table">
-                            <thead>
-                                <tr>
-                                    <th>Test</th>
-                                    <th>1m</th>
-                                    <th>3m</th>
-                                    <th>6m</th>
-                                    <th>9m</th>
-                                    <th>12m</th>
-                                </tr>
-                            </thead>
-                            <tbody id="evolutionEditRows"></tbody>
-                        </table>
-                        <div class="modal-footer">
-                            <button id="cancelEvolutionEdit" class="btn btn-secondary">Anuleaza</button>
-                            <button id="saveEvolutionBtn" class="btn btn-primary">Salveaza Scoruri</button>
-                        </div>
                     </div>
-                </div>
-
-                <div id="tabPrograme" class="tab-content">
-                    <div id="programHistoryContainer">
+                    <div id="evolutionSummary" class="mt-4">
                         </div>
                 </div>
 
-                <div id="tabNotite" class="tab-content">
-                <div id="privateNotesContainer" class="private-notes-container">
-                    </div>
-            </div>
+                <div id="tabPrograme" class="tab-content hidden p-4 md:p-0">
+                    <div id="programHistoryContainer" class="p-4 bg-gray-100 dark:bg-gray-900 rounded-lg min-h-[200px]">
+                        </div>
+                </div>
 
-                <div id="tabEvaluare" class="tab-content">
+                <div id="tabNotite" class="tab-content hidden p-4 md:p-0">
+                    <div id="privateNotesContainer" class="private-notes-container flex flex-col gap-4 max-h-[60vh] overflow-y-auto p-1">
+                        </div>
+                </div>
+
+                <div id="tabEvaluare" class="tab-content hidden p-4 md:p-0">
                     <form id="addEvaluationForm">
-                        <div class="form-grid-3">
+                        <div class="form-grid-3 grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                             <div class="form-group">
-                                <label for="childBirthDateInput">Data Nasterii Client</label>
-                                <input type="date" id="childBirthDateInput" class="form-input">
+                                <label for="childBirthDateInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data Nasterii Client</label>
+                                <input type="date" id="childBirthDateInput" class="form-input w-full">
                             </div>
                             <div class="form-group">
-                                <label for="evaluationDateInput">Data Evaluarii</label>
-                                <input type="date" id="evaluationDateInput" class="form-input">
+                                <label for="evaluationDateInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data Evaluarii</label>
+                                <input type="date" id="evaluationDateInput" class="form-input w-full">
                             </div>
                             <div class="form-group">
-                                <label>Varsta Curenta</label>
-                                <div id="childAgeDisplay" class="form-input-static">–</div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Varsta Curenta</label>
+                                <div id="childAgeDisplay" class="form-input-static w-full"> – </div>
                             </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="evaluationTypeSelect">Tip evaluare</label>
-                            <select id="evaluationTypeSelect" class="form-input">
+                        <div class="form-group mb-4">
+                            <label for="evaluationTypeSelect" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Tip evaluare</label>
+                            <select id="evaluationTypeSelect" class="form-input w-full">
                                 <option value="portage" selected>Portage</option>
                                 <option value="logopedica">Evaluare logopedică</option>
                             </select>
                         </div>
                         
                         <div id="portageFormContainer">
-                            <div id="portageDomainsContainer">
+                            <div id="portageDomainsContainer" class="flex flex-col gap-4 py-2">
                                 </div>
                         </div>
 
                         <div id="logopedicaFormContainer" style="display: none;">
-                            
-                            <div class="logopedica-table-container">
-                                <table class="logopedica-table">
-                                    <thead>
+                            <div class="logopedica-table-container overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800">
+                                <table class="logopedica-table w-full">
+                                    <thead class="bg-gray-100 dark:bg-gray-700">
                                         <tr>
-                                            <th>Sunet</th>
-                                            <th>Poziție Inițială</th>
-                                            <th>Poziție Mediană</th>
-                                            <th>Poziție Finală</th>
+                                            <th class="p-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sunet</th>
+                                            <th class="p-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Poziție Inițială</th>
+                                            <th class="p-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Poziție Mediană</th>
+                                            <th class="p-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Poziție Finală</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                                         <tr>
-                                            <td>A</td>
-                                            <td>
-                                                <span class="logo-example-text">arici</span>
-                                                <input type="text" class="logo-input" id="logo_A_init">
+                                            <td class="font-bold text-xl w-20 p-3 text-center align-middle border border-gray-200 dark:border-gray-700">A</td>
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">arici</span>
+                                                <input type="text" class="logo-input w-full max-w-20 p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_A_init">
                                             </td>
-                                            <td>
-                                                <span class="logo-example-text">vaca</span>
-                                                <input type="text" class="logo-input" id="logo_A_med">
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">vaca</span>
+                                                <input type="text" class="logo-input w-full max-w-20 p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_A_med">
                                             </td>
-                                            <td>
-                                                <span class="logo-example-text">perdea</span>
-                                                <input type="text" class="logo-input" id="logo_A_fin">
+                                            <td class="p-3 text-center align-middle border border-gray-200 dark:border-gray-700">
+                                                <span class="logo-example-text block text-xs text-gray-500 dark:text-gray-400 mb-1 italic">perdea</span>
+                                                <input type="text" class="logo-input w-full max-w-20 p-1.5 text-sm bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded text-center" id="logo_A_fin">
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>O</td>
-                                            <td>
-                                                <span class="logo-example-text">olita</span>
-                                                <input type="text" class="logo-input" id="logo_O_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">foc</span>
-                                                <input type="text" class="logo-input" id="logo_O_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">radio</span>
-                                                <input type="text" class="logo-input" id="logo_O_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>U</td>
-                                            <td>
-                                                <span class="logo-example-text">umbrela</span>
-                                                <input type="text" class="logo-input" id="logo_U_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">pui</span>
-                                                <input type="text" class="logo-input" id="logo_U_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">cadou</span>
-                                                <input type="text" class="logo-input" id="logo_U_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>E</td>
-                                            <td>
-                                                <span class="logo-example-text">elefant</span>
-                                                <input type="text" class="logo-input" id="logo_E_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">peste</span>
-                                                <input type="text" class="logo-input" id="logo_E_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">rosie</span>
-                                                <input type="text" class="logo-input" id="logo_E_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>I</td>
-                                            <td>
-                                                <span class="logo-example-text">iepure</span>
-                                                <input type="text" class="logo-input" id="logo_I_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">lingura</span>
-                                                <input type="text" class="logo-input" id="logo_I_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">ardei</span>
-                                                <input type="text" class="logo-input" id="logo_I_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Ă</td>
-                                            <td>
-                                                <span class="logo-example-text">ăla, ăsta (pe care ursulet il vrei?)</span>
-                                                <input type="text" class="logo-input" id="logo_Ah_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">mănuși</span>
-                                                <input type="text" class="logo-input" id="logo_Ah_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">casă</span>
-                                                <input type="text" class="logo-input" id="logo_Ah_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Â/Î</td>
-                                            <td>
-                                                <span class="logo-example-text">îngeraș</span>
-                                                <input type="text" class="logo-input" id="logo_hA_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">pâine</span>
-                                                <input type="text" class="logo-input" id="logo_hA_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">a coborî (Daca nu e a urca e...)</span>
-                                                <input type="text" class="logo-input" id="logo_hA_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>P</td>
-                                            <td>
-                                                <span class="logo-example-text">pară</span>
-                                                <input type="text" class="logo-input" id="logo_P_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">șarpe</span>
-                                                <input type="text" class="logo-input" id="logo_P_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">dulap</span>
-                                                <input type="text" class="logo-input" id="logo_P_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>B</td>
-                                            <td>
-                                                <span class="logo-example-text">balon</span>
-                                                <input type="text" class="logo-input" id="logo_B_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">albină</span>
-                                                <input type="text" class="logo-input" id="logo_B_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">cerb</span>
-                                                <input type="text" class="logo-input" id="logo_B_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>M</td>
-                                            <td>
-                                                <span class="logo-example-text">mașină</span>
-                                                <input type="text" class="logo-input" id="logo_M_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">bomboană</span>
-                                                <input type="text" class="logo-input" id="logo_M_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">pom</span>
-                                                <input type="text" class="logo-input" id="logo_M_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>T</td>
-                                            <td>
-                                                <span class="logo-example-text">tobă</span>
-                                                <input type="text" class="logo-input" id="logo_T_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">autobuz</span>
-                                                <input type="text" class="logo-input" id="logo_T_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">pat</span>
-                                                <input type="text" class="logo-input" id="logo_T_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>D</td>
-                                            <td>
-                                                <span class="logo-example-text">dinozaur</span>
-                                                <input type="text" class="logo-input" id="logo_D_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">crocodil</span>
-                                                <input type="text" class="logo-input" id="logo_D_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">brad</span>
-                                                <input type="text" class="logo-input" id="logo_D_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>N</td>
-                                            <td>
-                                                <span class="logo-example-text">nor</span>
-                                                <input type="text" class="logo-input" id="logo_N_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">cană</span>
-                                                <input type="text" class="logo-input" id="logo_N_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">scaun</span>
-                                                <input type="text" class="logo-input" id="logo_N_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>L</td>
-                                            <td>
-                                                <span class="logo-example-text">leu</span>
-                                                <input type="text" class="logo-input" id="logo_L_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">melc</span>
-                                                <input type="text" class="logo-input" id="logo_L_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">cal</span>
-                                                <input type="text" class="logo-input" id="logo_L_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>F</td>
-                                            <td>
-                                                <span class="logo-example-text">floare</span>
-                                                <input type="text" class="logo-input" id="logo_F_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">telefon</span>
-                                                <input type="text" class="logo-input" id="logo_F_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">cartof</span>
-                                                <input type="text" class="logo-input" id="logo_F_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>V</td>
-                                            <td>
-                                                <span class="logo-example-text">vapor</span>
-                                                <input type="text" class="logo-input" id="logo_V_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">avion</span>
-                                                <input type="text" class="logo-input" id="logo_V_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">morcov</span>
-                                                <input type="text" class="logo-input" id="logo_V_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>S</td>
-                                            <td>
-                                                <span class="logo-example-text">sanie</span>
-                                                <input type="text" class="logo-input" id="logo_S_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">pisică</span>
-                                                <input type="text" class="logo-input" id="logo_S_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">urs</span>
-                                                <input type="text" class="logo-input" id="logo_S_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Z</td>
-                                            <td>
-                                                <span class="logo-example-text">zebră</span>
-                                                <input type="text" class="logo-input" id="logo_Z_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">frunză</span>
-                                                <input type="text" class="logo-input" id="logo_Z_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">autobuz</span>
-                                                <input type="text" class="logo-input" id="logo_Z_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Ț</td>
-                                            <td>
-                                                <span class="logo-example-text">țap</span>
-                                                <input type="text" class="logo-input" id="logo_Tz_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">maimuță</span>
-                                                <input type="text" class="logo-input" id="logo_Tz_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">căluț-leagăn</span>
-                                                <input type="text" class="logo-input" id="logo_Tz_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Ș</td>
-                                            <td>
-                                                <span class="logo-example-text">șervețel</span>
-                                                <input type="text" class="logo-input" id="logo_Sz_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">ușă</span>
-                                                <input type="text" class="logo-input" id="logo_Sz_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">cocoș</span>
-                                                <input type="text" class="logo-input" id="logo_Sz_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>J</td>
-                                            <td>
-                                                <span class="logo-example-text">jucării</span>
-                                                <input type="text" class="logo-input" id="logo_J_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">păianjen</span>
-                                                <input type="text" class="logo-input" id="logo_J_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">ruj</span>
-                                                <input type="text" class="logo-input" id="logo_J_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>C</td>
-                                            <td>
-                                                <span class="logo-example-text">câine</span>
-                                                <input type="text" class="logo-input" id="logo_C_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">muscă</span>
-                                                <input type="text" class="logo-input" id="logo_C_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">porc</span>
-                                                <input type="text" class="logo-input" id="logo_C_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>G</td>
-                                            <td>
-                                                <span class="logo-example-text">găină</span>
-                                                <input type="text" class="logo-input" id="logo_G_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">papagal</span>
-                                                <input type="text" class="logo-input" id="logo_G_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">steag</span>
-                                                <input type="text" class="logo-input" id="logo_G_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>H</td>
-                                            <td>
-                                                <span class="logo-example-text">hipopotam</span>
-                                                <input type="text" class="logo-input" id="logo_H_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">pahar</span>
-                                                <input type="text" class="logo-input" id="logo_H_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">șah</span>
-                                                <input type="text" class="logo-input" id="logo_H_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>R</td>
-                                            <td>
-                                                <span class="logo-example-text">rață</span>
-                                                <input type="text" class="logo-input" id="logo_R_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">carte</span>
-                                                <input type="text" class="logo-input" id="logo_R_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">fular</span>
-                                                <input type="text" class="logo-input" id="logo_R_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>X</td>
-                                            <td>
-                                                <span class="logo-example-text">xilofon</span>
-                                                <input type="text" class="logo-input" id="logo_X_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">boxer</span>
-                                                <input type="text" class="logo-input" id="logo_X_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">pix</span>
-                                                <input type="text" class="logo-input" id="logo_X_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>ce</td>
-                                            <td>
-                                                <span class="logo-example-text">ceas</span>
-                                                <input type="text" class="logo-input" id="logo_CE_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">rinocer</span>
-                                                <input type="text" class="logo-input" id="logo_CE_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">șoarece</span>
-                                                <input type="text" class="logo-input" id="logo_CE_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>ci</td>
-                                            <td>
-                                                <span class="logo-example-text">citește</span>
-                                                <input type="text" class="logo-input" id="logo_CI_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">bicicletă</span>
-                                                <input type="text" class="logo-input" id="logo_CI_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">papuci</span>
-                                                <input type="text" class="logo-input" id="logo_CI_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>ge</td>
-                                            <td>
-                                                <span class="logo-example-text">geam</span>
-                                                <input type="text" class="logo-input" id="logo_GE_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">deget</span>
-                                                <input type="text" class="logo-input" id="logo_GE_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">minge</span>
-                                                <input type="text" class="logo-input" id="logo_GE_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>gi</td>
-                                            <td>
-                                                <span class="logo-example-text">girafă</span>
-                                                <input type="text" class="logo-input" id="logo_GI_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">frigider</span>
-                                                <input type="text" class="logo-input" id="logo_GI_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">covrigi</span>
-                                                <input type="text" class="logo-input" id="logo_GI_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>che</td>
-                                            <td>
-                                                <span class="logo-example-text">cheie</span>
-                                                <input type="text" class="logo-input" id="logo_CHE_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">ochelari</span>
-                                                <input type="text" class="logo-input" id="logo_CHE_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">ridiche</span>
-                                                <input type="text" class="logo-input" id="logo_CHE_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>chi</td>
-                                            <td>
-                                                <span class="logo-example-text">chibrituri</span>
-                                                <input type="text" class="logo-input" id="logo_CHI_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">rochie</span>
-                                                <input type="text" class="logo-input" id="logo_CHI_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">ochi</span>
-                                                <input type="text" class="logo-input" id="logo_CHI_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>ghe</td>
-                                            <td>
-                                                <span class="logo-example-text">ghete</span>
-                                                <input type="text" class="logo-input" id="logo_GHE_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">înghețată</span>
-                                                <input type="text" class="logo-input" id="logo_GHE_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">Gheorghe (Cum il cheama pe baietel? Gheor...?)</span>
-                                                <input type="text" class="logo-input" id="logo_GHE_fin">
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>ghi</td>
-                                            <td>
-                                                <span class="logo-example-text">ghiozdan</span>
-                                                <input type="text" class="logo-input" id="logo_GHI_init">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">unghie</span>
-                                                <input type="text" class="logo-input" id="logo_GHI_med">
-                                            </td>
-                                            <td>
-                                                <span class="logo-example-text">triunghi</span>
-                                                <input type="text" class="logo-input" id="logo_GHI_fin">
-                                            </td>
-                                        </tr>
-                                    </tbody>
+                                        </tbody>
                                 </table>
                             </div>
                             
-                            <div class="form-group" style="margin-top: 1.5rem;">
-                                <label for="logoComentarii">Comentarii Evaluare Logopedică</label>
-                                <textarea id="logoComentarii" class="form-input" rows="4" placeholder="Observații suplimentare..."></textarea>
+                            <div class="form-group mt-6">
+                                <label for="logoComentarii" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Comentarii Evaluare Logopedică</label>
+                                <textarea id="logoComentarii" class="form-input w-full" rows="4" placeholder="Observații suplimentare..."></textarea>
                             </div>
                         </div>
                         
-                        <div class="modal-footer">
+                        <div class="modal-footer mt-6">
                             <button id="cancelEvaluationBtn" type="button" class="btn btn-secondary">Anuleaza</button>
                             <button id="saveEvaluationBtn" type="button" class="btn btn-primary">Salveaza Evaluarea</button>
                         </div>
@@ -1284,7 +648,7 @@
         </div>
     </div>
     
-    <div id="alertModal" class="modal-backdrop modal-small">
+    <div id="alertModal" class="modal-backdrop modal-small hidden">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="alertModalTitle" class="modal-title">Notificare</h2>
@@ -1301,7 +665,7 @@
         </div>
     </div>
     
-    <div id="confirmModal" class="modal-backdrop modal-small">
+    <div id="confirmModal" class="modal-backdrop modal-small hidden">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="confirmModalTitle" class="modal-title">Confirma actiunea</h2>
@@ -1319,7 +683,7 @@
         </div>
     </div>
 
-    <div id="recurringDeleteModal" class="modal-backdrop modal-small">
+    <div id="recurringDeleteModal" class="modal-backdrop modal-small hidden">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="recurringDeleteModalTitle" class="modal-title">Stergere Eveniment Recurent</h2>
@@ -1330,14 +694,51 @@
             <div class="modal-body">
                 <p id="recurringDeleteModalMessage">Acesta este un eveniment recurent. Ce doresti sa stergi?</p>
             </div>
-            <div class="modal-footer column-footer">
-                <button id="recurringDeleteSingle" class="btn btn-primary">Doar acest eveniment</button>
-                <button id="recurringDeleteAll" class="btn btn-danger-outline">Toate evenimentele (din aceasta luna)</button>
-                <button id="recurringDeleteCancel" class="btn btn-secondary">Anuleaza</button>
+            <div class="modal-footer column-footer flex-col !gap-2">
+                <button id="recurringDeleteSingle" class="btn btn-primary w-full">Doar acest eveniment</button>
+                <button id="recurringDeleteAll" class="btn btn-danger-outline w-full">Toate evenimentele (din aceasta luna)</button>
+                <button id="recurringDeleteCancel" class="btn btn-secondary w-full">Anuleaza</button>
             </div>
         </div>
     </div>
-    <!-- (All modal HTML code from original dashboard.html should be included here) -->
+    
+    <div id="paymentModal" class="modal-backdrop modal-small hidden">
+        <div class="modal-content">
+            <form id="paymentForm">
+                <div class="modal-header">
+                    <h2 id="paymentModalTitle" class="modal-title">Adaugă Încasare</h2>
+                    <button id="closePaymentModal" type="button" class="btn-icon btn-close" title="Inchide">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="paymentClientId">
+                    <input type="hidden" id="paymentMonthKey">
+
+                    <div class="form-group mb-4">
+                        <label for="paymentDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Data Încasării</label>
+                        <input type="date" id="paymentDate" class="form-input w-full" required>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="paymentAmount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Sumă (RON)</label>
+                        <input type="number" id="paymentAmount" class="form-input w-full" required min="1" step="1">
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="paymentNotes" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notițe (Opțional)</label>
+                        <input type="text" id="paymentNotes" class="form-input w-full" placeholder="ex: chitanța nr. 123">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancelPaymentBtn" type="button" class="btn btn-secondary">Anulează</button>
+                    <button type="submit" class="btn btn-primary">Salvează Încasarea</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="mobileMenuBackdrop" class="mobile-menu-backdrop md:hidden hidden"></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1377,7 +778,7 @@
             }
 
             if (activityLog.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 dark:text-gray-400 py-4 text-center">Nicio activitate recentă.</p>';
+                container.innerHTML = '<p class="text-center p-8 text-gray-500 dark:text-gray-400">Nicio activitate recentă.</p>';
                 return;
             }
 
@@ -1389,7 +790,7 @@
             };
 
             let html = '';
-            activityLog.forEach(entry => {
+            activityLog.forEach((entry, index) => {
                 const actionType = entry.actionType || 'generic';
                 const icon = icons[actionType] || icons.generic;
                 let actionButton = '';
@@ -1402,25 +803,24 @@
                     actionButton = `<button class="px-3 py-1.5 text-xs md:text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors whitespace-nowrap" data-action="goToClient" data-client-id="${entry.relatedId}">Vezi Client</button>`;
                 }
 
+                const borderClass = index === activityLog.length - 1 ? '' : 'border-b border-gray-200 dark:border-gray-700';
                 html += `
-                <div class="activity-item">
-                    <div class="activity-icon">${icon}</div>
-                    <div class="activity-text">
+                <div class="grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 md:gap-4 py-3 ${borderClass}">
+                    <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">${icon}</div>
+                    <div class="text-sm text-gray-700 dark:text-gray-300 overflow-hidden text-ellipsis whitespace-nowrap">
                         <strong>${entry.action}</strong>: ${entry.details}
                     </div>
-                    <div class="activity-time">${formatTimeAgo(entry.timestamp)}</div>
-                    <div class="activity-action">${actionButton}</div>
+                    <div class="text-xs md:text-sm text-gray-500 dark:text-gray-400 flex-shrink-0 whitespace-nowrap">${formatTimeAgo(entry.timestamp)}</div>
+                    <div class="flex-shrink-0">${actionButton}</div>
                 </div>
                 `;
             });
             container.innerHTML = html;
         }
 
-        // Initialize on DOM load
         document.addEventListener('DOMContentLoaded', () => {
             populateRecentActivity();
 
-            // Quick action buttons
             const quickAddEvent = document.getElementById('quickAddEventBtn');
             const quickAddClient = document.getElementById('quickAddClientBtn');
             const quickAddTeam = document.getElementById('quickAddTeamBtn');
@@ -1452,61 +852,63 @@
                 });
             }
             
-            // Activity action buttons
             const activityContainer = document.getElementById('dashboardRecentActivity');
-            
-            activityContainer.addEventListener('click', (e) => {
-                const button = e.target.closest('button[data-action]');
-                if (!button) return;
+            if (activityContainer) {
+                activityContainer.addEventListener('click', (e) => {
+                    const button = e.target.closest('button[data-action]');
+                    if (!button) return;
 
-                const action = button.dataset.action;
-                
-                if (action === 'goToDate') {
-                    const date = button.dataset.date;
-                    if (!date) return;
+                    const action = button.dataset.action;
                     
-                    import('./js/calendarState.js').then(({ calendarState }) => {
-                        calendarState.setCurrentDate(new Date(date));
-                        calendarState.setCurrentView('day');
-                        document.querySelector('.menu-item[data-view="calendar"]').click();
-                        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-                        const dayBtn = document.querySelector('.view-btn[data-view="day"]');
-                        if(dayBtn) dayBtn.classList.add('active');
-                    });
-                }
-                
-                if (action === 'goToClientEvolution') {
-                    const clientId = button.dataset.clientId;
-                    if (!clientId) return;
+                    if (action === 'goToDate') {
+                        const date = button.dataset.date;
+                        if (!date) return;
+                        
+                        import('./js/calendarState.js').then(({ calendarState }) => {
+                            calendarState.setCurrentDate(new Date(date));
+                            calendarState.setCurrentView('day');
+                            document.querySelector('.menu-item[data-view="calendar"]').click();
+                            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                            const dayBtn = document.querySelector('.view-btn[data-view="day"]');
+                            if(dayBtn) dayBtn.classList.add('active');
+                        });
+                    }
                     
-                    document.querySelector('.menu-item[data-view="client"]').click();
-                    
-                    import('./js/evolutionService.js').then(({ showEvolutionModal }) => {
-                        showEvolutionModal(clientId);
-                    });
-                }
+                    if (action === 'goToClientEvolution') {
+                        const clientId = button.dataset.clientId;
+                        if (!clientId) return;
+                        
+                        document.querySelector('.menu-item[data-view="client"]').click();
+                        
+                        import('./js/evolutionService.js').then(({ showEvolutionModal }) => {
+                            showEvolutionModal(clientId);
+                        });
+                    }
 
-                if (action === 'goToClient') {
-                    const clientId = button.dataset.clientId;
-                    if (!clientId) return;
+                    if (action === 'goToClient') {
+                        const clientId = button.dataset.clientId;
+                        if (!clientId) return;
 
-                    document.querySelector('.menu-item[data-view="client"]').click();
-                    
-                    setTimeout(() => {
-                        const clientCard = document.querySelector(`.client-actions[data-client-id="${clientId}"]`);
-                        if(clientCard) {
-                            clientCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            clientCard.closest('.client-card').style.transition = 'all 0.3s ease';
-                            clientCard.closest('.client-card').style.boxShadow = '0 0 0 3px var(--accent-primary)';
-                            setTimeout(() => {
-                                clientCard.closest('.client-card').style.boxShadow = '';
-                            }, 2000);
-                        }
-                    }, 200);
-                }
-            });
+                        document.querySelector('.menu-item[data-view="client"]').click();
+                        
+                        setTimeout(() => {
+                            const clientCard = document.querySelector(`.client-actions[data-client-id="${clientId}"]`);
+                            if(clientCard) {
+                                clientCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                const cardElement = clientCard.closest('.client-card');
+                                if (cardElement) {
+                                    cardElement.style.transition = 'all 0.3s ease';
+                                    cardElement.style.boxShadow = '0 0 0 3px var(--accent-primary)';
+                                    setTimeout(() => {
+                                        cardElement.style.boxShadow = '';
+                                    }, 2000);
+                                }
+                            }
+                        }, 200);
+                    }
+                });
+            }
         });
     </script>
-    <div id="mobileMenuBackdrop" class="mobile-menu-backdrop md:hidden"></div>
 </body>
 </html>

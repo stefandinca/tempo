@@ -4,7 +4,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            
             padding: 2rem;
         }
         
@@ -61,6 +61,7 @@
         [data-theme="dark"] .role-coordinator { background: #78350f; color: #fef3c7; }
         [data-theme="dark"] .role-admin { background: #831843; color: #fce7f3; }
         [data-theme="dark"] .role-parent { background: #14532d; color: #dcfce7; }
+        [data-theme="dark"] .text-white {color: white;}
         
         .parent-input-container {
             margin-top: 1rem;

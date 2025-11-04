@@ -186,8 +186,8 @@ function renderEvaluationReportsList(clientData, client) {
     // 4. Generează HTML
     if (allEvaluations.length === 0) {
         container.innerHTML = `
-            <h3 class="evolution-summary-title">Rapoarte Evaluări Salvate</h3>
-            <p class="empty-list-message" style="margin-top: 1rem; text-align: center;">Nu există evaluări salvate pentru acest client.</p>
+            <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-4 mt-8 pb-2 border-b border-gray-200 dark:border-gray-700">Rapoarte Evaluări Salvate</h3>
+            <p class="text-gray-500 dark:text-gray-400 p-4 text-center">Nu există evaluări salvate pentru acest client.</p>
         `;
         return;
     }
@@ -196,13 +196,12 @@ function renderEvaluationReportsList(clientData, client) {
         const formattedDate = new Date(ev.date).toLocaleDateString('ro-RO', {
             day: '2-digit', month: '2-digit', year: 'numeric'
         });
-        // Pictograme diferite pentru fiecare tip de raport
         const icon = ev.type === 'portage' 
             ? '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9l-5 5-4-4-6 6"/></svg>'
             : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-megaphone" viewBox="0 0 16 16"><path d="M13 2.5a1.5 1.5 0 0 1 3 0v11a1.5 1.5 0 0 1-3 0v-.214c-2.162-1.241-4.49-1.843-6.912-2.083l.405 2.712A1 1 0 0 1 5.51 15.1h-.548a1 1 0 0 1-.916-.599l-1.85-3.49-.202-.003A2.014 2.014 0 0 1 0 9V7a2.02 2.02 0 0 1 1.992-2.013 75 75 0 0 0 2.483-.075c3.043-.154 6.148-.849 8.525-2.199zm1 0v11a.5.5 0 0 0 1 0v-11a.5.5 0 0 0-1 0m-1 1.35c-2.344 1.205-5.209 1.842-8 2.033v4.233q.27.015.537.036c2.568.189 5.093.744 7.463 1.993zm-9 6.215v-4.13a95 95 0 0 1-1.992.052A1.02 1.02 0 0 0 1 7v2c0 .55.448 1.002 1.006 1.009A61 61 0 0 1 4 10.065m-.657.975 1.609 3.037.01.024h.548l-.002-.014-.443-2.966a68 68 0 0 0-1.722-.082z"/></svg>';
 
         return `
-            <button class="btn btn-action-text evaluation-report-button" data-type="${ev.type}" data-date="${ev.date}">
+            <button class="w-full justify-start btn btn-secondary" data-type="${ev.type}" data-date="${ev.date}">
                 ${icon}
                 <span>${ev.title} - ${formattedDate}</span>
             </button>
@@ -210,8 +209,8 @@ function renderEvaluationReportsList(clientData, client) {
     }).join('');
 
     container.innerHTML = `
-        <h3 class="evolution-summary-title">Rapoarte Evaluări Salvate</h3>
-        <div class="evaluation-report-list">
+        <h3 class="text-base font-semibold text-gray-900 dark:text-white mb-4 mt-8 pb-2 border-b border-gray-200 dark:border-gray-700">Rapoarte Evaluări Salvate</h3>
+        <div class="flex flex-col gap-2 mt-4">
             ${buttonsHTML}
         </div>
     `;
@@ -709,7 +708,7 @@ function renderProgramHistory(clientData) {
 
     const programHistory = clientData.programHistory || [];
     if (programHistory.length === 0) {
-        container.innerHTML = '<div class="program-history-empty">Nu există istoric de programe pentru acest client.</div>';
+        container.innerHTML = '<div class="text-center p-8 text-gray-500 dark:text-gray-400">Nu există istoric de programe pentru acest client.</div>';
         return;
     }
 
@@ -722,20 +721,26 @@ function renderProgramHistory(clientData) {
     });
 
     let html = `
-        <table class="program-history-table">
-            <thead><tr><th>Program</th><th>Data</th><th>Scor</th></tr></thead>
-            <tbody>
+        <table class="w-full">
+            <thead class="bg-gray-100 dark:bg-gray-700">
+                <tr>
+                    <th class="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Program</th>
+                    <th class="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Data</th>
+                    <th class="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Scor</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
     `;
     
     Object.entries(grouped).forEach(([programTitle, entries]) => {
-        entries.slice(0, 10).forEach((entry, index) => { // Limitează la ultimele 10
+        entries.slice(0, 10).forEach((entry, index) => {
             const formattedDate = new Date(entry.date).toLocaleDateString('ro-RO');
-            html += `<tr>`;
+            html += `<tr class="hover:bg-gray-50 dark:hover:bg-gray-700">`;
             if (index === 0) {
-                html += `<td rowspan="${Math.min(entries.length, 10)}">${programTitle}</td>`;
+                html += `<td class="p-3 font-medium text-gray-900 dark:text-white" rowspan="${Math.min(entries.length, 10)}">${programTitle}</td>`;
             }
-            html += `<td>${formattedDate}</td>`;
-            html += `<td><span class="program-history-score" data-score="${entry.score}">${entry.score}</span></td>`;
+            html += `<td class="p-3 text-sm text-gray-500 dark:text-gray-400">${formattedDate}</td>`;
+            html += `<td class="p-3"><span class="inline-flex items-center justify-center font-bold w-7 h-7 rounded border-2" data-score="${entry.score}">${entry.score}</span></td>`;
             html += `</tr>`;
         });
     });
@@ -770,78 +775,70 @@ function renderProgramHistory(clientData) {
         });
 
         // 3. Randează HTML-ul
-        if (eventsWithComments.length === 0) {
-            container.innerHTML = '<p class="private-notes-empty">Nu există notițe private salvate pentru acest client.</p>';
-            return;
+       if (eventsWithComments.length === 0) {
+        container.innerHTML = '<p class="text-center p-8 text-gray-500 dark:text-gray-400">Nu există notițe private salvate pentru acest client.</p>';
+        return;
+    }
+
+       container.innerHTML = eventsWithComments.map(event => {
+        const memberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+        const members = memberIds
+            .map(id => calendarState.getTeamMemberById(id))
+            .filter(Boolean)
+            .map(m => m.name)
+            .join(', ');
+        const formattedDate = new Date(event.date).toLocaleDateString('ro-RO', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+        const time = event.startTime || 'N/A';
+
+        let scoresHtml = '';
+        const programIds = event.programIds || [];
+        const programScores = event.programScores || {};
+
+        if (programIds.length > 0) {
+            // REFACTORED: Replaced .private-note-scores and children
+            scoresHtml = '<div class="flex flex-col gap-2 mb-4 pb-4 border-b border-dashed border-gray-200 dark:border-gray-700">';
+            programIds.forEach(pId => {
+                const program = calendarState.getProgramById(pId);
+                const score = programScores[pId];
+                
+                if (program) {
+                    scoresHtml += `
+                        <div class="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-700 rounded">
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-300">${program.title}</span>
+                    `;
+                    if (score) {
+                        scoresHtml += `<span class="inline-flex items-center justify-center font-bold w-7 h-7 rounded border-2" data-score="${score}">${score}</span>`;
+                    } else {
+                        scoresHtml += `<span class="text-base font-bold text-gray-400 dark:text-gray-500">—</span>`;
+                    }
+                    scoresHtml += `</div>`;
+                }
+            });
+            scoresHtml += '</div>';
         }
 
-        container.innerHTML = eventsWithComments.map(event => {
-            // Găsește terapeuții
-            const memberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
-            const members = memberIds
-                .map(id => calendarState.getTeamMemberById(id))
-                .filter(Boolean) // Elimină membrii negăsiți
-                .map(m => m.name)
-                .join(', ');
-
-            // Formatează data și ora
-            const formattedDate = new Date(event.date).toLocaleDateString('ro-RO', {
-                day: '2-digit', month: '2-digit', year: 'numeric'
-            });
-            const time = event.startTime || 'N/A';
-
-            // --- NOU: LOGICĂ PENTRU SCORURI ---
-            let scoresHtml = '';
-            const programIds = event.programIds || [];
-            const programScores = event.programScores || {};
-
-            if (programIds.length > 0) {
-                scoresHtml = '<div class="private-note-scores">';
-                programIds.forEach(pId => {
-                    const program = calendarState.getProgramById(pId);
-                    const score = programScores[pId];
-                    
-                    if (program) { // Afișăm doar dacă programul există
-                        scoresHtml += `
-                            <div class="note-score-item">
-                                <span class="note-program-title">${program.title}</span>
-                        `;
-                        
-                        if (score) {
-                            // Folosim stilul din programHistory
-                            scoresHtml += `<span class="program-history-score" data-score="${score}">${score}</span>`;
-                        } else {
-                            // Dacă nu e scor, punem un placeholder
-                            scoresHtml += `<span class="note-program-no-score">—</span>`;
-                        }
-                        
-                        scoresHtml += `</div>`;
-                    }
-                });
-                scoresHtml += '</div>';
-            }
-            // --- SFÂRȘIT LOGICĂ SCORURI ---
-
-            return `
-                <div class="private-note-item">
-                    <div class="private-note-header">
-                        <span class="note-meta-item">
-                            Terapeut: <strong>${members || 'Nespecificat'}</strong>
-                        </span>
-                        <span class="note-meta-item">
-                            Data: <strong>${formattedDate}</strong>
-                        </span>
-                        <span class="note-meta-item">
-                            Ora: <strong>${time}</strong>
-                        </span>
-                    </div>
-                    <div class="private-note-body">
-                        ${scoresHtml} ${event.comments}
-                    </div>
+        return `
+            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 border-l-4 border-yellow-300 dark:border-primary rounded-md shadow-sm">
+                <div class="flex flex-wrap justify-between items-center gap-x-4 gap-y-1 p-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 text-sm">
+                    <span class="text-gray-500 dark:text-gray-400 font-medium">
+                        Terapeut: <strong class="text-gray-800 dark:text-gray-100 font-semibold">${members || 'Nespecificat'}</strong>
+                    </span>
+                    <span class="text-gray-500 dark:text-gray-400 font-medium">
+                        Data: <strong class="text-gray-800 dark:text-gray-100 font-semibold">${formattedDate}</strong>
+                    </span>
+                    <span class="text-gray-500 dark:text-gray-400 font-medium">
+                        Ora: <strong class="text-gray-800 dark:text-gray-100 font-semibold">${time}</strong>
+                    </span>
                 </div>
-            `;
-        }).join('');
-    }
+                <div class="p-4 text-gray-800 dark:text-gray-200 text-base leading-relaxed whitespace-pre-wrap">
+                    ${scoresHtml} ${event.comments}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
 // --- Secțiunea Evaluare (Portage) ---
 
@@ -908,12 +905,10 @@ function renderPortageDomains() {
     const evalDate = $('evaluationDateInput').value;
 
     if (!birthDate) {
-        container.innerHTML = '<p>Introduceți data nașterii pentru a afișa itemii.</p>';
-        return;
+container.innerHTML = '<p class="text-center p-4 text-gray-500 dark:text-gray-400">Introduceți data nașterii pentru a afișa itemii.</p>';        return;
     }
     if (!portrigeData || Object.keys(portrigeData).length === 0) {
-        container.innerHTML = '<p>Datele Portage nu sunt disponibile.</p>';
-        return;
+container.innerHTML = '<p class="text-center p-4 text-gray-500 dark:text-gray-400">Datele Portage nu sunt disponibile.</p>';        return;
     }
 
     const ageMonths = getAgeInMonths(birthDate, evalDate);
@@ -921,8 +916,7 @@ function renderPortageDomains() {
     Object.keys(portrigeData).forEach(domain => {
         const items = portrigeData[domain];
         const block = document.createElement('div');
-        block.className = 'domain-block';
-        
+block.className = 'border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 shadow-sm transition-all overflow-hidden';        
         // Group items by age range
         const ageGroups = {};
         items.forEach(item => {
@@ -950,61 +944,64 @@ function renderPortageDomains() {
             let separatorText = formatAgeRange(ageRange, firstItemInGroup.months);
             
             // Start age group
-            const groupHtml = `<div class="portage-age-separator">${separatorText}</div>`;
-            
+            const groupHtml = `<div class="text-left font-bold text-primary p-3.5 bg-gray-100 dark:bg-gray-700/50 text-sm border-t border-gray-200 dark:border-gray-700 sticky top-0 backdrop-blur-sm first:border-t-0">${separatorText}</div>`;            
             // Build items for this group
-            let groupItemsHtml = '';
             groupItems.forEach(item => {
                 const isFuture = item.months > ageMonths;
-
-                // --- START CORECȚIE 1: Logica pentru tag-ul [fin] ---
                 let ageText = `(${item.age})`;
                 if (ageText.includes('(fin)')) {
-                    ageText = ageText.replace(/\(fin\)/gi, '<span class="portage-fin-tag">fin</span>');
+                    // REFACTORED: Replaced .portage-fin-tag
+                    ageText = ageText.replace(/\(fin\)/gi, '<span class="inline-block text-xs font-medium px-1.5 py-0.5 ml-1 rounded bg-primary text-white normal-font align-middle">fin</span>');
                 }
-                // --- END CORECȚIE 1 ---
-
+                
+                // REFACTORED: Replaced .portage-item
+                const disabledClass = isFuture ? 'opacity-50 pointer-events-none bg-gray-50 dark:bg-gray-800/50' : '';
+                const disabledLabel = isFuture ? 'line-through text-gray-400 dark:text-gray-600' : '';
+                
                 groupItemsHtml += `
-                    <div class="portage-item ${isFuture ? 'disabled' : ''}" data-months="${item.months}">
-                        <input type="checkbox" data-domain="${domain}" data-id="${item.id}" ${isFuture ? 'disabled' : ''}>
-                        <label>${item.text} <i>${ageText}</i></label>
+                    <div class="portage-item flex items-start gap-3.5 p-3.5 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 last:border-b-0 ${disabledClass}" data-months="${item.months}">
+                        <input type="checkbox" data-domain="${domain}" data-id="${item.id}" class="scale-125 cursor-pointer flex-shrink-0 mt-1" ${isFuture ? 'disabled' : ''}>
+                        <label class="cursor-pointer flex-1 select-none leading-normal text-sm ${disabledLabel}">${item.text} <i class="text-gray-500 dark:text-gray-400 text-xs not-italic">${ageText}</i></label>
                     </div>
                 `;
             });
             
-            if (isFutureGroup && !showFutureButton) {
-                // This is the first future group - add warning and button
+             if (isFutureGroup && !showFutureButton) {
                 showFutureButton = true;
                 const ageYearsMonths = formatAgeInYearsMonths(ageMonths);
+                // REFACTORED: Replaced .portage-future-warning and .portage-future-toggle
                 futureItemsHtml = `
-                    <div class="portage-future-warning">
-                        <p>Unele iteme din secțiunile următoare sunt pentru vârste mai mari decât ${ageYearsMonths}.</p>
-                        <button type="button" class="domain-toggle-btn portage-future-toggle">Arată iteme viitoare</button>
+                    <div class="bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-300 dark:border-yellow-700 rounded-md p-4 m-4 flex flex-col gap-3 shadow-sm">
+                        <p class="m-0 text-yellow-800 dark:text-yellow-200 font-medium text-sm leading-relaxed">
+                            ⚠️ Unele iteme din secțiunile următoare sunt pentru vârste mai mari decât ${ageYearsMonths}.
+                        </p>
+                        <button type="button" class="portage-future-toggle self-start bg-yellow-400 hover:bg-yellow-500 border border-yellow-500 text-yellow-900 px-3 py-1.5 rounded-md cursor-pointer font-semibold text-xs transition-all shadow-sm">
+                            Arată iteme viitoare
+                        </button>
                     </div>
-                    <div class="portage-future-items collapsed">
+                    <div class="portage-future-items collapsed max-h-0 opacity-0 overflow-hidden transition-all duration-300 ease-in-out">
                         ${groupHtml}
                         ${groupItemsHtml}
                 `;
             } else if (isFutureGroup) {
-                // Continue adding to future items
                 futureItemsHtml += groupHtml + groupItemsHtml;
             } else {
-                // Current/past items
                 itemsHtml += groupHtml + groupItemsHtml;
             }
         });
         
         if (showFutureButton) {
-            futureItemsHtml += '</div>'; // Close portage-future-items
+            futureItemsHtml += '</div>';
             itemsHtml += futureItemsHtml;
         }
 
+        // REFACTORED: Replaced .domain-header and .domain-toggle-btn
         block.innerHTML = `
-            <div class="domain-header">
-                <span>${domain}</span>
-                <button type="button" class="domain-toggle-btn">Arată</button>
+            <div class="domain-header flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-t-lg cursor-pointer font-semibold text-base hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                <span class="flex-1 select-none">${domain}</span>
+                <button type="button" class="domain-toggle-btn bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-300 px-3 py-1.5 rounded-md cursor-pointer text-xs font-semibold transition-all uppercase tracking-wider">Arată</button>
             </div>
-            <div class="checkbox-grid collapsed">${itemsHtml}</div>
+            <div class="checkbox-grid collapsed max-h-0 p-0 opacity-0">${itemsHtml}</div>
         `;
         
         // Toggle domain visibility

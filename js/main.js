@@ -747,27 +747,20 @@ function updateUserInterface() {
 /**
  * Update dashboard schedule for current user
  */
-/**
- * Update dashboard schedule for current user
- */
 function updateDashboardSchedule() {
     const container = $('dashboardTodaySchedule');
     if (!container) return;
     
-    // Obține programul zilei. Pentru admin, auth.getTodaysSchedule()
-    // returnează TOATE evenimentele. Pentru terapeut, le returnează doar pe ale lui.
     const schedule = auth.getTodaysSchedule();
     
     if (auth.isAdmin()) {
         // --- LOGICĂ NOUĂ PENTRU ADMIN ---
-        // Grupăm evenimentele pe terapeut
         container.innerHTML = '';
         const { teamMembers } = calendarState.getState();
         
         let hasAnyEvents = false;
 
         teamMembers.forEach(member => {
-            // Găsește evenimentele pentru acest membru din programul zilei
             const memberEvents = schedule.filter(event => {
                 const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
                 return teamMemberIds.includes(member.id);
@@ -776,10 +769,10 @@ function updateDashboardSchedule() {
             if (memberEvents.length > 0) {
                 hasAnyEvents = true;
                 
-                // Adaugă header-ul terapeutului
-                container.innerHTML += `<h3 class="therapist-group-header" style="color: ${member.color || '#4A90E2'}">${member.name}</h3>`;
+                // REFACTORED: Replaced .therapist-group-header
+                container.innerHTML += `<h3 class="text-base font-bold mt-5 pb-2 border-b-2 border-gray-200 dark:border-gray-700 sticky top-0 bg-white dark:bg-gray-800 first:mt-0" style="color: ${member.color || '#4A90E2'}">${member.name}</h3>`;
                 
-                // Adaugă evenimentele pentru acest terapeut
+                // REFACTORED: Replaced .schedule-item, .schedule-time, etc.
                 container.innerHTML += memberEvents.map(event => {
                     const endTime = calculateEndTime(event.startTime, event.duration);
                     const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
@@ -789,11 +782,11 @@ function updateDashboardSchedule() {
                     }).join(', ');
                     
                    return `
-                        <div class="schedule-item clickable-schedule-item" data-event-id="${event.id}">
-                            <div class="schedule-time">${event.startTime} - ${endTime}</div>
-                            <div class="schedule-details">
-                                <div class="schedule-title">${event.name}</div>
-                                <div class="schedule-client">cu ${clientNames || 'Fără client'}</div>
+                        <div class="clickable-schedule-item flex gap-4 py-3.5 border-b border-gray-200 dark:border-gray-700 last:border-b-0" data-event-id="${event.id}">
+                            <div class="font-semibold text-primary flex-shrink-0 w-24 text-sm md:text-base">${event.startTime} - ${endTime}</div>
+                            <div class="flex-1 min-w-0">
+                                <div class="font-semibold text-gray-900 dark:text-white overflow-hidden text-ellipsis whitespace-nowrap">${event.name}</div>
+                                <div class="text-sm text-gray-600 dark:text-gray-400">cu ${clientNames || 'Fără client'}</div>
                             </div>
                         </div>
                     `;
@@ -802,16 +795,19 @@ function updateDashboardSchedule() {
         });
 
         if (!hasAnyEvents) {
-            container.innerHTML = '<div class="empty-schedule">Nicio sesiune programată pentru astăzi.</div>';
+            // REFACTORED: Replaced .empty-schedule
+            container.innerHTML = '<div class="text-center p-8 text-gray-500 dark:text-gray-400">Nicio sesiune programată pentru astăzi.</div>';
         }
 
     } else {
         // --- LOGICA EXISTENTĂ (PENTRU NON-ADMINI) ---
         if (schedule.length === 0) {
-            container.innerHTML = '<div class="empty-schedule">Nicio sesiune programată pentru astăzi.</div>';
+            // REFACTORED: Replaced .empty-schedule
+            container.innerHTML = '<div class="text-center p-8 text-gray-500 dark:text-gray-400">Nicio sesiune programată pentru astăzi.</div>';
             return;
         }
         
+        // REFACTORED: Replaced .schedule-item, .schedule-time, etc.
         container.innerHTML = schedule.map(event => {
             const endTime = calculateEndTime(event.startTime, event.duration);
             const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
@@ -821,11 +817,11 @@ function updateDashboardSchedule() {
             }).join(', ');
             
             return `
-            <div class="schedule-item clickable-schedule-item" data-event-id="${event.id}">
-                <div class="schedule-time">${event.startTime} - ${endTime}</div>
-                    <div class="schedule-details">
-                        <div class="schedule-title">${event.name}</div>
-                        <div class="schedule-client">cu ${clientNames || 'Fără client'}</div>
+            <div class="clickable-schedule-item flex gap-4 py-3.5 border-b border-gray-200 dark:border-gray-700 last:border-b-0" data-event-id="${event.id}">
+                <div class="font-semibold text-primary flex-shrink-0 w-24 text-sm md:text-base">${event.startTime} - ${endTime}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-semibold text-gray-900 dark:text-white overflow-hidden text-ellipsis whitespace-nowrap">${event.name}</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">cu ${clientNames || 'Fără client'}</div>
                     </div>
                 </div>
             `;
