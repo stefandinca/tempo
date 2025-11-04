@@ -1,0 +1,28 @@
+{
+    "test": {
+        "2025-11": [
+            {
+                "id": "pay_1762174943089",
+                "date": "2025-11-03",
+                "amount": 400,
+                "notes": "aici testez o incasare"
+            },
+            {
+                "id": "pay_1762174949074",
+                "date": "2025-11-03",
+                "amount": 100,
+                "notes": "alta incasare"
+            }
+        ]
+    },
+    "cezar": {
+        "2025-11": [
+            {
+                "id": "pay_1762175823356",
+                "date": "2025-11-03",
+                "amount": 1000,
+                "notes": "- 1,000 de lei bonus de la Mos Craciun"
+            }
+        ]
+    }
+}
