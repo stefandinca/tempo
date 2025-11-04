@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ro" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selectează utilizatorul - Tempo Admin</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
+    <link rel="icon" href="/tempo/vite/assets/icon-BU1uZ7fg.png" type="image/png">
+    
+  <script type="module" crossorigin src="/tempo/vite/assets/login-BVgBP41Y.js"></script>
+  <link rel="modulepreload" crossorigin href="/tempo/vite/assets/style-BhrU7pvw.js">
+  <link rel="stylesheet" crossorigin href="/tempo/vite/assets/style-DNDK3KV9.css">
+</head>
+<body>
+    <div class="w-full max-w-6xl">
+        <div class="text-center mb-12">
+            <img src="/tempo/vite/assets/tempo-logo-dark-BSanhaH9.png" alt="Tempo Logo" class="h-16 mx-auto mb-6">
+            <h1 class="text-4xl font-bold text-white mb-3">Bine ai venit!</h1>
+            <p class="text-xl text-white opacity-90">Selectează contul tău pentru a continua</p>
+        </div>
+        
+        <div id="userCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+        
+        <div class="text-center mt-8">
+            <button id="themeToggle" class="px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+                <span class="ml-2">Schimbă tema</span>
+            </button>
+        </div>
+    </div>
+
+    <div id="parentModal" class="parent-modal">
+        <div class="parent-modal-content">
+            <div class="parent-modal-header">
+                <h2 id="parentModalTitle">Profil Client</h2>
+                <button id="closeParentModal" class="parent-modal-close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="parent-modal-body" id="parentModalContent">
+                </div>
+        </div>
+    </div>
+
+</body>
+</html>
