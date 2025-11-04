@@ -34,12 +34,7 @@
         <div id="userCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             </div>
         
-        <div class="text-center mt-8">
-            <button id="themeToggle" class="px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white rounded-lg transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline-block"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-                <span class="ml-2">Schimbă tema</span>
-            </button>
-        </div>
+       
     </div>
 
     <div id="parentModal" class="parent-modal">
@@ -630,14 +625,7 @@
             window.location.href = 'dashboard.html';
         }
 
-        // Theme toggle
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            html.setAttribute('data-theme', newTheme);
-            localStorage.setItem('calendar-theme', newTheme);
-        });
+      
 
         // Close modal handlers
         document.getElementById('closeParentModal').addEventListener('click', closeParentModal);

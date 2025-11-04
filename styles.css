@@ -1,6 +1,6 @@
 /*
  * ==========================================================
- * OPTIMIZED & REORGANIZED STYLES.CSS - IMPROVED EVENT MODAL
+ * OPTIMIZED & REORGANIZED STYLES.CSS
  * ==========================================================
  *
  * TABLE OF CONTENTS
@@ -8,32 +8,16 @@
  * 0. ROOT & THEME
  * 1. BASE & UTILITIES
  * 2. LAYOUT (ADMIN)
- * - .app-container, .sidebar, .main-content
  * 3. LAYOUT (PUBLIC)
- * - .container, .header, .powered-by
  * 4. COMPONENTS (SHARED)
- * - Buttons (.btn, .btn-icon, .btn-action-text)
- * - View Toggle (.view-toggle)
- * - Navigation (.nav-controls, .nav-buttons)
- * - Filters (.filters-container, .filter-chip)
  * 5. COMPONENTS (CALENDAR)
- * - Month View (.month-view, .day-cell, .event-dot)
- * - Week/Day View (.week-view, .time-grid, .event-block)
  * 6. COMPONENTS (ADMIN PAGES)
- * - Section Layout (.section-header, .section-content-grid)
- * - Client & Team Cards (.client-card, .team-member-card)
  * 7. COMPONENTS (MODALS)
- * - Modal Wrapper (.modal-backdrop)
- * - Modal Content (.modal-content, .modal-header, .modal-body, .modal-footer)
- * - Modal Specifics (.event-details, .attendance-list, .program-score)
  * 8. COMPONENTS (FORMS)
- * - .form-group, .form-input, .checkbox-list, .repeating-days
  * 9. COMPONENTS (EVOLUTION & PORTAGE)
- * - Tabs (.tabs, .tab-button, .tab-content)
- * - Chart & Summary (.chart-container, .evolution-summary, .evolution-table)
- * - Program History (.program-history-table)
- * - Portage/Domain Blocks (.domain-block, .portage-item, .portage-age-separator)
- * 10. RESPONSIVE MEDIA QUERIES
+ * 10. COMPONENTS (BILLING)
+ * 11. COMPONENTS (EVOLUTION EXTRAS)
+ * 12. RESPONSIVE MEDIA QUERIES (CONSOLIDATED)
  *
  * ==========================================================
  */
@@ -61,18 +45,6 @@
   --daniela-color: #E91E63;
   --alexandra-color: #9B59B6;
 }
-
-[data-theme="dark"] {
-  --bg-main: #0F172A;
-  --bg-card: #1E293B;
-  --bg-hover: #334155;
-  --border-color: #475569;
-  --text-primary: #F1F5F9;
-  --text-secondary: #94A3B8;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-hover: 0 4px 6px rgba(0, 0, 0, 0.4);
-}
-
 
 /* ==========================================================
    1. BASE & UTILITIES
@@ -255,8 +227,6 @@ body {
   gap: 1rem;
 }
 
-
-
 /* ==========================================================
    3. LAYOUT (PUBLIC - index.html)
    ========================================================== */
@@ -327,7 +297,6 @@ body.public-view {
   vertical-align: middle;
 }
 
-
 /* ==========================================================
    4. COMPONENTS (SHARED)
    ========================================================== */
@@ -375,8 +344,6 @@ body.public-view {
   border-color: #ef4444;
 }
 .btn-danger-outline:hover { background-color: #fef2f2; }
-
-[data-theme="dark"] .btn-danger-outline:hover { background-color: #450a0a; }
 
 .btn-icon {
   display: inline-flex;
@@ -432,19 +399,6 @@ body.public-view {
     border-color: #ef4444;
     color: #ef4444;
 }
-[data-theme="dark"] .btn-action-text {
-    background: var(--bg-hover);
-    border-color: var(--border-color);
-}
-[data-theme="dark"] .btn-action-text:hover {
-    background: var(--bg-main);
-    border-color: var(--accent-primary);
-}
-[data-theme="dark"] .btn-delete.btn-action-text:hover {
-    background: #450a0a;
-    border-color: #ef4444;
-}
-
 
 /* --- View Toggle --- */
 .view-toggle {
@@ -557,32 +511,12 @@ body.public-view {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
 }
 
-
-[data-theme="dark"] .filter-chip {
-  border-color: var(--bg-card);
-  background-color: var(--bg-card);
-}
-[data-theme="dark"] .filter-chip.active {
-  background-color: transparent;
-}
-[data-theme="dark"] .filters .filter-chip {
-  border-color: var(--border-color);
-  opacity: 0.45;
-  background: var(--bg-hover);
-}
-[data-theme="dark"] .filters .filter-chip.active {
-  opacity: 1;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-  background: var(--bg-card);
-}
-
 .color-dot {
   width: 10px;
   height: 10px;
   border-radius: 50%;
   transition: all 0.2s;
 }
-
 
 /* ==========================================================
    5. COMPONENTS (CALENDAR)
@@ -600,13 +534,19 @@ body.public-view {
   padding: 1.5rem 2rem;
 }
 
-/* --- Month View --- */
-.month-view {
+/* --- Month, Week & Day Views (Refactored) --- */
+.month-view,
+.week-view,
+.day-view {
   background: var(--bg-card);
   border-radius: 0.75rem;
   padding: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   width: 100%;
+}
+.week-view,
+.day-view {
+  overflow-x: auto;
 }
 
 .calendar-grid {
@@ -648,9 +588,7 @@ body.public-view {
   border: 2px solid var(--accent-primary);
   box-shadow: 0 0 0 3px rgba(74,144,226,0.1);
 }
-[data-theme="dark"] .day-cell.current-day {
-  background: linear-gradient(135deg, rgba(74,144,226,0.25) 0%, rgba(74,144,226,0.1) 100%);
-}
+
 .day-cell.current-day .day-number {
   color: var(--accent-primary);
   font-weight: 700;
@@ -685,16 +623,6 @@ body.public-view {
 }
 
 /* --- Week & Day Views --- */
-.week-view,
-.day-view {
-  background: var(--bg-card);
-  border-radius: 0.75rem;
-  padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  overflow-x: auto;
-  width: 100%;
-}
-
 .week-header {
   display: grid;
   grid-template-columns: 80px repeat(7, 1fr);
@@ -774,9 +702,6 @@ body.public-view {
   border: 2px solid currentColor;
   color: inherit;
 }
-[data-theme="dark"] .event-block.public-view {
-  background: rgba(30, 41, 59, 0.9) !important;
-}
 
 .event-block.admin-view {
   color: white;
@@ -810,7 +735,6 @@ body.public-view {
   color: #f1f5f9;
 }
 
-
 .event-initials-container {
   position: absolute;
   top: 0.25rem;
@@ -832,9 +756,6 @@ body.public-view {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
-[data-theme="dark"] .therapist-initials-badge {
-  border: 1px solid rgba(0, 0, 0, 0.3);
-}
 
 /* Day View Specific */
 .day-view .time-slot,
@@ -844,7 +765,6 @@ body.public-view {
 .day-view .event-block {
   max-width: 600px;
 }
-
 
 /* ==========================================================
    6. COMPONENTS (ADMIN PAGES)
@@ -1058,10 +978,6 @@ body.public-view {
   border-color: #ef4444;
   color: #ef4444;
 }
-[data-theme="dark"] .team-member-actions .btn-delete:hover {
-  background: #450a0a;
-}
-
 
 /* ==========================================================
    7. COMPONENTS (MODALS)
@@ -1158,11 +1074,9 @@ body.public-view {
   max-width: 600px;
 }
 
-
 /* --- IMPROVED Modal Grid Layout (Event Modal) --- */
 .modal-body.modal-grid {
   display: grid;
-  
   gap: 2.5rem;
   padding: 2rem 2.5rem;
   max-height: 70vh;
@@ -1190,10 +1104,6 @@ body.public-view {
     var(--border-color) 95%, 
     transparent 100%);
   opacity: 0.5;
-}
-
-[data-theme="dark"] .modal-col:not(:last-child)::after {
-  opacity: 0.3;
 }
 
 /* Section headers with better styling */
@@ -1248,15 +1158,6 @@ body.public-view {
   border-color: var(--accent-primary);
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
 }
-
-[data-theme="dark"] .modal-body.modal-grid .form-input {
-  background: var(--bg-main);
-}
-
-[data-theme="dark"] .modal-body.modal-grid .form-input:focus {
-  background: var(--bg-hover);
-}
-
 
 /* --- Modal Content Details (Details Modal) --- */
 .event-details-section {
@@ -1316,7 +1217,7 @@ body.public-view {
   color: white;
 }
 
-/* --- Attendance --- */
+/* --- Attendance & Program Scoring (Refactored) --- */
 .attendance-list {
   display: flex;
   flex-direction: column;
@@ -1341,37 +1242,64 @@ body.public-view {
   display: flex;
   gap: 0.5rem;
 }
-.attendance-btn {
+
+.attendance-btn,
+.score-btn {
   display: flex;
   align-items: center;
-  gap: 0.375rem;
-  padding: 0.5rem 0.875rem;
+  justify-content: center;
   border: 2px solid var(--border-color);
   background: var(--bg-card);
   color: var(--text-secondary);
   border-radius: 0.375rem;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.875rem;
   cursor: pointer;
   transition: all 0.2s;
 }
-.attendance-btn:not(:disabled):hover {
+.attendance-btn:not(:disabled):hover,
+.score-btn:hover {
   background: var(--bg-hover);
   transform: translateY(-1px);
 }
+
+/* Specifics */
+.attendance-btn {
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+}
+.score-btn {
+  width: 36px;
+  height: 36px;
+}
+
 .attendance-btn.active {
   font-weight: 600;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-.attendance-btn[data-status="present"].active {
+
+/* Active states */
+.attendance-btn[data-status="present"].active,
+.score-btn[data-score="+"].active {
   background: #10b981;
   color: white;
   border-color: #10b981;
 }
-.attendance-btn[data-status="absent"].active {
+.attendance-btn[data-status="absent"].active,
+.score-btn[data-score="0"].active {
   background: #ef4444;
   color: white;
   border-color: #ef4444;
+}
+.score-btn[data-score="-"].active {
+  background: #f59e0b;
+  color: white;
+  border-color: #f59e0b;
+}
+.score-btn[data-score="P"].active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
 }
 
 /* --- Program Scoring --- */
@@ -1395,46 +1323,6 @@ body.public-view {
   display: flex;
   gap: 0.375rem;
 }
-.score-btn {
-  width: 36px;
-  height: 36px;
-  border: 2px solid var(--border-color);
-  background: var(--bg-card);
-  color: var(--text-secondary);
-  border-radius: 0.375rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.score-btn:hover {
-  background: var(--bg-hover);
-  transform: translateY(-1px);
-}
-.score-btn[data-score="0"].active {
-  background: #ef4444;
-  color: white;
-  border-color: #ef4444;
-}
-.score-btn[data-score="-"].active {
-  background: #f59e0b;
-  color: white;
-  border-color: #f59e0b;
-}
-.score-btn[data-score="P"].active {
-  background: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
-}
-.score-btn[data-score="+"].active {
-  background: #10b981;
-  color: white;
-  border-color: #10b981;
-}
-
 
 /* ==========================================================
    8. COMPONENTS (FORMS)
@@ -1480,14 +1368,6 @@ textarea.form-input {
   min-height: 44px;
   display: flex;
   align-items: center;
-}
-
-[data-theme="dark"] .form-input,
-[data-theme="dark"] textarea.form-input {
-  background-color: var(--bg-main);
-}
-[data-theme="dark"] .form-input-static {
-  background-color: var(--bg-main);
 }
 
 .form-grid-2 {
@@ -1542,9 +1422,7 @@ textarea.form-input {
   padding: 0.75rem;
   background: var(--bg-card);
 }
-[data-theme="dark"] .checkbox-list {
-  background: var(--bg-main);
-}
+
 .checkbox-item {
   display: flex;
   align-items: center;
@@ -1579,7 +1457,7 @@ textarea.form-input {
   flex: 1;
 }
 
-/* --- NOU: Stiluri pentru Evaluarea Logopedică --- */
+/* --- Stiluri pentru Evaluarea Logopedică --- */
 .logopedica-table-container {
   overflow-x: auto; /* Adaugă scroll orizontal dacă e nevoie pe ecrane mici */
   border: 1px solid var(--border-color);
@@ -1640,26 +1518,6 @@ textarea.form-input {
   background: var(--bg-card);
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
 }
-
-[data-theme="dark"] .logopedica-table {
-  border-color: #374151;
-}
-[data-theme="dark"] .logopedica-table th,
-[data-theme="dark"] .logopedica-table td {
-  border-color: #374151;
-}
-[data-theme="dark"] .logopedica-table thead th {
-  background: #1f293b;
-  color: #9ca3af;
-}
-[data-theme="dark"] .logo-input {
-  background: #0f172a;
-  border-color: #4b5563;
-}
-[data-theme="dark"] .logo-input:focus {
-  background: #1e293b;
-}
-
 
 /* ==========================================================
    9. COMPONENTS (EVOLUTION & PORTAGE)
@@ -1760,9 +1618,7 @@ textarea.form-input {
 .evolution-table tbody tr:nth-child(odd) {
   background: rgba(0, 0, 0, 0.02);
 }
-[data-theme="dark"] .evolution-table tbody tr:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.04);
-}
+
 .evolution-table tbody tr:hover {
   background: var(--bg-hover);
 }
@@ -1810,7 +1666,6 @@ textarea.form-input {
   text-align: center;
   padding: 2rem;
 }
-
 
 /* --- Portage/Domain Blocks --- */
 #portageDomainsContainer {
@@ -1915,18 +1770,6 @@ textarea.form-input {
   vertical-align: middle;
 }
 
-/* Stil pentru a evidenția vizual item-ul selectat */
-.portage-item.checked {
-  background: linear-gradient(to right, #dbeafe 0%, transparent 100%);
-  border-left: 3px solid #60a5fa;
-  padding-left: calc(1.25rem - 3px);
-}
-
-[data-theme="dark"] .portage-item.checked {
-  background: linear-gradient(to right, rgba(37, 99, 235, 0.2) 0%, transparent 100%);
-  border-left-color: #60a5fa;
-}
-
 .portage-age-separator {
   text-align: left;
   font-weight: 700;
@@ -1969,7 +1812,7 @@ textarea.form-input {
 .portage-item.checked {
   background: linear-gradient(to right, #dbeafe 0%, transparent 100%);
   border-left: 3px solid #60a5fa;
-  padding-left: 1.125rem;
+  padding-left: 1.125rem; /* 1.25rem - 3px */
 }
 .portage-item input[type="checkbox"] {
   transform: scale(1.3);
@@ -2060,79 +1903,7 @@ textarea.form-input {
   color: var(--text-secondary);
 }
 
-/* Dark Theme Portage */
-[data-theme="dark"] .domain-block {
-  border-color: #374151;
-  background: #1f2937;
-}
-[data-theme="dark"] .domain-header {
-  background: #1f2937;
-  color: #f3f4f6;
-}
-[data-theme="dark"] .domain-header:hover {
-  background: #374155;
-  border-bottom-color: #60a5fa;
-}
-[data-theme="dark"] .checkbox-grid {
-  background: #1e293b;
-}
-[data-theme="dark"] .portage-age-separator {
-  color: #93c5fd;
-  background: linear-gradient(to right, #1f2937 0%, transparent 100%);
-  border-top-color: #374151;
-}
-[data-theme="dark"] .portage-item {
-  background: #1f2937;
-  border-bottom-color: #374151;
-  color: #f3f4f6;
-}
-[data-theme="dark"] .portage-item:hover:not(.disabled) {
-  background: #374155;
-}
-[data-theme="dark"] .portage-item.checked {
-  background: linear-gradient(to right, #1e3a8a33 0%, transparent 100%);
-  border-left-color: #60a5fa;
-}
-[data-theme="dark"] .portage-item label i {
-  color: #9ca3af;
-}
-[data-theme="dark"] .portage-future-warning {
-  background: linear-gradient(135deg, #422006 0%, #3b3b0f 100%);
-  border-color: #78350f;
-}
-[data-theme="dark"] .portage-future-warning p {
-  color: #fef9c3;
-}
-[data-theme="dark"] .portage-future-toggle {
-  background: #92400e;
-  border-color: #78350f;
-  color: #fef9c3;
-}
-[data-theme="dark"] .portage-future-toggle:hover {
-  background: #b45309;
-  border-color: #92400e;
-  color: #fffbeb;
-}
-[data-theme="dark"] .portage-item.disabled {
-  background: #374155;
-}
-[data-theme="dark"] .domain-toggle-btn {
-  background: #1f2937;
-  border-color: #4b5563;
-  color: #d1d5db;
-}
-[data-theme="dark"] .domain-toggle-btn:hover {
-  background: #2563eb;
-  color: #f9fafb;
-  border-color: #2563eb;
-}
-[data-theme="dark"] #programHistoryContainer {
-  background: #1e293b;
-}
-
-/* ... (după .evolution-table:hover) ... */
-
-/* NOU: Titlu pentru lista de rapoarte (înlocuiește titlul h3 din .evolution-summary) */
+/* Titlu pentru lista de rapoarte */
 .evolution-summary-title {
   font-size: 1rem;
   font-weight: 600;
@@ -2143,7 +1914,7 @@ textarea.form-input {
   border-bottom: 1px solid var(--border-color);
 }
 
-/* NOU: Lista de butoane pentru rapoarte */
+/* Lista de butoane pentru rapoarte */
 .evaluation-report-list {
   display: flex;
   flex-direction: column;
@@ -2151,7 +1922,7 @@ textarea.form-input {
   margin-top: 1rem;
 }
 
-/* NOU: Buton individual de raport */
+/* Buton individual de raport */
 .evaluation-report-button {
   width: 100%;
   justify-content: flex-start; /* Aliniază textul la stânga */
@@ -2161,11 +1932,8 @@ textarea.form-input {
     cursor: not-allowed;
 }
 
-/* --- Program History --- */
-/* ... (restul stilurilor continuă de aici) ... */
-
 /* ==========================================================
-   9.5 COMPONENTS (BILLING)
+   10. COMPONENTS (BILLING)
    ========================================================== */
 
 #billingCurrentMonth {
@@ -2289,11 +2057,7 @@ textarea.form-input {
     border-color: #fca5a5;
     color: #ef4444;
 }
-[data-theme="dark"] .btn-delete-payment:hover {
-    background: #450a0a;
-    border-color: #7f1d1d;
-    color: #fca5a5;
-}
+
 .no-payments {
     font-size: 0.875rem;
     color: var(--text-secondary);
@@ -2313,10 +2077,8 @@ textarea.form-input {
     font-size: 0.875rem;
 }
 
-
 /* ==========================================================
    11. COMPONENTS (EVOLUTION - PRIVATE NOTES - TEMA LUNARA) 
-   (SECȚIUNE NOU ADĂUGATĂ)
    ========================================================== */
 
  /* Monthly Theme Styles */
@@ -2409,41 +2171,7 @@ textarea.form-input {
     font-size: 0.875rem;
 }
 
-/* Dark mode support (if your app uses dark mode) */
-html[data-theme="dark"] .monthly-theme-form {
-    background: #1f2937;
-    border-color: #374151;
-}
-
-html[data-theme="dark"] .monthly-theme-form h3,
-html[data-theme="dark"] .monthly-theme-history h3 {
-    color: #f9fafb;
-}
-
-html[data-theme="dark"] .monthly-theme-item {
-    background: #1f2937;
-    border-color: #374151;
-}
-
-html[data-theme="dark"] .monthly-theme-text {
-    color: #e5e7eb;
-}
-
-html[data-theme="dark"] .monthly-theme-header {
-    border-bottom-color: #374151;
-}
-
-html[data-theme="dark"] .monthly-theme-actions {
-    border-top-color: #374151;
-}
-
-html[data-theme="dark"] .monthly-theme-empty {
-    background: #1f2937;
-    border-color: #4b5563;
-    color: #9ca3af;
-}
-
-/* NOU: Stiluri pentru lista de scoruri din notiță */
+/* Stiluri pentru lista de scoruri din notiță */
 .private-note-scores {
     display: flex;
     flex-direction: column;
@@ -2465,10 +2193,6 @@ html[data-theme="dark"] .monthly-theme-empty {
 .note-program-title {
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--text-secondary);
-}
-
-[data-theme="dark"] .note-program-title {
     color: var(--text-secondary);
 }
 
@@ -2498,10 +2222,6 @@ html[data-theme="dark"] .monthly-theme-empty {
   border-left: 4px solid var(--accent-secondary);
   border-radius: 0.5rem;
   box-shadow: var(--shadow);
-}
-
-[data-theme="dark"] .private-note-item {
-    border-left-color: var(--accent-primary);
 }
 
 .private-note-header {
@@ -2543,26 +2263,9 @@ html[data-theme="dark"] .monthly-theme-empty {
   padding: 2rem;
 }
 
-
-
 /* ==========================================================
-   10. RESPONSIVE MEDIA QUERIES
+   12. RESPONSIVE MEDIA QUERIES (CONSOLIDATED)
    ========================================================== */
-
-   /* Responsive pt Facturare */
-@media (max-width: 768px) {
-    .financial-summary {
-        grid-template-columns: 1fr;
-    }
-    .payment-item {
-        flex-wrap: wrap;
-    }
-    .payment-item .payment-note {
-        flex-basis: 100%;
-        order: 3;
-        margin-left: 2.5rem; /* Aliniere cu restul */
-    }
-}
 
 /* --- Admin Layout (Tablet) --- */
 @media (max-width: 1024px) {
@@ -2591,17 +2294,17 @@ html[data-theme="dark"] .monthly-theme-empty {
     }
 
     .app-container .sidebar-menu {
-    flex-direction: column; /* FORȚEAZĂ vertical */
-    justify-content: flex-start; /* Aliniază de sus */
-    overflow-y: auto; /* Permite scroll vertical DACA e nevoie */
-    overflow-x: hidden;
-    flex-grow: 1; /* Ocupă spațiul rămas */
-}
+        flex-direction: column; /* FORȚEAZĂ vertical */
+        justify-content: flex-start; /* Aliniază de sus */
+        overflow-y: auto; /* Permite scroll vertical DACA e nevoie */
+        overflow-x: hidden;
+        flex-grow: 1; /* Ocupă spațiul rămas */
+    }
 
-/* NOU: Readaugă spațierea verticală între butoane */
-.app-container .sidebar .menu-item a {
-    margin-bottom: 0.5rem;
-}
+    /* Readaugă spațierea verticală între butoane */
+    .app-container .sidebar .menu-item a {
+        margin-bottom: 0.5rem;
+    }
 
     /* Afișează conținutul sidebar-ului corect în modul flyout */
     .app-container .sidebar .logo-full {
@@ -2644,12 +2347,24 @@ html[data-theme="dark"] .monthly-theme-empty {
 
 /* --- Admin Layout (Mobile) & Public Layout --- */
 @media (max-width: 768px) {
+
+    /* Responsive pt Facturare */
+    .financial-summary {
+        grid-template-columns: 1fr;
+    }
+    .payment-item {
+        flex-wrap: wrap;
+    }
+    .payment-item .payment-note {
+        flex-basis: 100%;
+        order: 3;
+        margin-left: 2.5rem; /* Aliniere cu restul */
+    }
     
-    /* NOU: Forțează scroll orizontal pe calendar pe mobil */
+    /* Forțează scroll orizontal pe calendar pe mobil */
     .month-view,
     .week-view {
         min-width: 800px; /* O lățime minimă care forțează scroll-ul */
-        
     }
     
     /* --- Admin --- */
@@ -2664,33 +2379,31 @@ html[data-theme="dark"] .monthly-theme-empty {
     }
     
      .tabs {
-    overflow-x: auto;   /* Permite scroll orizontal */
-    white-space: nowrap;  /* Împiedică butoanele să treacă pe rândul următor */
-    padding: 0 0.5rem;    /* Micșorează padding-ul lateral al containerului */
-    
-    /* Ascunde bara de scroll vizuală */
-    -ms-overflow-style: none;  /* IE și Edge */
-    scrollbar-width: none;     /* Firefox */
-}
+        overflow-x: auto;   /* Permite scroll orizontal */
+        white-space: nowrap;  /* Împiedică butoanele să treacă pe rândul următor */
+        padding: 0 0.5rem;    /* Micșorează padding-ul lateral al containerului */
+        
+        /* Ascunde bara de scroll vizuală */
+        -ms-overflow-style: none;  /* IE și Edge */
+        scrollbar-width: none;     /* Firefox */
+    }
 
-.tabs::-webkit-scrollbar {
-    display: none;  /* Chrome, Safari, Opera */
-}
+    .tabs::-webkit-scrollbar {
+        display: none;  /* Chrome, Safari, Opera */
+    }
 
-.tab-button {
-    padding: 0.75rem 1rem; /* Micșorează padding-ul butoanelor */
-    font-size: 0.875rem;   /* Micșorează puțin textul */
-    flex-shrink: 0;      /* Împiedică butoanele să se "strângă" */
-}
+    .tab-button {
+      padding: 0.75rem 1rem; /* Micșorează padding-ul butoanelor */
+      font-size: 0.875rem;   /* Micșorează puțin textul */
+      flex-shrink: 0;      /* Împiedică butoanele să se "strângă" */
+    }
 
-
-.chart-container {
-    padding: 0.5rem;       /* Reduce padding-ul pe mobil */
-    min-height: 280px;   /* Forțează o înălțime minimă pentru grafic */
-}
+    .chart-container {
+        padding: 0.5rem;       /* Reduce padding-ul pe mobil */
+        min-height: 280px;   /* Forțează o înălțime minimă pentru grafic */
+    }
 
     .modal-body.modal-grid {
-        
         gap: 1.5rem;
     }
     .modal-col:not(:last-child)::after {
@@ -2701,47 +2414,37 @@ html[data-theme="dark"] .monthly-theme-empty {
     }
     .main-header, .section-header {
         padding: 1rem;
-    /* Am scos: flex-direction: column; align-items: flex-start; */
-    /* NOU: */
-    display: flex;
-    flex-direction: row; /* Asigură alinierea orizontală */
-    align-items: center; /* Centrează vertical */
-    justify-content: space-between; /* Spațiază elementele */
-    gap: 1rem;
+        display: flex;
+        flex-direction: row; /* Asigură alinierea orizontală */
+        align-items: center; /* Centrează vertical */
+        justify-content: space-between; /* Spațiază elementele */
+        gap: 1rem;
     }
 
     .main-header .header-title-group,
-.section-header .header-title-group {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex: 1; /* Permite titlului să crească */
-    min-width: 0; /* Previne depășirea pe ecrane mici */
-}
+    .section-header .header-title-group {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1; /* Permite titlului să crească */
+        min-width: 0; /* Previne depășirea pe ecrane mici */
+    }
 
-.header-title-group h1 {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+    .header-title-group h1 {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
     .period-navigation {
         width: 100%;
         justify-content: space-between;
     }
     .header-actions {
         width: auto; /* Nu mai forța lățimea completă */
-    flex-shrink: 0; /* Nu lăsa acțiunile să se micșoreze */
+        flex-shrink: 0; /* Nu lăsa acțiunile să se micșoreze */
     }
     .event-details-grid {
       grid-template-columns: 1fr;
-    }
-    .tabs {
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-    .tab-button {
-      padding: 0.75rem 1rem;
-      font-size: 0.875rem;
     }
 
     /* --- Public --- */
@@ -2774,138 +2477,80 @@ html[data-theme="dark"] .monthly-theme-empty {
       height: 40px;
     }
 
+    /* --- Tabele responsive (devin carduri) --- */
     .evolution-table {
-    border: none;
-    box-shadow: none;
-}
-.evolution-table thead {
-    /* Ascunde headerele desktop */
-    display: none;
-}
-.evolution-table tr {
-    /* Fiecare rând devine un card */
-    display: block;
-    margin-bottom: 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    box-shadow: var(--shadow);
-    background: var(--bg-card);
-    overflow: hidden; /* Asigură colțurile rotunjite */
+        border: none;
+        box-shadow: none;
+        border-spacing: 0; 
+        min-width: 0; 
+        width: 100%;    
+    }
+    .evolution-table thead {
+        /* Ascunde headerele desktop */
+        display: none;
+    }
+    .evolution-table tr {
+        /* Fiecare rând devine un card */
+        display: block;
+        margin-bottom: 1rem;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow);
+        background: var(--bg-card);
+        overflow: hidden; /* Asigură colțurile rotunjite */
+    }
+    .evolution-table td {
+        /* Afișează celulele ca blocuri (una sub alta) */
+        display: block;
+        padding: 0.75rem 1rem;
+        text-align: right; /* Aliniază valoarea la dreapta */
+        border-bottom: 1px solid var(--border-color);
+        position: relative;
+        padding-left: 50%; /* Fă loc pentru etichetă */
+        min-height: 44px; /* O înălțime minimă pentru lizibilitate */
+        white-space: normal; /* Permite textului să treacă pe rândul următor */
+    }
+    .evolution-table td:last-child {
+        border-bottom: none;
+    }
+    .evolution-table td::before {
+        /* Afișează eticheta (luată din data-label) */
+        content: attr(data-label);
+        position: absolute;
+        left: 1rem;
+        width: 45%; /* Ocupă ~jumătatea din stânga */
+        text-align: left;
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        text-transform: uppercase;
+    }
+
+    /* Resetăm containerul .evolution-summary (acum gol) */
+    .evolution-summary {
+        padding: 0;
+        border: none;
+        box-shadow: none;
+        background: transparent;
+        margin-top: 0;
+    }
+
+    .evolution-table-container {
+        overflow-x: visible;  /* ANULEAZĂ scroll-ul orizontal */
+        border-radius: 0;
+        margin-top: 0;
+        padding-top: 0;
+    }
     
-}
-.evolution-table td {
-    /* Afișează celulele ca blocuri (una sub alta) */
-    display: block;
-    padding: 0.75rem 1rem;
-    text-align: right; /* Aliniază valoarea la dreapta */
-    border-bottom: 1px solid var(--border-color);
-    position: relative;
-    padding-left: 50%; /* Fă loc pentru etichetă */
-    min-height: 44px; /* O înălțime minimă pentru lizibilitate */
-    white-space: normal; /* Permite textului să treacă pe rândul următor */
-}
-.evolution-table td:last-child {
-    border-bottom: none;
-}
-.evolution-table td::before {
-    /* Afișează eticheta (luată din data-label) */
-    content: attr(data-label);
-    position: absolute;
-    left: 1rem;
-    width: 45%; /* Ocupă ~jumătatea din stânga */
-    text-align: left;
-    font-weight: 600;
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-}
-}
+    .tab-content {
+        padding: 0 0.5rem 1rem 0.5rem;
+    }
 
+    .form-grid-3 {
+        grid-template-columns: 1fr; /* Trecem de la 3 coloane la 1 singură */
+    }
 
-
-
-/* --- Admin Cards (Mobile) --- */
-@media (max-width: 768px) {
-
-  /* Resetăm containerul .evolution-summary (acum gol) ca să nu ocupe spațiu */
-.evolution-summary {
-    padding: 0;
-    border: none;
-    box-shadow: none;
-    background: transparent;
-    margin-top: 0;
-}
-
-/* Anulăm stilurile desktop pentru containerul tabelului DQ */
-.evolution-table-container {
-    overflow-x: visible;  /* ANULEAZĂ scroll-ul orizontal */
-    border-radius: 0;
-    margin-top: 0;
-    padding-top: 0;
-}
-
-/* Anulăm lățimea minimă a tabelului pe mobil */
-.evolution-table {
-    min-width: 0; 
-    width: 100%;    
-    border: none;
-    box-shadow: none;
-    border-spacing: 0; 
-}
-
-/* Ascundem headerele desktop */
-.evolution-table thead {
-    display: none; 
-}
-
-/* Transformăm fiecare rând într-un card */
-.evolution-table tr {
-    display: block;
-    margin-bottom: 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.5rem;
-    box-shadow: var(--shadow);
-    background: var(--bg-card);
-    overflow: hidden; 
-}
-
-/* Celulele devin rânduri verticale */
-.evolution-table td {
-    display: block;
-    padding: 0.75rem 1rem;
-    text-align: right; /* Valoarea la dreapta */
-    border-bottom: 1px solid var(--border-color);
-    position: relative;
-    padding-left: 50%; /* Spațiu pentru etichetă */
-    min-height: 44px; 
-    white-space: normal; 
-}
-
-.evolution-table td:last-child {
-    border-bottom: none;
-}
-
-/* Adăugăm eticheta (din data-label) în stânga */
-.evolution-table td::before {
-    content: attr(data-label);
-    position: absolute;
-    left: 1rem;
-    width: 45%; 
-    text-align: left;
-    font-weight: 600;
-    color: var(--text-secondary);
-    font-size: 0.8rem;
-    text-transform: uppercase;
-}
-
-/* Micșorăm padding-ul general al tab-urilor pe mobil */
-.tab-content {
-    padding: 0 0.5rem 1rem 0.5rem;
-}
-
-.form-grid-3 {
-    grid-template-columns: 1fr; /* Trecem de la 3 coloane la 1 singură */
-}
+    /* --- Admin Cards (Mobile) --- */
     .client-card-content,
     .team-member-card-content {
         flex-direction: column;

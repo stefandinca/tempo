@@ -56,11 +56,7 @@
         .role-coordinator { background: #fef3c7; color: #92400e; }
         .role-admin { background: #fce7f3; color: #9f1239; }
         .role-parent { background: #dcfce7; color: #166534; }
-        
-        [data-theme="dark"] .role-therapist { background: #1e3a8a; color: #dbeafe; }
-        [data-theme="dark"] .role-coordinator { background: #78350f; color: #fef3c7; }
-        [data-theme="dark"] .role-admin { background: #831843; color: #fce7f3; }
-        [data-theme="dark"] .role-parent { background: #14532d; color: #dcfce7; }
+    
         
         .parent-input-container {
             margin-top: 1rem;
@@ -89,15 +85,7 @@
             color: #9ca3af;
         }
         
-        [data-theme="dark"] .client-code-input {
-            background: #1f2937;
-            color: #f3f4f6;
-            border-color: #4b5563;
-        }
-        
-        [data-theme="dark"] .client-code-input:focus {
-            border-color: #10b981;
-        }
+    
         
         .view-profile-btn {
             width: 100%;
@@ -151,16 +139,7 @@
             color: #9ca3af;
         }
         
-        [data-theme="dark"] .password-input {
-            background: #1f2937;
-            color: #f3f4f6;
-            border-color: #4b5563;
-        }
-        
-        [data-theme="dark"] .password-input:focus {
-            border-color: #4A90E2;
-        }
-        
+      
         .login-btn {
             width: 100%;
             margin-top: 0.75rem;
@@ -214,10 +193,7 @@
             overflow: hidden;
         }
         
-        [data-theme="dark"] .parent-modal-content {
-            background: #1e293b;
-        }
-        
+   
         .parent-modal-header {
             padding: 2rem;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -266,11 +242,7 @@
             border: 1px solid #e5e7eb;
         }
         
-        [data-theme="dark"] .client-info-section {
-            background: #0f172a;
-            border-color: #334155;
-        }
-        
+      
         .section-title {
             font-size: 1.25rem;
             font-weight: 700;
@@ -280,11 +252,7 @@
             border-bottom: 2px solid #e5e7eb;
         }
         
-        [data-theme="dark"] .section-title {
-            color: #f3f4f6;
-            border-bottom-color: #334155;
-        }
-        
+      
         .client-info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -306,19 +274,14 @@
             letter-spacing: 0.05em;
         }
         
-        [data-theme="dark"] .info-label {
-            color: #9ca3af;
-        }
-        
+      
         .info-value {
             font-size: 1rem;
             font-weight: 500;
             color: #1f2937;
         }
         
-        [data-theme="dark"] .info-value {
-            color: #f3f4f6;
-        }
+     
         
         .error-message {
             padding: 1rem;
@@ -329,10 +292,7 @@
             font-weight: 500;
         }
         
-        [data-theme="dark"] .error-message {
-            background: #450a0a;
-            color: #fecaca;
-        }
+      
         
         .chart-container-parent {
             min-height: 400px;
@@ -342,11 +302,7 @@
             border: 1px solid #e5e7eb;
         }
         
-        [data-theme="dark"] .chart-container-parent {
-            background: #0f172a;
-            border-color: #334155;
-        }
-        
+     
         .program-history-table {
             width: 100%;
             border-collapse: collapse;
@@ -356,10 +312,7 @@
             border: 1px solid #e5e7eb;
         }
         
-        [data-theme="dark"] .program-history-table {
-            background: #0f172a;
-            border-color: #334155;
-        }
+     
         
         .program-history-table th,
         .program-history-table td {
@@ -368,10 +321,7 @@
             border-bottom: 1px solid #e5e7eb;
         }
         
-        [data-theme="dark"] .program-history-table th,
-        [data-theme="dark"] .program-history-table td {
-            border-bottom-color: #334155;
-        }
+      
         
         .program-history-table thead th {
             background: #f9fafb;
@@ -379,10 +329,7 @@
             color: #6b7280;
         }
         
-        [data-theme="dark"] .program-history-table thead th {
-            background: #1e293b;
-            color: #9ca3af;
-        }
+      
         
         .program-history-score {
             display: inline-flex;
@@ -416,10 +363,7 @@
             text-align: center;
         }
         
-        [data-theme="dark"] .stat-card {
-            background: #1e293b;
-            border-color: #334155;
-        }
+   
         
         .stat-value {
             font-size: 2rem;
@@ -429,9 +373,7 @@
             margin-bottom: 0.5rem;
         }
         
-        [data-theme="dark"] .stat-value {
-            color: #f3f4f6;
-        }
+       
         
         .stat-value.hours { color: #4A90E2; }
         .stat-value.present { color: #10b981; }
@@ -445,9 +387,7 @@
             letter-spacing: 0.05em;
         }
         
-        [data-theme="dark"] .stat-label {
-            color: #9ca3af;
-        }
+       
         
         .schedule-list {
             display: flex;
@@ -469,10 +409,7 @@
             transition: all 0.2s;
         }
         
-        [data-theme="dark"] .schedule-item {
-            background: #1e293b;
-            border-color: #334155;
-        }
+        
         
         .schedule-item:hover {
             border-color: #4A90E2;
@@ -485,9 +422,7 @@
             font-size: 0.875rem;
         }
         
-        [data-theme="dark"] .schedule-date {
-            color: #f3f4f6;
-        }
+       
         
         .schedule-time {
             font-size: 0.75rem;
@@ -495,9 +430,7 @@
             margin-top: 0.25rem;
         }
         
-        [data-theme="dark"] .schedule-time {
-            color: #9ca3af;
-        }
+   
         
         .schedule-status {
             display: flex;
@@ -527,15 +460,7 @@
             color: #991b1b;
         }
         
-        [data-theme="dark"] .status-badge.present {
-            background: #14532d;
-            color: #dcfce7;
-        }
-        
-        [data-theme="dark"] .status-badge.absent {
-            background: #450a0a;
-            color: #fecaca;
-        }
+       
         
         .month-selector {
             display: flex;
@@ -548,9 +473,7 @@
             border-radius: 0.5rem;
         }
         
-        [data-theme="dark"] .month-selector {
-            background: #1e293b;
-        }
+       
         
         .month-selector button {
             padding: 0.5rem;
@@ -564,11 +487,7 @@
             justify-content: center;
         }
         
-        [data-theme="dark"] .month-selector button {
-            background: #0f172a;
-            border-color: #334155;
-            color: #f3f4f6;
-        }
+    
         
         .month-selector button:hover {
             background: #4A90E2;
@@ -584,7 +503,5 @@
             text-align: center;
         }
         
-        [data-theme="dark"] .month-selector span {
-            color: #f3f4f6;
-        }
+      
    

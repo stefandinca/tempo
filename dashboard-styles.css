@@ -17,9 +17,7 @@
     border-bottom: 1px solid #e5e7eb;
 }
 
-[data-theme="dark"] .stat-item {
-    border-bottom-color: #374151;
-}
+
 
 .stat-item:last-child {
     border-bottom: 0;
@@ -31,9 +29,7 @@
     font-size: 0.875rem;
 }
 
-[data-theme="dark"] .stat-label {
-    color: #9ca3af;
-}
+
 
 .stat-value {
     font-size: 1.5rem;
@@ -56,9 +52,6 @@
     border-bottom: 1px solid #e5e7eb;
 }
 
-[data-theme="dark"] .schedule-item {
-    border-bottom-color: #374151;
-}
 
 .schedule-item:last-child {
     border-bottom: 0;
@@ -91,18 +84,14 @@
     white-space: nowrap;
 }
 
-[data-theme="dark"] .schedule-title {
-    color: #f3f4f6;
-}
+
 
 .schedule-client {
     font-size: 0.875rem;
     color: #4b5563;
 }
 
-[data-theme="dark"] .schedule-client {
-    color: #9ca3af;
-}
+
 
 .empty-schedule {
     text-align: center;
@@ -110,9 +99,7 @@
     color: #6b7280;
 }
 
-[data-theme="dark"] .empty-schedule {
-    color: #9ca3af;
-}
+
 
 /* Activity item styling */
 .activity-item {
@@ -131,9 +118,7 @@
     }
 }
 
-[data-theme="dark"] .activity-item {
-    border-bottom-color: #374151;
-}
+
 
 .activity-item:last-child {
     border-bottom: 0;
@@ -150,9 +135,7 @@
     flex-shrink: 0;
 }
 
-[data-theme="dark"] .activity-icon {
-    background-color: #1f2937;
-}
+
 
 .activity-text {
     font-size: 0.875rem;
@@ -162,9 +145,7 @@
     white-space: nowrap;
 }
 
-[data-theme="dark"] .activity-text {
-    color: #d1d5db;
-}
+
 
 .activity-time {
     font-size: 0.75rem;
@@ -179,9 +160,7 @@
     }
 }
 
-[data-theme="dark"] .activity-time {
-    color: #9ca3af;
-}
+
 
 .activity-action {
     flex-shrink: 0;
@@ -212,11 +191,6 @@
     background-color: white; 
 }
 
-/* Stiluri pentru tema dark */
-[data-theme="dark"] .therapist-group-header {
-    border-bottom-color: #374151; /* dark:border-gray-700 */
-    background-color: #1f2937; /* dark:bg-gray-800 */
-}
 
 /* Elimină marginea de sus pentru primul header din listă */
 #dashboardTodaySchedule .therapist-group-header:first-child {
@@ -233,9 +207,7 @@
     background-color: #f8f9fa; /* --bg-hover */
 }
 
-[data-theme="dark"] .clickable-schedule-item:hover {
-    background-color: #334155; /* dark: --bg-hover */
-}
+
 
 /* Stil adăugat pentru scroll în Activitate Recentă */
 #dashboardRecentActivity {
