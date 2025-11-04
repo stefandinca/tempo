@@ -2477,6 +2477,15 @@ textarea.form-input {
       height: 40px;
     }
 
+   
+
+    /* 4. Micsorează padding-ul secțiunilor din interior */
+    .client-info-section,
+    .chart-container-parent {
+        padding: 1rem; /* Redus de la 1.5rem */
+    }
+
+
     /* --- Tabele responsive (devin carduri) --- */
     .evolution-table {
         border: none;

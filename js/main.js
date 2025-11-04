@@ -117,7 +117,7 @@ function generateClientId(fullName, birthDate) {
         dateSuffix = String(Math.floor(1000 + Math.random() * 9000));
     }
     
-    return `${firstName}_${dateSuffix}`;
+    return `${firstName}${dateSuffix}`;
 }
 
 // --- Navigare Principală (Tab-uri) ---

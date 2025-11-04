@@ -503,5 +503,30 @@
             text-align: center;
         }
         
-      
-   
+      @media (max-width:768px) {
+    /*-----Stiluri pentru parinte-----*/
+    /* 1. Elimină padding-ul exterior al modalului */
+    .parent-modal {
+        padding: 0;
+    }
+
+    /* 2. Face conținutul modalului să ocupe tot ecranul */
+    .parent-modal-content {
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh; /* Ocupă toată înălțimea ecranului */
+        margin: 0;          /* Elimină marginile */
+        border-radius: 0;   /* Elimină colțurile rotunjite */
+        box-shadow: none;   /* Elimină umbra */
+    }
+
+    /* 3. Reduce padding-ul pentru header și corpul modalului */
+    .parent-modal-header {
+        padding: 1rem 1.5rem;
+    }
+
+    .parent-modal-body {
+        padding: 1.5rem; /* Redus de la 2rem */
+        max-height: none;  /* Permite scroll pe tot corpul paginii */
+    }
+}
