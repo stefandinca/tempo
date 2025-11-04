@@ -103,6 +103,13 @@ try {
                     // Convertim 'isPublic' și 'isBillable' înapoi în boolean pentru JS
                     $event['isPublic'] = (bool)$event['isPublic'];
                     $event['isBillable'] = (bool)$event['isBillable'];
+
+                    // !!! ADAUGĂ ACESTE 3 LINII AICI !!!
+                    // --- CORECȚIE PENTRU FORMATUL OREI (hh:mm:ss -> hh:mm) ---
+                    if (!empty($event['startTime'])) {
+                        $event['startTime'] = substr($event['startTime'], 0, 5);
+                    }
+                    // --- SFÂRȘIT CORECȚIE ---
                 }
 
                 $data['events'] = $events;

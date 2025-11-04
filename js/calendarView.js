@@ -278,106 +278,117 @@ function renderEventsInGrid(days, viewElement, onEventClick) {
             const overlapCount = group.length;
             
             group.forEach((event, eventIndex) => {
-                const [startHour, startMinute] = event.startTime.split(':').map(Number);
-                
-                // Găsește containerul corect (celula orei de început)
-                const containerSelector = `.event-container[data-date="${dateStr}"][data-hour="${startHour}"]`;
-                const container = viewElement.querySelector(containerSelector);
-                
-                if (!container) return; // Evenimentul este în afara orelor (ex. înainte de 8:00)
+                // --- MODIFICARE 1: Parsare mai robustă a orei ---
+            // În loc de: const [startHour, startMinute] = event.startTime.split(':').map(Number);
+            const timeParts = event.startTime.split(':').map(Number);
+            const startHour = timeParts[0] || 0;
+            const startMinute = timeParts[1] || 0;
 
-                // --- Obține membrii vizibili ---
-                const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
-                const members = teamMemberIds.map(id => calendarState.getTeamMemberById(id)).filter(m => m);
-                
-                const visibleMembers = activeFilters.length === 0 
-                    ? members 
-                    : members.filter(m => activeFilters.includes(m.id));
-                
-                // Dacă niciun membru vizibil (din cauza filtrării), nu randa evenimentul
-                if (visibleMembers.length === 0) return;
-                
-                const primaryMember = visibleMembers[0]; // Folosim primul membru vizibil pentru culoare
-                
-                // --- Creează blocul evenimentului ---
-                const eventBlock = document.createElement('div');
-                eventBlock.className = 'event-block';
-                eventBlock.classList.add(`event-type-${event.type}`); // Pentru stilare (ex. zi liberă)
-                
-                // --- Stilizare Admin vs Public ---
-                if (isAdminView) {
-                    eventBlock.classList.add('admin-view');
+            // --- MODIFICARE 2: Creăm un string formatat pentru afișare ---
+            const formattedStartTime = `${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`;
+            
+            // Găsește containerul corect (celula orei de început)
+            // Această logică este acum corectă deoarece startHour este parsat corect
+            const containerSelector = `.event-container[data-date="${dateStr}"][data-hour="${startHour}"]`;
+            const container = viewElement.querySelector(containerSelector);
+            
+            if (!container) return; // Evenimentul este în afara orelor (ex. înainte de 8:00)
+
+            // --- Obține membrii vizibili ---
+            const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+            const members = teamMemberIds.map(id => calendarState.getTeamMemberById(id)).filter(m => m);
+            
+            const visibleMembers = activeFilters.length === 0 
+                ? members 
+                : members.filter(m => activeFilters.includes(m.id));
+            
+            // Dacă niciun membru vizibil (din cauza filtrării), nu randa evenimentul
+            if (visibleMembers.length === 0) return;
+            
+            const primaryMember = visibleMembers[0]; // Folosim primul membru vizibil pentru culoare
+            
+            // --- Creează blocul evenimentului ---
+            const eventBlock = document.createElement('div');
+            eventBlock.className = 'event-block';
+            eventBlock.classList.add(`event-type-${event.type}`); // Pentru stilare (ex. zi liberă)
+            
+            // --- Stilizare Admin vs Public ---
+            if (isAdminView) {
+                eventBlock.classList.add('admin-view');
+                eventBlock.style.backgroundColor = primaryMember.color;
+                eventBlock.style.borderLeft = `3px solid ${primaryMember.color}`;
+            } else {
+                if (event.isPublic) {
+                    eventBlock.classList.add('admin-view'); // Stil public=admin
                     eventBlock.style.backgroundColor = primaryMember.color;
                     eventBlock.style.borderLeft = `3px solid ${primaryMember.color}`;
                 } else {
-                    if (event.isPublic) {
-                        eventBlock.classList.add('admin-view'); // Stil public=admin
-                        eventBlock.style.backgroundColor = primaryMember.color;
-                        eventBlock.style.borderLeft = `3px solid ${primaryMember.color}`;
-                    } else {
-                        eventBlock.classList.add('public-view'); // Stil privat
-                        eventBlock.style.borderColor = primaryMember.color;
-                        eventBlock.style.color = primaryMember.color;
-                    }
+                    eventBlock.classList.add('public-view'); // Stil privat
+                    eventBlock.style.borderColor = primaryMember.color;
+                    eventBlock.style.color = primaryMember.color;
                 }
-                
-                // --- Poziționare și dimensiune ---
-                // Poziția 'top' este relativă la începutul orei (ex. 8:30)
-                const topOffset = (startMinute / 60) * 60; // 60px = înălțimea unei ore (din CSS)
-                const height = (event.duration / 60) * 60;
-                
-                eventBlock.style.top = `${topOffset}px`;
-                eventBlock.style.height = `${height}px`;
+            }
+            
+            // --- Poziționare și dimensiune ---
+            // Poziția 'top' este relativă la începutul orei (ex. 8:30)
+            const topOffset = (startMinute / 60) * 60; // 60px = înălțimea unei ore (din CSS)
+            const height = (event.duration / 60) * 60;
+            
+            eventBlock.style.top = `${topOffset}px`;
+            eventBlock.style.height = `${height}px`;
 
-                // Lățime și poziție 'left' pentru suprapuneri
-                if (overlapCount > 1) {
-                    const widthPercent = 100 / overlapCount;
-                    const leftPercent = widthPercent * eventIndex;
-                    eventBlock.style.width = `${widthPercent}%`;
-                    eventBlock.style.left = `${leftPercent}%`;
-                } else {
-                    eventBlock.style.width = '100%';
-                    eventBlock.style.left = '0';
-                }
+            // Lățime și poziție 'left' pentru suprapuneri
+            if (overlapCount > 1) {
+                const widthPercent = 100 / overlapCount;
+                const leftPercent = widthPercent * eventIndex;
+                eventBlock.style.width = `${widthPercent}%`;
+                eventBlock.style.left = `${leftPercent}%`;
+            } else {
+                eventBlock.style.width = '100%';
+                eventBlock.style.left = '0';
+            }
 
-                const endTime = calculateEndTime(event.startTime, event.duration);
+            const endTime = calculateEndTime(event.startTime, event.duration);
+            
+            // --- Conținutul blocului ---
+            const initialsHtml = visibleMembers.map(m => 
+                `<span class="therapist-initials-badge" style="background-color: ${m.color};" title="${m.name}">${m.initials}</span>`
+            ).join('');
+            
+            if (isAdminView) {
+                const publicBadge = event.isPublic ? '<span class="event-badge public">PUBLIC</span>' : '';
+                const billableBadge = event.isBillable === false ? '<span class="event-badge non-billable" title="Non-billable"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bluesky" viewBox="0 0 16 16"><path d="M3.468 1.948C5.303 3.325 7.276 6.118 8 7.616c.725-1.498 2.698-4.29 4.532-5.668C13.855.955 16 .186 16 2.632c0 .489-.28 4.105-.444 4.692-.572 2.04-2.653 2.561-4.504 2.246 3.236.551 4.06 2.375 2.281 4.2-3.376 3.464-4.852-.87-5.23-1.98-.07-.204-.103-.3-.103-.218 0-.081-.033.014-.102.218-.379 1.11-1.855 5.444-5.231 1.98-1.778-1.825-.955-3.65 2.28-4.2-1.85.315-3.932-.205-4.503-2.246C.28 6.737 0 3.12 0 2.632 0 .186 2.145.955 3.468 1.948"/></svg></span>' : ''; // Simbol $ sau â‚
                 
-                // --- Conținutul blocului ---
-                const initialsHtml = visibleMembers.map(m => 
-                    `<span class="therapist-initials-badge" style="background-color: ${m.color};" title="${m.name}">${m.initials}</span>`
-                ).join('');
+                // --- MODIFICARE 3: Folosim formattedStartTime ---
+                eventBlock.innerHTML = `
+                    <div class="event-initials-container">${initialsHtml}</div>
+                    <div class="event-time">${formattedStartTime} - ${endTime}</div>
+                    <div class="event-title">${event.name}${publicBadge}${billableBadge}</div>
+                `;
+                // Click handler pentru admin
+                eventBlock.addEventListener('click', () => onEventClick(event.id));
                 
-                if (isAdminView) {
-                    const publicBadge = event.isPublic ? '<span class="event-badge public">PUBLIC</span>' : '';
-                    const billableBadge = event.isBillable === false ? '<span class="event-badge non-billable" title="Non-billable"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bluesky" viewBox="0 0 16 16"><path d="M3.468 1.948C5.303 3.325 7.276 6.118 8 7.616c.725-1.498 2.698-4.29 4.532-5.668C13.855.955 16 .186 16 2.632c0 .489-.28 4.105-.444 4.692-.572 2.04-2.653 2.561-4.504 2.246 3.236.551 4.06 2.375 2.281 4.2-3.376 3.464-4.852-.87-5.23-1.98-.07-.204-.103-.3-.103-.218 0-.081-.033.014-.102.218-.379 1.11-1.855 5.444-5.231 1.98-1.778-1.825-.955-3.65 2.28-4.2-1.85.315-3.932-.205-4.503-2.246C.28 6.737 0 3.12 0 2.632 0 .186 2.145.955 3.468 1.948"/></svg></span>' : ''; // Simbol $ sau â‚
-                    
+            } else {
+                // Public view
+                if (event.isPublic) {
+                    // --- MODIFICARE 4: Folosim formattedStartTime ---
                     eventBlock.innerHTML = `
                         <div class="event-initials-container">${initialsHtml}</div>
-                        <div class="event-time">${event.startTime} - ${endTime}</div>
-                        <div class="event-title">${event.name}${publicBadge}${billableBadge}</div>
+                        <div class="event-time">${formattedStartTime} - ${endTime}</div>
+                        <div class="event-title">${event.name}</div>
                     `;
-                    // Click handler pentru admin
+                    // Click handler pentru evenimente publice
                     eventBlock.addEventListener('click', () => onEventClick(event.id));
-                    
                 } else {
-                    // Public view
-                    if (event.isPublic) {
-                        eventBlock.innerHTML = `
-                            <div class="event-initials-container">${initialsHtml}</div>
-                            <div class="event-time">${event.startTime} - ${endTime}</div>
-                            <div class="event-title">${event.name}</div>
-                        `;
-                        // Click handler pentru evenimente publice
-                        eventBlock.addEventListener('click', () => onEventClick(event.id));
-                    } else {
-                        eventBlock.innerHTML = `
-                            <div class="event-initials-container">${initialsHtml}</div>
-                            <div class="event-time">${event.startTime} - ${endTime}</div>
-                            <div class="event-title" style="font-style: italic;">Ocupat</div>
-                        `;
-                        // Fără click handler pentru evenimente private
-                    }
+                    // --- MODIFICARE 5: Folosim formattedStartTime ---
+                    eventBlock.innerHTML = `
+                        <div class="event-initials-container">${initialsHtml}</div>
+                        <div class="event-time">${formattedStartTime} - ${endTime}</div>
+                        <div class="event-title" style="font-style: italic;">Ocupat</div>
+                    `;
+                    // Fără click handler pentru evenimente private
                 }
+            }
                 
                 container.appendChild(eventBlock);
             });
