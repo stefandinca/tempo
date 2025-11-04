@@ -2409,6 +2409,40 @@ textarea.form-input {
     font-size: 0.875rem;
 }
 
+/* Dark mode support (if your app uses dark mode) */
+html[data-theme="dark"] .monthly-theme-form {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+html[data-theme="dark"] .monthly-theme-form h3,
+html[data-theme="dark"] .monthly-theme-history h3 {
+    color: #f9fafb;
+}
+
+html[data-theme="dark"] .monthly-theme-item {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+html[data-theme="dark"] .monthly-theme-text {
+    color: #e5e7eb;
+}
+
+html[data-theme="dark"] .monthly-theme-header {
+    border-bottom-color: #374151;
+}
+
+html[data-theme="dark"] .monthly-theme-actions {
+    border-top-color: #374151;
+}
+
+html[data-theme="dark"] .monthly-theme-empty {
+    background: #1f2937;
+    border-color: #4b5563;
+    color: #9ca3af;
+}
+
 /* NOU: Stiluri pentru lista de scoruri din notiță */
 .private-note-scores {
     display: flex;

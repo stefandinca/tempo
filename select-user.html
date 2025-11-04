@@ -294,6 +294,30 @@
             const year = currentScheduleDate.getFullYear();
             const month = currentScheduleDate.getMonth();
             const monthName = currentScheduleDate.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
+
+            // --- NOU: Logica pentru Tema Lunară ---
+            // Creează cheia pentru luna curentă (format YYYY-MM)
+            const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+            let themeHTML = ''; // Inițializează ca gol
+            
+            // Verifică dacă există date despre teme și dacă există o temă pentru luna curentă
+            if (clientData.evolution && clientData.evolution.monthlyThemes) {
+                const themeText = clientData.evolution.monthlyThemes[monthKey];
+                
+                if (themeText) {
+                    // Am găsit o temă pentru această lună. Creăm HTML-ul.
+                    // Folosim stiluri inline inspirate din styles.css pentru un aspect similar
+                    themeHTML = `
+                        <div class="monthly-theme-parent" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e5e7eb); border-left: 4px solid #4A90E2; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; box-shadow: var(--shadow, 0 2px 4px rgba(0,0,0,0.05));">
+                            <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: #4A90E2; text-transform: uppercase; font-weight: 700;">Tema lunii ${monthName}</h4>
+                            <p style="white-space: pre-wrap; margin: 0; line-height: 1.6; color: var(--text-primary, #374151); font-size: 1rem;">
+                                ${themeText.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
+                            </p>
+                        </div>
+                    `;
+                }
+            }
+            // --- SFÂRȘIT NOU ---
             
             const stats = calculateMonthlyStats(clientData.events, clientData.client.id, year, month);
             
@@ -311,7 +335,7 @@
                         </button>
                     </div>
                     
-                    <div class="schedule-stats-grid">
+                    ${themeHTML} <div class="schedule-stats-grid">
                         <div class="stat-card">
                             <div class="stat-value hours">${stats.totalHours}</div>
                             <div class="stat-label">Ore Totale</div>

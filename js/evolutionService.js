@@ -41,6 +41,8 @@ export async function showEvolutionModal(clientId) {
     // Continuăm cu deschiderea modalului
     $('evolutionTitle').textContent = `Evoluție - ${client.name}`;
     evolutionModal.style.display = 'flex';
+
+    
     
     // Asigură-te că primul tab este activ
     activateTab('tabGrafice');
@@ -50,9 +52,11 @@ export async function showEvolutionModal(clientId) {
     renderEvaluationReportsList(clientData, client);
     renderProgramHistory(clientData);
     renderPrivateNotes(client.id);
+    renderMonthlyThemeHistory(clientData);
     
     // Pregătește modalul de evaluare
     await setupEvaluationTab(client);
+    setupMonthlyThemeTab();
 }
 
 /**
@@ -843,6 +847,139 @@ function renderProgramHistory(clientData) {
         }).join('');
     }
 
+    // --- Secțiunea Temă Lunară ---
+
+/**
+ * NOU: Randează istoricul temelor lunare în tab-ul corespunzător.
+ * @param {object} clientData Datele de evoluție complete ale clientului.
+ */
+function renderMonthlyThemeHistory(clientData) {
+    const container = $('monthlyThemeHistoryContainer');
+    if (!container) return;
+
+    const themes = clientData.monthlyThemes || {};
+    // Sortează lunile în ordine cronologică inversă (cele mai noi primele)
+    const sortedMonths = Object.keys(themes).sort((a, b) => b.localeCompare(a));
+
+    if (sortedMonths.length === 0) {
+        container.innerHTML = '<p class="empty-list-message" style="text-align: center; margin-top: 1rem;">Nu există teme lunare salvate.</p>';
+        return;
+    }
+
+    // Helper pentru a formata "YYYY-MM" în "Luna An" (ex: "Noiembrie 2025")
+    const formatMonth = (monthKey) => {
+        const [year, month] = monthKey.split('-');
+        // Creăm o dată sigură (folosind ziua 1)
+        const date = new Date(year, month - 1, 1);
+        return date.toLocaleDateString('ro-RO', { 
+            month: 'long', 
+            year: 'numeric' 
+        });
+    };
+
+    container.innerHTML = sortedMonths.map(monthKey => {
+        // Asigură afișarea corectă a textului și previne XSS simplu
+        const themeText = themes[monthKey]
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+            
+        return `
+            <div class="monthly-theme-item" style="border-bottom: 1px solid #eee; padding: 1rem 0;">
+                <h4 class="monthly-theme-date" style="font-weight: 600; margin-bottom: 0.5rem; color: #333;">
+                    ${formatMonth(monthKey)}
+                </h4>
+                <p class="monthly-theme-content" style="white-space: pre-wrap; margin: 0; line-height: 1.6;">
+                    ${themeText}
+                </p>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * NOU: Inițializează valorile implicite pentru tab-ul "Temă Lunară".
+ * Setează luna curentă în input și golește câmpul de text.
+ */
+function setupMonthlyThemeTab() {
+    const monthInput = $('monthlyThemeMonth');
+    if (monthInput) {
+        const now = new Date();
+        const year = now.getFullYear();
+        // Adaugă '0' la început pentru lunile 1-9
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        monthInput.value = `${year}-${month}`;
+    }
+    
+    const textInput = $('monthlyThemeText');
+    if (textInput) {
+        textInput.value = ''; // Golește textul la deschiderea modalului
+    }
+}
+
+/**
+ * NOU: Salvează tema lunara pentru clientul curent.
+ */
+async function saveMonthlyTheme() {
+    const month = $('monthlyThemeMonth').value;
+    const text = $('monthlyThemeText').value;
+
+    if (!currentClientId) {
+        showCustomAlert('Eroare: Niciun client selectat.', 'Eroare');
+        return;
+    }
+    if (!month) {
+        showCustomAlert('Selectați luna pentru care doriți să salvați tema.', 'Atenție');
+        return;
+    }
+    if (!text.trim()) {
+        showCustomAlert('Introduceți textul temei.', 'Atenție');
+        return;
+    }
+
+    const { evolutionData } = calendarState.getState();
+    const client = calendarState.getClientById(currentClientId);
+
+    // Asigură-te că structura de bază există în obiectul evolutionData
+    if (!evolutionData[currentClientId]) {
+        evolutionData[currentClientId] = { 
+            name: client.name, 
+            evaluations: {}, 
+            programHistory: [], 
+            monthlyThemes: {} 
+        };
+    }
+    if (!evolutionData[currentClientId].monthlyThemes) {
+        evolutionData[currentClientId].monthlyThemes = {};
+    }
+
+    // Salvează sau actualizează tema pentru luna respectivă
+    evolutionData[currentClientId].monthlyThemes[month] = text.trim();
+
+    // Actualizează starea locală
+    calendarState.setEvolutionData(evolutionData);
+
+    try {
+        // Salvează pe server (în evolution.json)
+        await api.saveEvolutionData(evolutionData);
+        showCustomAlert('Tema lunară a fost salvată cu succes!', 'Succes');
+
+        // Re-randează istoricul pentru a reflecta noua adăugare
+        renderMonthlyThemeHistory(evolutionData[currentClientId]);
+        
+        // Golește câmpul de text după salvare
+        $('monthlyThemeText').value = '';
+
+        // Opcțional: înregistrează activitatea
+        if (window.logActivity) {
+            window.logActivity("Temă lunară salvată", client.name, 'evaluation', currentClientId);
+        }
+
+    } catch (err) {
+        console.error('Eroare la salvarea temei lunare:', err);
+        showCustomAlert('Nu s-a putut salva tema lunară pe server.', 'Eroare');
+    }
+}
+
 // --- Secțiunea Evaluare (Portage) ---
 
 /**
@@ -1291,6 +1428,10 @@ $('childBirthDateInput')?.addEventListener('change', () => {
     updateChildAgeDisplay($('childBirthDateInput').value);
     renderPortageDomains();
 });
+
+// Listener pentru salvarea temei lunare
+$('saveMonthlyThemeBtn')?.addEventListener('click', saveMonthlyTheme);
+
 $('evaluationDateInput')?.addEventListener('change', () => {
     updateChildAgeDisplay($('childBirthDateInput').value);
     renderPortageDomains();
