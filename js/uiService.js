@@ -1024,8 +1024,7 @@ function calculateClientHours(clientId, events, currentDate) {
         return eventDate.getFullYear() === year && eventDate.getMonth() === month;
     });
     
-    const totalMinutes = monthEvents.reduce((sum, event) => sum + (event.duration || 0), 0);
-    return (totalMinutes / 60).toFixed(1);
+const totalMinutes = monthEvents.reduce((sum, event) => sum + (Number(event.duration) || 0), 0);    return (totalMinutes / 60).toFixed(1);
 }
 
 function formatDateISO(date) {
