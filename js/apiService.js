@@ -77,7 +77,7 @@ export async function saveData(data) {
  */
 export async function loadPrograms() {
     // api.php are o regulă care încarcă fișiere .json
-    return apiFetch('programs.json');
+    return apiFetch('programs');
 }
 
 /**
@@ -87,7 +87,7 @@ export async function loadPrograms() {
 export async function loadEvolutionData() {
     // Logica din calendar.js încarcă direct 'evolution.json'
     // Folosim api.php pentru a-l încărca
-    return apiFetch('evolution.json');
+    return apiFetch('evolution');
 }
 
 /**

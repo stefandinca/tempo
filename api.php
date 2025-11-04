@@ -1,52 +1,29 @@
 <?php
 /**
- * Therapy Calendar API - PHP Backend
+ * Therapy Calendar API - PHP Backend (MySQL Version)
  * Provides RESTful API for calendar data management
  */
 
-// Enable error reporting for debugging (disable in production)
+// Erori (dezactivează 'display_errors' în producție)
 error_reporting(E_ALL);
-ini_set('display_errors', 0); // Set to 0 in production
+ini_set('display_errors', 1); // Setează pe 0 în producție
 ini_set('log_errors', 1);
 
-// CORS headers - adjust for production
+// CORS headers
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
+
+// Include conexiunea la baza de date
+// @ in caz că $pdo este definit deja (deși nu ar trebui)
+@include 'db.php'; 
 
 // ---------- Cache control helpers ----------
 function setNoCacheHeaders() {
-    // Prevent browsers/CDNs from caching responses
     header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
     header('Pragma: no-cache');
     header('Expires: 0');
     header('Content-Type: application/json; charset=utf-8');
-}
-
-/**
- * Send ETag/Last-Modified based on a file, and handle conditional GET.
- * If client validators match, responds 304 and exits.
- */
-function setValidationHeadersFromFile($filePath) {
-    if (!is_file($filePath)) {
-        return;
-    }
-    clearstatcache(true, $filePath);
-    $mtime = filemtime($filePath);
-    $size  = filesize($filePath);
-    $etag  = '"' . md5($filePath . '|' . $mtime . '|' . $size) . '"';
-
-    header('ETag: ' . $etag);
-    header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $mtime) . ' GMT');
-
-    $ifNoneMatch = isset($_SERVER['HTTP_IF_NONE_MATCH']) ? trim($_SERVER['HTTP_IF_NONE_MATCH']) : null;
-    $ifModified  = isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) ? strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) : null;
-
-    if (($ifNoneMatch && $ifNoneMatch === $etag) || ($ifModified && $ifModified >= $mtime)) {
-        setNoCacheHeaders();
-        http_response_code(304);
-        exit();
-    }
 }
 
 // Handle preflight requests early
@@ -54,38 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     setNoCacheHeaders();
     http_response_code(200);
     exit();
-}
-
-// Data file path
-$dataFile = __DIR__ . '/data.json';
-
-/**
- * Read data from JSON file
- */
-function readData($dataFile) {
-    if (!file_exists($dataFile)) {
-        return [
-            'teamMembers' => [],
-            'clients' => [],
-            'events' => []
-        ];
-    }
-
-    $content = file_get_contents($dataFile);
-    $decoded = json_decode($content, true);
-    return is_array($decoded) ? $decoded : [
-        'teamMembers' => [],
-        'clients' => [],
-        'events' => []
-    ];
-}
-
-/**
- * Write data to JSON file
- */
-function writeData($dataFile, $data) {
-    $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-    return file_put_contents($dataFile, $json) !== false;
 }
 
 /**
@@ -110,337 +55,297 @@ $method = $_SERVER['REQUEST_METHOD'];
 $path   = isset($_GET['path']) ? $_GET['path'] : '';
 $input  = json_decode(file_get_contents('php://input'), true);
 
+// Asigură-te că $pdo există
+if (!isset($pdo)) {
+    sendError('Database connection object is not available.', 500);
+}
+
 // Route requests
 try {
     switch ($path) {
+        
+        // ==========================================================
+        // CAZUL 'data' (GET) - Citește totul din DB
+        // ==========================================================
         case 'data':
             if ($method === 'GET') {
-                // Validators derived from data.json
-                setValidationHeadersFromFile($dataFile);
-                $data = readData($dataFile);
+                $data = [];
+
+                // 1. Obține teamMembers
+                $data['teamMembers'] = $pdo->query("SELECT * FROM team_members")->fetchAll();
+
+                // 2. Obține clients
+                $data['clients'] = $pdo->query("SELECT * FROM clients")->fetchAll();
+
+                // 3. Obține events și legăturile lor (folosind GROUP_CONCAT)
+                $stmt = $pdo->query("
+                    SELECT 
+                        e.*,
+                        e.repeating_json as repeating,
+                        GROUP_CONCAT(DISTINCT etm.team_member_id) as teamMemberIds,
+                        GROUP_CONCAT(DISTINCT ec.client_id) as clientIds,
+                        GROUP_CONCAT(DISTINCT ep.program_id) as programIds
+                    FROM events e
+                    LEFT JOIN event_team_members etm ON e.id = etm.event_id
+                    LEFT JOIN event_clients ec ON e.id = ec.event_id
+                    LEFT JOIN event_programs ep ON e.id = ep.event_id
+                    GROUP BY e.id
+                ");
+                
+                $events = $stmt->fetchAll();
+                
+                // Procesează string-urile din GROUP_CONCAT în array-uri
+                foreach ($events as &$event) {
+                    $event['teamMemberIds'] = $event['teamMemberIds'] ? explode(',', $event['teamMemberIds']) : [];
+                    $event['clientIds'] = $event['clientIds'] ? explode(',', $event['clientIds']) : [];
+                    $event['programIds'] = $event['programIds'] ? explode(',', $event['programIds']) : [];
+                    $event['repeating'] = $event['repeating'] ? json_decode($event['repeating']) : [];
+                    // Convertim 'isPublic' și 'isBillable' înapoi în boolean pentru JS
+                    $event['isPublic'] = (bool)$event['isPublic'];
+                    $event['isBillable'] = (bool)$event['isBillable'];
+                }
+
+                $data['events'] = $events;
                 sendResponse($data);
 
+            // ==========================================================
+            // CAZUL 'data' (POST) - Salvează totul în DB (Metoda Truncate)
+            // ==========================================================
             } elseif ($method === 'POST') {
                 if (!$input) {
                     sendError('Invalid JSON data', 400);
                 }
 
-                if (writeData($dataFile, $input)) {
+                try {
+                    $pdo->beginTransaction();
+
+                    // 1. Șterge datele vechi (cu TRUNCATE pentru a reseta și auto-increment, dar necesită permisiuni)
+                    // Folosim DELETE pentru compatibilitate mai largă cu cheile străine
+                    $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
+                    $pdo->exec("TRUNCATE TABLE event_team_members;");
+                    $pdo->exec("TRUNCATE TABLE event_clients;");
+                    $pdo->exec("TRUNCATE TABLE event_programs;");
+                    $pdo->exec("TRUNCATE TABLE events;");
+                    $pdo->exec("TRUNCATE TABLE clients;");
+                    $pdo->exec("TRUNCATE TABLE team_members;");
+                    $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
+
+                    // 2. Inserează team_members
+                    $stmt_team = $pdo->prepare("INSERT INTO team_members (id, name, color, initials, role) VALUES (?, ?, ?, ?, ?)");
+                    foreach ($input['teamMembers'] as $m) {
+                        $stmt_team->execute([$m['id'], $m['name'], $m['color'], $m['initials'], $m['role']]);
+                    }
+
+                    // 3. Inserează clients
+                    $stmt_client = $pdo->prepare("INSERT INTO clients (id, name, email, phone, birthDate, medical) VALUES (?, ?, ?, ?, ?, ?)");
+                    foreach ($input['clients'] as $c) {
+                        // Asigură-te că data este null dacă e goală
+                        $birthDate = !empty($c['birthDate']) ? $c['birthDate'] : null;
+                        $stmt_client->execute([$c['id'], $c['name'], $c['email'], $c['phone'], $birthDate, $c['medical'] ?? '']);
+                    }
+
+                    // 4. Inserează events și joncțiunile
+                    $stmt_evt = $pdo->prepare("INSERT INTO events (id, name, details, type, date, startTime, duration, isPublic, isBillable, repeating_json, comments) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt_evt_team = $pdo->prepare("INSERT INTO event_team_members (event_id, team_member_id) VALUES (?, ?)");
+                    $stmt_evt_client = $pdo->prepare("INSERT INTO event_clients (event_id, client_id) VALUES (?, ?)");
+                    $stmt_evt_prog = $pdo->prepare("INSERT INTO event_programs (event_id, program_id) VALUES (?, ?)");
+
+                    foreach ($input['events'] as $e) {
+                        $stmt_evt->execute([
+                            $e['id'], $e['name'] ?? null, $e['details'] ?? null, $e['type'] ?? 'therapy', 
+                            $e['date'], $e['startTime'] ?? null, $e['duration'] ?? null,
+                            isset($e['isPublic']) ? (int)$e['isPublic'] : 0, 
+                            isset($e['isBillable']) ? (int)$e['isBillable'] : 1, 
+                            json_encode($e['repeating'] ?? []), $e['comments'] ?? null
+                        ]);
+                        
+                        foreach ($e['teamMemberIds'] ?? [] as $id) { $stmt_evt_team->execute([$e['id'], $id]); }
+                        foreach ($e['clientIds'] ?? [] as $id) { $stmt_evt_client->execute([$e['id'], $id]); }
+                        foreach ($e['programIds'] ?? [] as $id) { $stmt_evt_prog->execute([$e['id'], $id]); }
+                    }
+
+                    $pdo->commit();
                     sendResponse(['success' => true, 'message' => 'Data saved successfully']);
-                } else {
-                    sendError('Failed to write data');
+
+                } catch (Exception $e) {
+                    $pdo->rollBack();
+                    sendError('Failed to write data (transaction failed): ' . $e->getMessage());
                 }
             } else {
                 sendError('Unsupported method', 405);
             }
             break;
 
-        case 'events':
-            $data = readData($dataFile);
-
-            if ($method === 'POST') {
-                // Add event
-                if (!isset($input['id'])) {
-                    sendError('Event ID is required', 400);
-                }
-
-                if (!isset($data['events']) || !is_array($data['events'])) {
-                    $data['events'] = [];
-                }
-
-                $data['events'][] = $input;
-
-                if (writeData($dataFile, $data)) {
-                    sendResponse(['success' => true, 'event' => $input]);
-                } else {
-                    sendError('Failed to add event');
-                }
-
-            } elseif ($method === 'PUT' && isset($_GET['id'])) {
-                // Update event
-                $eventId = $_GET['id'];
-                $found = false;
-
-                if (!isset($data['events']) || !is_array($data['events'])) {
-                    $data['events'] = [];
-                }
-
-                foreach ($data['events'] as &$event) {
-                    if (isset($event['id']) && $event['id'] === $eventId) {
-                        $event = array_merge($event, $input ?? []);
-                        $found = true;
-                        break;
-                    }
-                }
-                unset($event);
-
-                if ($found) {
-                    if (writeData($dataFile, $data)) {
-                        sendResponse(['success' => true, 'event' => $eventId]);
-                    } else {
-                        sendError('Failed to update event');
-                    }
-                } else {
-                    sendError('Event not found', 404);
-                }
-
-            } elseif ($method === 'DELETE' && isset($_GET['id'])) {
-                // Delete event
-                $eventId = $_GET['id'];
-                $initialCount = isset($data['events']) && is_array($data['events']) ? count($data['events']) : 0;
-
-                $data['events'] = array_values(array_filter($data['events'] ?? [], function($e) use ($eventId) {
-                    return isset($e['id']) && $e['id'] !== $eventId;
-                }));
-
-                if (count($data['events']) < $initialCount) {
-                    if (writeData($dataFile, $data)) {
-                        sendResponse(['success' => true, 'message' => 'Event deleted']);
-                    } else {
-                        sendError('Failed to delete event');
-                    }
-                } else {
-                    sendError('Event not found', 404);
-                }
-            } else {
-                sendError('Unsupported method', 405);
-            }
-            break;
-
-        case 'clients':
-            $data = readData($dataFile);
-
-            if (!isset($data['clients']) || !is_array($data['clients'])) {
-                $data['clients'] = [];
-            }
-
-            if ($method === 'POST') {
-                // Add client
-                if (!isset($input['id'])) {
-                    sendError('Client ID is required', 400);
-                }
-
-                $data['clients'][] = $input;
-
-                if (writeData($dataFile, $data)) {
-                    sendResponse(['success' => true, 'client' => $input]);
-                } else {
-                    sendError('Failed to add client');
-                }
-
-            } elseif ($method === 'PUT' && isset($_GET['id'])) {
-                // Update client
-                $clientId = $_GET['id'];
-                $found = false;
-
-                foreach ($data['clients'] as &$client) {
-                    if (isset($client['id']) && $client['id'] === $clientId) {
-                        $client = array_merge($client, $input ?? []);
-                        $found = true;
-                        break;
-                    }
-                }
-                unset($client);
-
-                if ($found) {
-                    if (writeData($dataFile, $data)) {
-                        sendResponse(['success' => true, 'client' => $clientId]);
-                    } else {
-                        sendError('Failed to update client');
-                    }
-                } else {
-                    sendError('Client not found', 404);
-                }
-
-            } elseif ($method === 'DELETE' && isset($_GET['id'])) {
-                // Delete client
-                $clientId = $_GET['id'];
-                $initialCount = count($data['clients']);
-
-                $data['clients'] = array_values(array_filter($data['clients'], function($c) use ($clientId) {
-                    return isset($c['id']) && $c['id'] !== $clientId;
-                }));
-
-                // Remove clientId from events
-                if (!isset($data['events']) || !is_array($data['events'])) {
-                    $data['events'] = [];
-                }
-                foreach ($data['events'] as &$event) {
-                    if (isset($event['clientId']) && $event['clientId'] === $clientId) {
-                        unset($event['clientId']);
-                    }
-                }
-                unset($event);
-
-                if (count($data['clients']) < $initialCount) {
-                    if (writeData($dataFile, $data)) {
-                        sendResponse(['success' => true, 'message' => 'Client deleted']);
-                    } else {
-                        sendError('Failed to delete client');
-                    }
-                } else {
-                    sendError('Client not found', 404);
-                }
-            } else {
-                sendError('Unsupported method', 405);
-            }
-            break;
-
-        case 'team':
-            $data = readData($dataFile);
-
-            if (!isset($data['teamMembers']) || !is_array($data['teamMembers'])) {
-                $data['teamMembers'] = [];
-            }
-
-            if ($method === 'POST') {
-                // Add team member
-                if (!isset($input['id'])) {
-                    sendError('Team member ID is required', 400);
-                }
-
-                $data['teamMembers'][] = $input;
-
-                if (writeData($dataFile, $data)) {
-                    sendResponse(['success' => true, 'member' => $input]);
-                } else {
-                    sendError('Failed to add team member');
-                }
-
-            } elseif ($method === 'PUT' && isset($_GET['id'])) {
-                // Update team member
-                $memberId = $_GET['id'];
-                $found = false;
-
-                foreach ($data['teamMembers'] as &$member) {
-                    if (isset($member['id']) && $member['id'] === $memberId) {
-                        $member = array_merge($member, $input ?? []);
-                        $found = true;
-                        break;
-                    }
-                }
-                unset($member);
-
-                if ($found) {
-                    if (writeData($dataFile, $data)) {
-                        sendResponse(['success' => true, 'member' => $memberId]);
-                    } else {
-                        sendError('Failed to update team member');
-                    }
-                } else {
-                    sendError('Team member not found', 404);
-                }
-
-            } elseif ($method === 'DELETE' && isset($_GET['id'])) {
-                // Delete team member
-                $memberId = $_GET['id'];
-                $initialCount = count($data['teamMembers']);
-
-                $data['teamMembers'] = array_values(array_filter($data['teamMembers'], function($m) use ($memberId) {
-                    return isset($m['id']) && $m['id'] !== $memberId;
-                }));
-
-                // Remove their events
-                if (!isset($data['events']) || !is_array($data['events'])) {
-                    $data['events'] = [];
-                }
-                $data['events'] = array_values(array_filter($data['events'], function($e) use ($memberId) {
-                    return !isset($e['teamMemberId']) || $e['teamMemberId'] !== $memberId;
-                }));
-
-                if (count($data['teamMembers']) < $initialCount) {
-                    if (writeData($dataFile, $data)) {
-                        sendResponse(['success' => true, 'message' => 'Team member deleted']);
-                    } else {
-                        sendError('Failed to delete team member');
-                    }
-                } else {
-                    sendError('Team member not found', 404);
-                }
-            } else {
-                sendError('Unsupported method', 405);
-            }
-            break;
-
+        // ==========================================================
+        // CAZUL 'evolution'
+        // ==========================================================
         case 'evolution':
-            $evolutionFile = __DIR__ . '/evolution.json';
-
             if ($method === 'GET') {
-                setValidationHeadersFromFile($evolutionFile);
-                if (file_exists($evolutionFile)) {
-                    $content = file_get_contents($evolutionFile);
-                    $decoded = json_decode($content, true);
-                    sendResponse(is_array($decoded) ? $decoded : []);
-                } else {
-                    sendError('Evolution data not found', 404);
+                $evolutionData = [];
+
+                // 1. Portage
+                $stmt_portage = $pdo->query("SELECT * FROM portage_evaluations");
+                while ($row = $stmt_portage->fetch()) {
+                    $evolutionData[$row['client_id']]['evaluations'][$row['domain']][$row['eval_date']] = (int)$row['score'];
                 }
+
+                // 2. Program History
+                $stmt_history = $pdo->query("SELECT * FROM program_history ORDER BY eval_date DESC");
+                while ($row = $stmt_history->fetch()) {
+                    $evolutionData[$row['client_id']]['programHistory'][] = [
+                        "date" => $row['eval_date'],
+                        "programId" => $row['program_id'],
+                        "score" => $row['score'],
+                        "eventId" => $row['event_id']
+                    ];
+                }
+
+                // 3. Logopedic
+                $stmt_logo = $pdo->query("SELECT * FROM logopedic_evaluations");
+                while ($row = $stmt_logo->fetch()) {
+                    $evolutionData[$row['client_id']]['evaluationsLogopedica'][$row['eval_date']] = [
+                        'scores' => json_decode($row['scores_json'], true),
+                        'comments' => $row['comments']
+                    ];
+                }
+
+                // 4. Monthly Themes
+                $stmt_theme = $pdo->query("SELECT * FROM monthly_themes");
+                while ($row = $stmt_theme->fetch()) {
+                    $evolutionData[$row['client_id']]['monthlyThemes'][$row['month_key']] = $row['theme_text'];
+                }
+                
+                sendResponse($evolutionData);
 
             } elseif ($method === 'POST') {
-                if (!$input) {
-                    sendError('Invalid JSON data', 400);
-                }
+                try {
+                    $pdo->beginTransaction();
+                    
+                    // Șterge datele vechi
+                    $pdo->exec("TRUNCATE TABLE portage_evaluations;");
+                    $pdo->exec("TRUNCATE TABLE program_history;");
+                    $pdo->exec("TRUNCATE TABLE logopedic_evaluations;");
+                    $pdo->exec("TRUNCATE TABLE monthly_themes;");
 
-                $json = json_encode($input, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                if (file_put_contents($evolutionFile, $json) !== false) {
+                    $stmt_portage = $pdo->prepare("INSERT INTO portage_evaluations (client_id, domain, eval_date, score) VALUES (?, ?, ?, ?)");
+                    $stmt_history = $pdo->prepare("INSERT INTO program_history (client_id, event_id, program_id, score, eval_date) VALUES (?, ?, ?, ?, ?)");
+                    $stmt_logo = $pdo->prepare("INSERT INTO logopedic_evaluations (client_id, eval_date, scores_json, comments) VALUES (?, ?, ?, ?)");
+                    $stmt_theme = $pdo->prepare("INSERT INTO monthly_themes (client_id, month_key, theme_text) VALUES (?, ?, ?)");
+
+                    // Inserează datele noi
+                    foreach ($input as $clientId => $data) {
+                        foreach ($data['evaluations'] ?? [] as $domain => $dates) {
+                            foreach ($dates as $date => $score) {
+                                $stmt_portage->execute([$clientId, $domain, $date, $score]);
+                            }
+                        }
+                        foreach ($data['programHistory'] ?? [] as $entry) {
+                            $stmt_history->execute([$clientId, $entry['eventId'], $entry['programId'], $entry['score'], $entry['date']]);
+                        }
+                        foreach ($data['evaluationsLogopedica'] ?? [] as $date => $entry) {
+                            $stmt_logo->execute([$clientId, $date, json_encode($entry['scores']), $entry['comments']]);
+                        }
+                        foreach ($data['monthlyThemes'] ?? [] as $monthKey => $text) {
+                            $stmt_theme->execute([$clientId, $monthKey, $text]);
+                        }
+                    }
+                    
+                    $pdo->commit();
                     sendResponse(['success' => true, 'message' => 'Evolution data saved']);
-                } else {
-                    sendError('Failed to write evolution data');
+                } catch (Exception $e) {
+                    $pdo->rollBack();
+                    sendError('Failed to write evolution data: ' . $e->getMessage());
                 }
-
-            } else {
-                sendError('Unsupported method', 405);
             }
             break;
 
-            case 'billings':
-            $billingFile = __DIR__ . '/billings.json';
-
+        // ==========================================================
+        // CAZUL 'billings'
+        // ==========================================================
+        case 'billings':
             if ($method === 'GET') {
-                setValidationHeadersFromFile($billingFile);
-                if (file_exists($billingFile)) {
-                    $content = file_get_contents($billingFile);
-                    $decoded = json_decode($content, true);
-                    sendResponse(is_array($decoded) ? $decoded : (object)[]); // Trimite obiect gol
-                } else {
-                    sendResponse((object)[]); // Trimite obiect gol dacă fișierul nu există
+                $stmt = $pdo->query("SELECT * FROM payments ORDER BY payment_date ASC");
+                $billingsData = [];
+                while ($row = $stmt->fetch()) {
+                    $clientId = $row['client_id'];
+                    $monthKey = $row['month_key'];
+                    if (!isset($billingsData[$clientId])) $billingsData[$clientId] = [];
+                    if (!isset($billingsData[$clientId][$monthKey])) $billingsData[$clientId][$monthKey] = [];
+                    
+                    $billingsData[$clientId][$monthKey][] = [
+                        'id' => $row['id'],
+                        'date' => $row['payment_date'],
+                        'amount' => (float)$row['amount'],
+                        'notes' => $row['notes']
+                    ];
                 }
+                sendResponse($billingsData);
 
             } elseif ($method === 'POST') {
-                if (!$input) {
-                    sendError('Invalid JSON data', 400);
-                }
-
-                $json = json_encode($input, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-                if (file_put_contents($billingFile, $json) !== false) {
+                try {
+                    $pdo->beginTransaction();
+                    $pdo->exec("TRUNCATE TABLE payments;");
+                    $stmt = $pdo->prepare("INSERT INTO payments (id, client_id, month_key, payment_date, amount, notes) VALUES (?, ?, ?, ?, ?, ?)");
+                    
+                    foreach ($input as $clientId => $months) {
+                        foreach ($months as $monthKey => $payments) {
+                            foreach ($payments as $payment) {
+                                $stmt->execute([
+                                    $payment['id'], $clientId, $monthKey,
+                                    $payment['date'], $payment['amount'], $payment['notes']
+                                ]);
+                            }
+                        }
+                    }
+                    $pdo->commit();
                     sendResponse(['success' => true, 'message' => 'Billings data saved']);
-                } else {
-                    sendError('Failed to write billings data');
+                } catch (Exception $e) {
+                    $pdo->rollBack();
+                    sendError('Failed to write billings data: ' . $e->getMessage());
                 }
-
-            } else {
-                sendError('Unsupported method', 405);
             }
             break;
 
-                    // --- Generic JSON file loader (for portrige.json, programs.json, etc.) ---
-        case (preg_match('/\.json$/', $path) ? true : false):
-            $file = __DIR__ . '/' . basename($path);
+        // ==========================================================
+        // CAZURILE .json (programs, portrige)
+        // ==========================================================
+        case 'programs':
+            $programs = $pdo->query("SELECT * FROM programs")->fetchAll();
+            // Recreează formatul JSON original
+            sendResponse(['programs' => $programs]);
+            break;
+
+        case 'portrige.json':
+            // portrige.json este static, îl citim direct din fișier ca înainte
+            $file = __DIR__ . '/portrige.json';
             if (file_exists($file)) {
-                setValidationHeadersFromFile($file);
-                $content = file_get_contents($file);
-                $decoded = json_decode($content, true);
-                sendResponse(is_array($decoded) ? $decoded : $content);
+                setNoCacheHeaders(); // Simplu, fără validare ETag
+                header('Content-Type: application/json; charset=utf-8');
+                readfile($file);
+                exit();
             } else {
                 sendError('JSON file not found: ' . $path, 404);
             }
             break;
 
-                error_log("API PATH: " . $path);
+        // ==========================================================
+        // ENDPOINT-URI VECHI (Dezactivate, acum gestionate de 'POST /data')
+        // ==========================================================
+        case 'events':
+        case 'clients':
+        case 'team':
+            sendError('This endpoint is deprecated. Use GET/POST on "data" endpoint.', 404);
+            break;
+
+        // ==========================================================
+        // DEFAULT
+        // ==========================================================
         default:
-            sendError('Invalid endpoint', 404);
+            sendError('Invalid endpoint: ' . $path, 404);
     }
 
 } catch (Exception $e) {
+    // Prinde erorile PDO sau altele
     sendError('Server error: ' . $e->getMessage());
 }
 ?>
