@@ -5,44 +5,77 @@
  * Acesta extrage toată logica 'fetch' din calendar.js.
  */
 
+// --- Global Loader Functions ---
+const $loader = () => document.getElementById('globalLoader');
+
+/**
+ * Afișează indicatorul de încărcare global.
+ */
+function showLoader() {
+    const loader = $loader();
+    if (loader) loader.classList.add('active');
+}
+
+/**
+ * Ascunde indicatorul de încărcare global.
+ */
+function hideLoader() {
+    const loader = $loader();
+    if (loader) loader.classList.remove('active');
+}
+// --- End Global Loader ---
+
+
 /**
  * O funcție helper de bază pentru toate apelurile API.
  * Se ocupă de calea API și de încercarea unei căi de fallback
  * (bazat pe logica originală din calendar.js).
  */
 async function apiFetch(path, options = {}) {
+    showLoader(); // <-- ARATĂ LOADER-UL
+    
     let response;
     // Calea principală, relativă
     const url = `api.php?path=${path}`;
 
     try {
-        // 1. Încearcă calea relativă
-        response = await fetch(url, options);
-    } catch (networkError) {
-        console.error(`Eroare rețea la apelarea ${url}:`, networkError);
-        
-        // 2. Încercare fallback (cale absolută, conform logicii din calendar.js)
-        const fallbackUrl = `/calendar-app/${url.replace('api.php', 'api.php')}`; // Asigură calea corectă
-        console.warn(`Încercare cale fallback: ${fallbackUrl}`);
-        
         try {
-            response = await fetch(fallbackUrl, options);
-        } catch (fallbackError) {
-            console.error(`Eroare rețea la calea fallback ${fallbackUrl}:`, fallbackError);
-            // Aruncă eroarea originală dacă și fallback-ul eșuează
-            throw new Error(`Eroare de rețea: ${networkError.message}`);
+            // 1. Încearcă calea relativă
+            response = await fetch(url, options);
+        } catch (networkError) {
+            console.error(`Eroare rețea la apelarea ${url}:`, networkError);
+            
+            // 2. Încercare fallback (cale absolută, conform logicii din calendar.js)
+            const fallbackUrl = `/calendar-app/${url.replace('api.php', 'api.php')}`; // Asigură calea corectă
+            console.warn(`Încercare cale fallback: ${fallbackUrl}`);
+            
+            try {
+                response = await fetch(fallbackUrl, options);
+            } catch (fallbackError) {
+                console.error(`Eroare rețea la calea fallback ${fallbackUrl}:`, fallbackError);
+                // Aruncă eroarea originală dacă și fallback-ul eșuează
+                throw new Error(`Eroare de rețea: ${networkError.message}`);
+            }
         }
-    }
 
-    // Verifică dacă răspunsul este OK (ex. 200)
-    if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`Eroare API (${response.status}) pentru ${url}:`, errorText);
-        throw new Error(`Eroare server: ${response.status}`);
-    }
+        // Verifică dacă răspunsul este OK (ex. 200)
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`Eroare API (${response.status}) pentru ${url}:`, errorText);
+            throw new Error(`Eroare server: ${response.status}`);
+        }
 
-    // Returnează răspunsul ca JSON
-    return await response.json();
+        // Returnează răspunsul ca JSON
+        return await response.json();
+
+    } catch (error) {
+        // Prinde orice eroare (network, fallback, server status, or json parsing)
+        console.error('apiFetch a eșuat:', error);
+        throw error; // Aruncă eroarea mai departe pentru a fi prinsă de funcția apelantă
+    } finally {
+        // Indiferent de succes or eroare, ascunde loader-ul
+        hideLoader(); // <-- ASCUNDE LOADER-UL
+    }
 }
 
 // --- Metode API Publice (Exportate) ---
@@ -73,7 +106,7 @@ export async function saveData(data) {
 
 /**
  * Încarcă programele terapeutice.
- * Apel GET la api.php?path=programs.json
+ * Apel GET la api.php?path=programs
  */
 export async function loadPrograms() {
     // api.php are o regulă care încarcă fișiere .json
@@ -82,10 +115,9 @@ export async function loadPrograms() {
 
 /**
  * Încarcă datele de evoluție (din evolution.json).
- * Apel GET la api.php?path=evolution.json
+ * Apel GET la api.php?path=evolution
  */
 export async function loadEvolutionData() {
-    // Logica din calendar.js încarcă direct 'evolution.json'
     // Folosim api.php pentru a-l încărca
     return apiFetch('evolution');
 }
