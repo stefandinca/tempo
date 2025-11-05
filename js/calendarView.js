@@ -348,8 +348,8 @@ function renderEventsInGrid(days, viewElement, onEventClick) {
                 }
                 
                 // Poziționare și dimensiune
-                const topOffset = (startMinute / 60) * 60;
-                const height = (event.duration / 60) * 60;
+                const topOffset = (startMinute / 60) * 120;
+                const height = (event.duration / 60) * 120;
                 
                 eventBlock.style.top = `${topOffset}px`;
                 eventBlock.style.height = `${height}px`;
@@ -418,7 +418,7 @@ function getCurrentTimePosition() {
     // Calculate position relative to 8:00 AM
     const hoursFromStart = hours - 8;
     const totalMinutes = (hoursFromStart * 60) + minutes;
-    const topPosition = (totalMinutes / 60) * 60; // 60px per hour
+    const topPosition = (totalMinutes / 60) * 120; // 60px per hour
     
     return { hours, minutes, topPosition };
 }

@@ -665,9 +665,7 @@ body.public-view {
   border-radius: 0.5rem;
 }
 
-.time-grid-container {
-  /* Renamed from .time-grid */
-}
+
 
 .time-slot {
   display: grid;
@@ -686,7 +684,7 @@ body.public-view {
 
 .hour-cell {
   border-top: 1px solid var(--border-color);
-  min-height: 60px;
+  min-height: 120px;
   position: relative;
 }
 
@@ -737,11 +735,11 @@ body.public-view {
 /* Ensure the time grid container has relative positioning */
 .time-grid-container {
     position: relative;
-}
+} 
 
 .event-container {
   position: relative;
-  min-height: 60px;
+  min-height: 120px;
   width: 100%;
 }
 
