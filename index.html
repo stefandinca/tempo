@@ -1,25 +1,83 @@
 <!DOCTYPE html>
-<html lang="ro">
+<html lang="ro" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Better Life - Selectează Profil</title>
+    <title>Selectează utilizatorul - Tempo Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: ['class', '[data-theme="dark"]'],
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4A90E2',
+                        secondary: '#F4E8D8',
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="icon.png" type="image/png">
     <link rel="stylesheet" href="netflix-style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <img src="logo.png" alt="Live Better Life" class="logo">
+    <div class="w-full max-w-7xl page-container">
+        
+        <div class="main-content">
+            <div class="text-center mb-12">
+                <img src="logo.png" alt="Tempo Logo" class="h-16 mx-auto mb-6">
+                <h1 class="text-4xl font-bold text-blue-800 mb-3">Bine ai venit!</h1>
+                <p class="text-xl text-blue-800 opacity-90">Selectează contul tău pentru a continua</p>
+            </div>
+    
+            <div id="userCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                </div>
+        </div>
+       
+        <div class="public-calendar-container">
+            <header class="public-calendar-header">
+                <h2 id="publicCurrentPeriod" class="dark:text-white">Calendar Public</h2>
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="nav-controls">
+                        <button id="publicPrevBtn" class="nav-btn" title="Perioada precedentă">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                        </button>
+                        <button id="publicTodayBtn" class="nav-btn" style="padding-left: 1rem; padding-right: 1rem; font-weight: 500;">Azi</button>
+                        <button id="publicNextBtn" class="nav-btn" title="Perioada următoare">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+                        </button>
+                    </div>
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="month">Lună</button>
+                        <button class="view-btn" data-view="week">Săptămână</button>
+                        <button class="view-btn" data-view="day">Zi</button>
+                    </div>
+                </div>
+            </header>
+            <div id="publicFilters" class="filters-container">
+                </div>
+            <div id="publicCalendarView" class="calendar-view">
+                </div>
         </div>
 
-        <div class="main-content">
-            <h1 class="title">Cine urmărește?</h1>
-            
-            <div class="profiles-grid" id="profilesGrid">
-                <!-- Profiles will be dynamically loaded here -->
-            </div>
+    </div> <div class="powered-by-footer">
+        <span class="text-blue-800 mr-2 opacity-70 text-xs">Powered by:</span>
+        <img class="w-24" src="tempo-logo-dark.png"/>
+    </div>
 
-            <button class="manage-profiles">Gestionează Profiluri</button>
+    <div id="parentModal" class="parent-modal">
+        <div class="parent-modal-content">
+            <div class="parent-modal-header">
+                <h2 id="parentModalTitle">Profil Client</h2>
+                <button id="closeParentModal" class="parent-modal-close">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="parent-modal-body" id="parentModalContent">
+                </div>
         </div>
     </div>
 
@@ -27,7 +85,7 @@
         // API Configuration
         const API_BASE = 'api.php';
         
-        // User passwords
+        // Parole hardcodate
         const USER_PASSWORDS = {
             'corina': '$C0r1n4',
             'dana': '#D4n4G',
@@ -36,22 +94,16 @@
             'member_1762036330730': '&St3f'
         };
 
-        // User display configuration
-        const USER_CONFIG = {
-            'alexandra': { name: 'Alexandra', initials: 'AP', role: 'TERAPEUT', color: '#9333ea' },
-            'corina': { name: 'Corina', initials: 'CG', role: 'ADMINISTRATOR', color: '#3b82f6' },
-            'dana': { name: 'Dana G', initials: 'DG', role: 'TERAPEUT', color: '#ef4444' },
-            'daniela': { name: 'Dana P', initials: 'DP', role: 'TERAPEUT', color: '#06b6d4' },
-            'member_1762036330730': { name: 'Ștefan', initials: 'S', role: 'ADMINISTRATOR', color: '#4f46e5' }
-        };
+        // Store current selected month for schedule viewing
+        let currentScheduleDate = new Date();
 
-        // Special parent profile
-        const PARENT_PROFILE = {
-            name: 'Acces Părinți',
-            initials: '👨‍👩‍👧',
-            role: 'PĂRINTE',
-            color: '#10b981',
-            isParent: true
+        const calendarState = {
+            currentDate: new Date(),
+            currentView: 'month',
+            teamMembers: [],
+            clients: [],
+            events: [],
+            activeFilters: [],
         };
 
         async function loadTeamMembers() {
@@ -65,94 +117,1044 @@
             }
         }
 
-        function createProfileCard(profile) {
-            const card = document.createElement('div');
-            card.className = 'profile-card';
-            
-            if (profile.isParent) {
-                card.innerHTML = `
-                    <div class="profile-avatar" style="background-color: ${profile.color}">
-                        <span class="profile-icon">${profile.initials}</span>
-                    </div>
-                    <div class="profile-name">${profile.name}</div>
-                    <div class="profile-role">${profile.role}</div>
-                `;
+        async function loadAllData() {
+            try {
+                const response = await fetch(`${API_BASE}?path=data`);
+                const data = await response.json();
                 
-                card.addEventListener('click', () => {
-                    showParentLogin();
-                });
-            } else {
-                card.innerHTML = `
-                    <div class="profile-avatar" style="background-color: ${profile.color}">
-                        <span class="profile-initials">${profile.initials}</span>
-                    </div>
-                    <div class="profile-name">${profile.name}</div>
-                    <div class="profile-role">${profile.role}</div>
-                `;
+                calendarState.teamMembers = data.teamMembers || [];
+                calendarState.clients = data.clients || [];
+                calendarState.events = data.events || [];
+                calendarState.activeFilters = (data.teamMembers || []).map(m => m.id);
+
+                return (data.teamMembers || []).filter(member => USER_PASSWORDS.hasOwnProperty(member.id));
+            } catch (error) {
+                console.error('Error loading all data:', error);
+                return [];
+            }
+        }
+
+        async function loadClientData(clientId) {
+            try {
+                const [dataResponse, evolutionResponse] = await Promise.all([
+                    fetch(`${API_BASE}?path=data`),
+                    fetch(`${API_BASE}?path=evolution.json`)
+                ]);
                 
-                card.addEventListener('click', () => {
-                    showPasswordPrompt(profile);
+                const data = await dataResponse.json();
+                const evolutionData = await evolutionResponse.json();
+                
+                const client = data.clients.find(c => c.id === clientId);
+                if (!client) return null;
+                
+                const clientEvolution = evolutionData[clientId] || {};
+                
+                const clientEvents = data.events.filter(event => {
+                    const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
+                    return clientIds.includes(clientId);
                 });
-            }
-            
-            return card;
-        }
-
-        function showPasswordPrompt(profile) {
-            const password = prompt(`Introduceți parola pentru ${profile.name}:`);
-            
-            if (password === null) return; // User canceled
-            
-            // Find the actual user ID
-            const userId = Object.keys(USER_CONFIG).find(key => USER_CONFIG[key].name === profile.name);
-            
-            if (password === USER_PASSWORDS[userId]) {
-                // Redirect to main page with user ID
-                window.location.href = `index.html?userId=${userId}`;
-            } else {
-                alert('Parolă incorectă!');
+                
+                return {
+                    client,
+                    evolution: clientEvolution,
+                    events: clientEvents,
+                    teamMembers: data.teamMembers || []
+                };
+            } catch (error) {
+                console.error('Error loading client data:', error);
+                return null;
             }
         }
 
-        function showParentLogin() {
-            const code = prompt('Introduceți codul de acces (ex: cezar_2102):');
-            
-            if (code === null) return; // User canceled
-            
-            if (code.trim()) {
-                // Redirect to parent view
-                window.location.href = `parent-view.html?code=${code}`;
-            } else {
-                alert('Vă rugăm să introduceți un cod valid!');
-            }
+        function getRoleLabel(role) {
+            const labels = {
+                'therapist': 'Terapeut',
+                'coordinator': 'Coordonator',
+                'admin': 'Administrator',
+                'parent': 'Părinte'
+            };
+            return labels[role] || role;
         }
 
-        async function renderProfiles() {
-            const grid = document.getElementById('profilesGrid');
-            grid.innerHTML = '';
+        function getRoleClass(role) {
+            return `role-${role}`;
+        }
 
-            // Add team member profiles
-            const teamMembers = await loadTeamMembers();
+        async function renderUserCards() {
+            const container = document.getElementById('userCardsContainer');
+            const teamMembers = await loadAllData();
+            
+            let cardsHTML = '';
+
+            // Add team member cards
             teamMembers.forEach(member => {
-                const config = USER_CONFIG[member.id];
-                if (config) {
-                    const profile = {
-                        id: member.id,
-                        name: config.name,
-                        initials: config.initials,
-                        role: config.role,
-                        color: config.color
-                    };
-                    grid.appendChild(createProfileCard(profile));
+                cardsHTML += `
+                    <div class="user-card bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg" data-user-id="${member.id}">
+                        <div class="user-avatar" style="background-color: ${member.color}">
+                            ${member.initials}
+                        </div>
+                        <h3 class="user-card-name">${member.name}</h3>
+                        <span class="role-badge ${getRoleClass(member.role)}">${getRoleLabel(member.role)}</span>
+                        
+                        <div class="password-input-container">
+                            <input 
+                                type="password" 
+                                id="pass_${member.id}" 
+                                class="password-input" 
+                                placeholder="Parolă"
+                            />
+                            <button id="login_btn_${member.id}" class="login-btn" data-user-id="${member.id}">
+                                Intră în cont
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Add parent card
+            cardsHTML += `
+                <div class="user-card parent-card bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg">
+                    <div class="user-avatar" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%)">
+                        👨‍👩‍👧
+                    </div>
+                    <h3 class="user-card-name">Acces Părinte</h3>
+                    <span class="role-badge role-parent">Părinte</span>
+                    <div class="parent-input-container">
+                        <input 
+                            type="text" 
+                            id="clientCodeInput" 
+                            class="client-code-input" 
+                            placeholder="ex: cezar_2102"
+                        />
+                        <button id="viewProfileBtn" class="view-profile-btn" disabled>
+                            Vezi Profil
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = cardsHTML;
+
+            // --- Logica de login "Netflix" ---
+            const allCards = container.querySelectorAll('.user-card[data-user-id]');
+            
+            container.addEventListener('click', (e) => {
+                const card = e.target.closest('.user-card[data-user-id]');
+                
+                if (!card) {
+                    if (!e.target.closest('.user-card')) {
+                        container.classList.remove('selection-active');
+                        allCards.forEach(c => c.classList.remove('active'));
+                    }
+                    return; 
+                }
+                
+                const isAlreadyActive = card.classList.contains('active');
+
+                container.classList.add('selection-active');
+                allCards.forEach(c => c.classList.remove('active'));
+                
+                if (!isAlreadyActive) {
+                    card.classList.add('active');
+                    card.querySelector('.password-input').focus();
+                } else {
+                    container.classList.remove('selection-active');
                 }
             });
 
-            // Add parent profile
-            grid.appendChild(createProfileCard(PARENT_PROFILE));
+            // --- Ascultători pentru submit-ul parolei ---
+            teamMembers.forEach(member => {
+                const loginBtn = document.getElementById(`login_btn_${member.id}`);
+                const passInput = document.getElementById(`pass_${member.id}`);
+                
+                if (!loginBtn || !passInput) return;
+
+                const handleLogin = () => {
+                    const userId = loginBtn.dataset.userId;
+                    const password = passInput.value;
+                    
+                    if (USER_PASSWORDS[userId] && password === USER_PASSWORDS[userId]) {
+                        selectUser(userId);
+                    } else {
+                        alert('Parolă incorectă!');
+                        passInput.value = '';
+                        passInput.focus();
+                    }
+                };
+
+                loginBtn.addEventListener('click', handleLogin);
+                
+                passInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleLogin();
+                    }
+                });
+            });
+
+            // Add parent card functionality
+            setupParentCard();
+
+            // Initializează calendarul public
+            initPublicCalendar();
         }
 
-        // Initialize on page load
-        renderProfiles();
+        function setupParentCard() {
+            const clientCodeInput = document.getElementById('clientCodeInput');
+            const viewProfileBtn = document.getElementById('viewProfileBtn');
+
+            clientCodeInput.addEventListener('input', (e) => {
+                const value = e.target.value.trim();
+                viewProfileBtn.disabled = value.length === 0;
+            });
+
+            viewProfileBtn.addEventListener('click', async () => {
+                const clientId = clientCodeInput.value.trim();
+                if (!clientId) return;
+
+                viewProfileBtn.disabled = true;
+                viewProfileBtn.textContent = 'Se încarcă...';
+
+                const clientData = await loadClientData(clientId);
+                
+                if (clientData) {
+                    currentScheduleDate = new Date(); // Reset to current month
+                    showParentModal(clientData);
+                } else {
+                    alert('Client negăsit. Verificați codul introdus.');
+                }
+
+                viewProfileBtn.disabled = false;
+                viewProfileBtn.textContent = 'Vezi Profil';
+            });
+
+            clientCodeInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !viewProfileBtn.disabled) {
+                    viewProfileBtn.click();
+                }
+            });
+        }
+
+        function calculateMonthlyStats(events, clientId, year, month) {
+            const monthEvents = events.filter(event => {
+                const eventDate = new Date(event.date);
+                return eventDate.getFullYear() === year && eventDate.getMonth() === month;
+            });
+            
+            let totalHours = 0;
+            let presentHours = 0;
+            let absentHours = 0;
+            let totalSessions = monthEvents.length;
+            
+            monthEvents.forEach(event => {
+                if (!event.duration) return;
+                const hours = event.duration / 60;
+                totalHours += hours;
+                
+                const attendance = (event.attendance && event.attendance[clientId]) || 'present';
+                if (attendance === 'present') {
+                    presentHours += hours;
+                } else {
+                    absentHours += hours;
+                }
+            });
+            
+            return {
+                totalSessions,
+                totalHours: totalHours.toFixed(1),
+                presentHours: presentHours.toFixed(1),
+                absentHours: absentHours.toFixed(1),
+                events: monthEvents
+            };
+        }
+
+        function generateScheduleHTML(clientData) {
+            const year = currentScheduleDate.getFullYear();
+            const month = currentScheduleDate.getMonth();
+            const monthName = currentScheduleDate.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
+
+            const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+            let themeHTML = '';
+            
+            if (clientData.evolution && clientData.evolution.monthlyThemes) {
+                const themeText = clientData.evolution.monthlyThemes[monthKey];
+                
+                if (themeText) {
+                    themeHTML = `
+                        <div class="monthly-theme-parent" style="background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e5e7eb); border-left: 4px solid #4A90E2; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; box-shadow: var(--shadow, 0 2px 4px rgba(0,0,0,0.05));">
+                            <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: #4A90E2; text-transform: uppercase; font-weight: 700;">Tema lunii ${monthName}</h4>
+                            <p style="white-space: pre-wrap; margin: 0; line-height: 1.6; color: var(--text-primary, #374151); font-size: 1rem;">
+                                ${themeText.replace(/</g, "&lt;").replace(/>/g, "&gt;")}
+                            </p>
+                        </div>
+                    `;
+                }
+            }
+            
+            const stats = calculateMonthlyStats(clientData.events, clientData.client.id, year, month);
+            
+            let html = `
+                <div class="client-info-section">
+                    <h3 class="section-title">Program Lunar</h3>
+                    
+                    <div class="month-selector">
+                        <button id="prevMonth">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                        </button>
+                        <span>${monthName}</span>
+                        <button id="nextMonth">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                        </button>
+                    </div>
+                    
+                    ${themeHTML} <div class="schedule-stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value hours">${stats.totalHours}</div>
+                            <div class="stat-label">Ore Totale</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value present">${stats.presentHours}</div>
+                            <div class="stat-label">Ore Prezent</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value absent">${stats.absentHours}</div>
+                            <div class="stat-label">Ore Absent</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${stats.totalSessions}</div>
+                            <div class="stat-label">Sesiuni</div>
+                        </div>
+                    </div>
+            `;
+            
+            if (stats.events.length > 0) {
+                const sortedEvents = stats.events.sort((a, b) => new Date(a.date) - new Date(b.date));
+                
+                html += `<div class="schedule-list">`;
+                sortedEvents.forEach(event => {
+                    const eventDate = new Date(event.date);
+                    const formattedDate = eventDate.toLocaleDateString('ro-RO', { 
+                        weekday: 'short', 
+                        day: 'numeric', 
+                        month: 'short' 
+                    });
+                    
+                    const attendance = (event.attendance && event.attendance[clientData.client.id]) || 'present';
+                    const statusClass = attendance === 'present' ? 'present' : 'absent';
+                    const statusText = attendance === 'present' ? 'Prezent' : 'Absent';
+                    
+                    const endTime = calculateEndTime(event.startTime, event.duration);
+                    const hours = (event.duration / 60).toFixed(1);
+                    
+                    const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+                    const therapistNames = teamMemberIds
+                        .map(id => {
+                            const therapist = clientData.teamMembers.find(m => m.id === id);
+                            return therapist ? therapist.name : 'Terapeut necunoscut';
+                        })
+                        .join(', ');
+                    
+                    html += `
+                        <div class="schedule-item">
+                            <div>
+                                <div class="schedule-date">${formattedDate}</div>
+                                <div class="schedule-time">${event.startTime} - ${endTime} (${hours}h)</div>
+                                <div class="schedule-time" style="margin-top: 0.25rem; color: #4A90E2;">
+                                    ${therapistNames}
+                                </div>
+                            </div>
+                            <div class="schedule-status">
+                                <span class="status-badge ${statusClass}">${statusText}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            } else {
+                html += `<p style="text-align: center; color: #6b7280; padding: 2rem;">Nu există sesiuni programate în această lună.</p>`;
+            }
+            
+            html += `</div>`;
+            
+            return html;
+        }
+
+        function calculateEndTime(startTime, durationMinutes) {
+            if (!startTime) return "N/A";
+            const [hours, minutes] = startTime.split(':').map(Number);
+            const totalMinutes = (hours * 60) + minutes + parseInt(durationMinutes, 10);
+            const endHours = Math.floor(totalMinutes / 60) % 24;
+            const endMinutes = totalMinutes % 60;
+            return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
+        }
+
+        function showParentModal(clientData) {
+            const modal = document.getElementById('parentModal');
+            const modalTitle = document.getElementById('parentModalTitle');
+            const modalContent = document.getElementById('parentModalContent');
+
+            modalTitle.textContent = `Profil - ${clientData.client.name}`;
+
+            let contentHTML = `
+                <div class="client-info-section">
+                    <h3 class="section-title">Informații Client</h3>
+                    <div class="client-info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Nume Complet</span>
+                            <span class="info-value">${clientData.client.name}</span>
+                        </div>
+            `;
+
+            if (clientData.client.email) {
+                contentHTML += `
+                    <div class="info-item">
+                        <span class="info-label">Email</span>
+                        <span class="info-value">${clientData.client.email}</span>
+                    </div>
+                `;
+            }
+
+            if (clientData.client.phone) {
+                contentHTML += `
+                    <div class="info-item">
+                        <span class="info-label">Telefon</span>
+                        <span class="info-value">${clientData.client.phone}</span>
+                    </div>
+                `;
+            }
+
+            if (clientData.client.birthDate) {
+                const birthDate = new Date(clientData.client.birthDate);
+                contentHTML += `
+                    <div class="info-item">
+                        <span class="info-label">Data Nașterii</span>
+                        <span class="info-value">${birthDate.toLocaleDateString('ro-RO')}</span>
+                    </div>
+                `;
+            }
+
+            if (clientData.client.medical) {
+                contentHTML += `
+                    <div class="info-item">
+                        <span class="info-label">Alergii sau medicatie</span>
+                        <span class="info-value">${clientData.client.medical}</span>
+                    </div>
+                `;
+            }
+
+            contentHTML += `
+                    </div>
+                </div>
+            `;
+
+            contentHTML += generateScheduleHTML(clientData);
+
+            if (clientData.evolution && clientData.evolution.evaluations && Object.keys(clientData.evolution.evaluations).length > 0) {
+                contentHTML += `
+                    <div class="client-info-section">
+                        <h3 class="section-title">Evoluție Portage</h3>
+                        <div class="chart-container-parent">
+                            <canvas id="parentEvolutionChart"></canvas>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (clientData.evolution && clientData.evolution.programHistory && clientData.evolution.programHistory.length > 0) {
+                contentHTML += `
+                    <div class="client-info-section">
+                        <h3 class="section-title">Istoric Programe Recente</h3>
+                        <div style="overflow-x: auto;">
+                            ${generateProgramHistoryTable(clientData.evolution.programHistory)}
+                        </div>
+                    </div>
+                `;
+            }
+
+            modalContent.innerHTML = contentHTML;
+            modal.classList.add('active');
+
+            document.getElementById('prevMonth').addEventListener('click', () => {
+                currentScheduleDate.setMonth(currentScheduleDate.getMonth() - 1);
+                updateScheduleSection(clientData);
+            });
+            
+            document.getElementById('nextMonth').addEventListener('click', () => {
+                currentScheduleDate.setMonth(currentScheduleDate.getMonth() + 1);
+                updateScheduleSection(clientData);
+            });
+
+            if (clientData.evolution && clientData.evolution.evaluations && Object.keys(clientData.evolution.evaluations).length > 0) {
+                setTimeout(() => renderEvolutionChart(clientData.evolution.evaluations), 100);
+            }
+        }
+
+        function updateScheduleSection(clientData) {
+            const scheduleSection = document.querySelector('.client-info-section:nth-child(2)');
+            if (scheduleSection) {
+                scheduleSection.outerHTML = generateScheduleHTML(clientData);
+                
+                document.getElementById('prevMonth').addEventListener('click', () => {
+                    currentScheduleDate.setMonth(currentScheduleDate.getMonth() - 1);
+                    updateScheduleSection(clientData);
+                });
+                
+                document.getElementById('nextMonth').addEventListener('click', () => {
+                    currentScheduleDate.setMonth(currentScheduleDate.getMonth() + 1);
+                    updateScheduleSection(clientData);
+                });
+            }
+        }
+
+        function generateProgramHistoryTable(programHistory) {
+            if (!programHistory || programHistory.length === 0) {
+                return '<p class="error-message">Nu există istoric de programe.</p>';
+            }
+
+            const sorted = [...programHistory].sort((a, b) => new Date(b.date) - new Date(a.date));
+            const grouped = {};
+            sorted.forEach(entry => {
+                if (!grouped[entry.programTitle]) grouped[entry.programTitle] = [];
+                grouped[entry.programTitle].push(entry);
+            });
+
+            let html = `
+                <table class="program-history-table">
+                    <thead>
+                        <tr>
+                            <th>Program</th>
+                            <th>Data</th>
+                            <th style="text-align: center;">Scor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            Object.entries(grouped).forEach(([programTitle, entries]) => {
+                entries.slice(0, 10).forEach((entry, index) => {
+                    const formattedDate = new Date(entry.date).toLocaleDateString('ro-RO');
+                    html += `<tr>`;
+                    if (index === 0) {
+                        html += `<td rowspan="${Math.min(entries.length, 10)}">${programTitle}</td>`;
+                    }
+                    html += `<td>${formattedDate}</td>`;
+                    html += `<td style="text-align: center;"><span class="program-history-score" data-score="${entry.score}">${entry.score}</span></td>`;
+                    html += `</tr>`;
+                });
+            });
+
+            html += `</tbody></table>`;
+            return html;
+        }
+
+        function renderEvolutionChart(evaluations) {
+            const canvas = document.getElementById('parentEvolutionChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const colors = ['#4A90E2', '#FF6B6B', '#12C4D9', '#9B59B6', '#1DD75B', '#FFA500', '#E91E63'];
+            const datasets = [];
+            const allDates = new Set();
+
+            Object.values(evaluations).forEach(values => {
+                Object.keys(values).forEach(date => allDates.add(date));
+            });
+            const sortedDates = Array.from(allDates).sort((a, b) => new Date(a) - new Date(b));
+
+            Object.entries(evaluations).forEach(([test, values], i) => {
+                const color = colors[i % colors.length];
+                datasets.push({
+                    label: test,
+                    data: sortedDates.map(date => values[date] ?? null),
+                    borderColor: color,
+                    backgroundColor: color,
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                });
+            });
+
+            new Chart(ctx, {
+                type: 'line',
+                data: { labels: sortedDates, datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: true, position: 'bottom' },
+                        title: { display: true, text: 'Evoluție Scoruri Portage', font: { size: 16 } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+        }
+
+        function closeParentModal() {
+            const modal = document.getElementById('parentModal');
+            modal.classList.remove('active');
+        }
+
+        function selectUser(userId) {
+            sessionStorage.setItem('currentUserId', userId);
+            window.location.href = 'dashboard.html';
+        }
+
+        // Close modal handlers
+        document.getElementById('closeParentModal').addEventListener('click', closeParentModal);
+        document.getElementById('parentModal').addEventListener('click', (e) => {
+            if (e.target.id === 'parentModal') {
+                closeParentModal();
+            }
+        });
+
+        // ==========================================================
+        // --- LOGICA PENTRU CALENDARUL PUBLIC ---
+        // ==========================================================
+
+        function initPublicCalendar() {
+            renderPublicCalendar();
+            renderPublicFilters();
+
+            document.getElementById('publicPrevBtn').addEventListener('click', () => handlePublicNavigation(-1));
+            document.getElementById('publicNextBtn').addEventListener('click', () => handlePublicNavigation(1));
+            document.getElementById('publicTodayBtn').addEventListener('click', navigateToPublicToday);
+            
+            document.querySelectorAll('.view-toggle .view-btn').forEach(btn => {
+                btn.addEventListener('click', handlePublicViewChange);
+            });
+        }
+
+        function renderPublicCalendar() {
+            const { currentDate, currentView } = calendarState;
+            updateCurrentPeriodLabel(currentDate, currentView);
+
+            if (currentView === 'month') {
+                renderPublicMonthView(handlePublicDayClick);
+            } else if (currentView === 'week') {
+                renderPublicWeekView();
+            } else if (currentView === 'day') {
+                renderPublicDayView();
+            }
+        }
+
+        function renderPublicFilters() {
+            const { teamMembers, activeFilters } = calendarState;
+            const container = document.getElementById('publicFilters');
+            if (!container) return;
+
+            container.innerHTML = '';
+            
+            teamMembers.forEach(member => {
+                const chip = document.createElement('div');
+                chip.className = 'filter-chip';
+                chip.style.color = member.color;
+                
+                const isActive = activeFilters.includes(member.id);
+                if (isActive) {
+                    chip.classList.add('active');
+                    chip.style.borderColor = member.color;
+                }
+                
+                chip.innerHTML = `<span class="color-dot" style="background-color: ${member.color}"></span><span>${member.name}</span>`;
+                
+                chip.addEventListener('click', () => {
+                    const index = calendarState.activeFilters.indexOf(member.id);
+                    if (index > -1) {
+                        calendarState.activeFilters.splice(index, 1);
+                    } else {
+                        calendarState.activeFilters.push(member.id);
+                    }
+                    renderPublicFilters();
+                    renderPublicCalendar();
+                });
+                
+                container.appendChild(chip);
+            });
+        }
+
+        function handlePublicNavigation(direction) {
+            const { currentDate, currentView } = calendarState;
+            const newDate = new Date(currentDate);
+            if (currentView === 'month') newDate.setMonth(newDate.getMonth() + direction);
+            else if (currentView === 'week') newDate.setDate(newDate.getDate() + (7 * direction));
+            else if (currentView === 'day') newDate.setDate(newDate.getDate() + direction);
+            calendarState.currentDate = newDate;
+            renderPublicCalendar();
+        }
+
+        function navigateToPublicToday() {
+            calendarState.currentDate = new Date();
+            renderPublicCalendar();
+        }
+
+        function handlePublicViewChange(e) {
+            const newView = e.target.dataset.view;
+            if (newView) {
+                calendarState.currentView = newView;
+                document.querySelectorAll('.view-toggle .view-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                renderPublicCalendar();
+            }
+        }
+
+        function handlePublicDayClick(date) {
+            calendarState.currentDate = date;
+            calendarState.currentView = 'day';
+            document.querySelectorAll('.view-toggle .view-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('.view-toggle .view-btn[data-view="day"]').classList.add('active');
+            renderPublicCalendar();
+        }
+
+        function renderPublicMonthView(onDayClick) {
+            const { currentDate, activeFilters } = calendarState;
+            const container = document.getElementById('publicCalendarView');
+            container.innerHTML = ''; 
+
+            const monthView = document.createElement('div');
+            monthView.className = 'month-view';
+            const grid = document.createElement('div');
+            grid.className = 'calendar-grid';
+
+            const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            dayNames.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'day-header';
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            let startDate = new Date(firstDay);
+            const dayOfWeek = firstDay.getDay();
+            const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            startDate.setDate(startDate.getDate() - diff);
+
+            for (let i = 0; i < 42; i++) {
+                const currentDay = new Date(startDate);
+                currentDay.setDate(startDate.getDate() + i);
+
+                const dayCell = document.createElement('div');
+                dayCell.className = 'day-cell';
+
+                if (currentDay.getMonth() !== month) dayCell.classList.add('other-month');
+                if (isWeekend(currentDay)) dayCell.classList.add('weekend');
+                if (isToday(currentDay)) dayCell.classList.add('current-day');
+
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = currentDay.getDate();
+                dayCell.appendChild(dayNumber);
+
+                const dayEvents = getEventsForDatePublic(currentDay);
+
+                if (dayEvents.length > 0) {
+                    const dotsContainer = document.createElement('div');
+                    dotsContainer.className = 'event-dots';
+                    const addedMembers = new Set(); 
+
+                    dayEvents.forEach(event => {
+                        const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+                        teamMemberIds.forEach(memberId => {
+                            if (addedMembers.has(memberId)) return; 
+                            
+                            const isFilterActive = activeFilters.length === 0 || activeFilters.includes(memberId);
+
+                            if (isFilterActive) {
+                                const member = calendarState.teamMembers.find(m => m.id === memberId);
+                                if (member) {
+                                    const dot = document.createElement('div');
+                                    dot.className = 'event-dot';
+                                    dot.style.backgroundColor = member.color;
+                                    dot.title = member.name;
+                                    dotsContainer.appendChild(dot);
+                                    addedMembers.add(memberId);
+                                }
+                            }
+                        });
+                    });
+                    dayCell.appendChild(dotsContainer);
+                }
+
+                dayCell.addEventListener('click', () => onDayClick(currentDay));
+                grid.appendChild(dayCell);
+            }
+
+            monthView.appendChild(grid);
+            container.appendChild(monthView);
+        }
+
+        function renderPublicWeekView() {
+            const { currentDate } = calendarState;
+            const container = document.getElementById('publicCalendarView');
+            container.innerHTML = '';
+
+            const weekView = document.createElement('div');
+            weekView.className = 'week-view';
+
+            const weekStart = getWeekStart(currentDate);
+            const days = [];
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(weekStart);
+                day.setDate(weekStart.getDate() + i);
+                days.push(day);
+            }
+
+            const header = document.createElement('div');
+            header.className = 'week-header';
+            header.innerHTML = '<div></div>'; 
+
+            days.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header-week';
+                dayHeader.innerHTML = `${day.toLocaleString('ro-RO', { weekday: 'short' })}<br>${day.getDate()}`;
+                if (isToday(day)) dayHeader.classList.add('today');
+                header.appendChild(dayHeader);
+            });
+            weekView.appendChild(header);
+
+            const timeGrid = document.createElement('div');
+            timeGrid.className = 'time-grid-container';
+
+            for (let hour = 8; hour <= 20; hour++) {
+                const timeSlot = document.createElement('div');
+                timeSlot.className = 'time-slot';
+                
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'time-label';
+                timeLabel.textContent = formatHour(hour);
+                timeSlot.appendChild(timeLabel);
+
+                days.forEach(day => {
+                    const hourCell = document.createElement('div');
+                    hourCell.className = 'hour-cell';
+                    const eventContainer = document.createElement('div');
+                    eventContainer.className = 'event-container';
+                    eventContainer.dataset.date = formatDateISO(day);
+                    eventContainer.dataset.hour = hour;
+                    hourCell.appendChild(eventContainer);
+                    timeSlot.appendChild(hourCell);
+                });
+                timeGrid.appendChild(timeSlot);
+            }
+            weekView.appendChild(timeGrid);
+            
+            renderEventsInPublicGrid(days, weekView);
+            container.appendChild(weekView);
+        }
+
+        function renderPublicDayView() {
+            const { currentDate } = calendarState;
+            const container = document.getElementById('publicCalendarView');
+            container.innerHTML = '';
+
+            const dayView = document.createElement('div');
+            dayView.className = 'day-view'; 
+
+            const days = [currentDate];
+
+            const header = document.createElement('div');
+            header.className = 'week-header';
+            header.innerHTML = '<div></div>'; 
+
+            const dayHeader = document.createElement('div');
+            dayHeader.className = 'day-header-week';
+            dayHeader.innerHTML = currentDate.toLocaleString('ro-RO', { weekday: 'long', month: 'long', day: 'numeric' });
+            if (isToday(currentDate)) dayHeader.classList.add('today');
+            header.appendChild(dayHeader);
+            dayView.appendChild(header);
+
+            const timeGrid = document.createElement('div');
+            timeGrid.className = 'time-grid-container';
+
+            for (let hour = 8; hour <= 20; hour++) {
+                const timeSlot = document.createElement('div');
+                timeSlot.className = 'time-slot';
+                
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'time-label';
+                timeLabel.textContent = formatHour(hour);
+                timeSlot.appendChild(timeLabel);
+
+                const hourCell = document.createElement('div');
+                hourCell.className = 'hour-cell';
+                const eventContainer = document.createElement('div');
+                eventContainer.className = 'event-container';
+                eventContainer.dataset.date = formatDateISO(currentDate);
+                eventContainer.dataset.hour = hour;
+                hourCell.appendChild(eventContainer);
+                timeSlot.appendChild(hourCell);
+                
+                timeGrid.appendChild(timeSlot);
+            }
+            dayView.appendChild(timeGrid);
+
+            renderEventsInPublicGrid(days, dayView);
+            container.appendChild(dayView);
+        }
+
+        function renderEventsInPublicGrid(days, viewElement) {
+            const { activeFilters, teamMembers, clients } = calendarState;
+            
+            const visibleTherapists = activeFilters.length === 0 
+                ? teamMembers 
+                : teamMembers.filter(m => activeFilters.includes(m.id));
+            
+            if (visibleTherapists.length === 0) return;
+            
+            const trackWidth = 100 / visibleTherapists.length;
+            
+            days.forEach((day) => {
+                const dateStr = formatDateISO(day);
+                const dayEvents = getEventsForDatePublic(day);
+                
+                const eventsByTherapist = {};
+                visibleTherapists.forEach(therapist => {
+                    eventsByTherapist[therapist.id] = [];
+                });
+                
+                dayEvents.forEach(event => {
+                    const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+                    teamMemberIds.forEach(memberId => {
+                        if (eventsByTherapist[memberId]) {
+                            eventsByTherapist[memberId].push(event);
+                        }
+                    });
+                });
+                
+                visibleTherapists.forEach((therapist, therapistIndex) => {
+                    const therapistEvents = eventsByTherapist[therapist.id] || [];
+                    
+                    therapistEvents.forEach((event) => {
+                        if (!event.startTime || !event.duration) return;
+
+                        const timeParts = event.startTime.split(':').map(Number);
+                        const startHour = timeParts[0] || 0;
+                        const startMinute = timeParts[1] || 0;
+                        const formattedStartTime = `${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`;
+                        
+                        const containerSelector = `.event-container[data-date="${dateStr}"][data-hour="${startHour}"]`;
+                        const container = viewElement.querySelector(containerSelector);
+                        
+                        if (!container) return;
+                        
+                        const eventBlock = document.createElement('div');
+                        eventBlock.className = 'event-block';
+                        
+                        const endTime = calculateEndTime(event.startTime, event.duration);
+                        
+                        const topOffset = (startMinute / 60) * 120;
+                        const height = (event.duration / 60) * 120;
+                        eventBlock.style.top = `${topOffset}px`;
+                        eventBlock.style.height = `${height}px`;
+                        eventBlock.style.width = `${trackWidth}%`;
+                        eventBlock.style.left = `${trackWidth * therapistIndex}%`;
+
+                        if (event.isPublic) {
+                            eventBlock.classList.add('admin-view');
+                            eventBlock.style.backgroundColor = therapist.color;
+                            
+                            const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
+                            const clientNames = clientIds.map(id => {
+                                const client = calendarState.clients.find(c => c.id === id);
+                                return client ? client.name : '';
+                            }).filter(Boolean).join(', ');
+
+                            eventBlock.innerHTML = `
+                                <div class="event-time">${formattedStartTime} - ${endTime}</div>
+                                <div class="event-title">${event.name}</div>
+                                ${clientNames ? `<div class="event-clients">${clientNames}</div>` : ''}
+                            `;
+                        } else {
+                            eventBlock.classList.add('public-view-private'); 
+                            eventBlock.style.borderColor = therapist.color;
+                            eventBlock.style.color = therapist.color;
+                            
+                            eventBlock.innerHTML = `
+                                <div class="event-time">${formattedStartTime} - ${endTime}</div>
+                                <div class="event-title">Ocupat</div>
+                            `;
+                        }
+                        
+                        container.appendChild(eventBlock);
+                    });
+                });
+            });
+        }
+
+        // --- Funcții Helper ---
+
+        function getEventsForDatePublic(dateObj) {
+            const { events, activeFilters } = calendarState;
+            const dateStr = formatDateISO(dateObj);
+            
+            return events.filter(event => {
+                if (event.date !== dateStr) return false;
+                if (activeFilters.length === 0) return true;
+                
+                const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+                return teamMemberIds.some(id => activeFilters.includes(id));
+            });
+        }
+
+        function getWeekStart(date) {
+            const d = new Date(date);
+            const day = d.getDay(); 
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(d.setDate(diff));
+        }
+
+        function isToday(date) {
+            const today = new Date();
+            return date.getDate() === today.getDate() &&
+                   date.getMonth() === today.getMonth() &&
+                   date.getFullYear() === today.getFullYear();
+        }
+
+        function isWeekend(date) {
+            const day = date.getDay();
+            return day === 0 || day === 6;
+        }
+
+        function formatDateISO(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function formatHour(hour) {
+            return `${String(hour).padStart(2, '0')}:00`;
+        }
+
+        function updateCurrentPeriodLabel(date, view) {
+            const labelEl = document.getElementById('publicCurrentPeriod');
+            if (!labelEl) return;
+            
+            let label = '';
+            const ro = 'ro-RO';
+            if (view === 'month') {
+                label = date.toLocaleString(ro, { month: 'long', year: 'numeric' });
+            } else if (view === 'week') {
+                const start = getWeekStart(date);
+                const end = new Date(start);
+                end.setDate(end.getDate() + 6);
+                label = `${start.toLocaleDateString(ro, {day: 'numeric', month: 'short'})} - ${end.toLocaleDateString(ro, {day: 'numeric', month: 'short', year: 'numeric'})}`;
+            } else if (view === 'day') {
+                label = date.toLocaleString(ro, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            }
+            labelEl.textContent = label;
+        }
+        
+        // --- Inițializare ---
+
+        // Initialize theme
+        const savedTheme = localStorage.getItem('calendar-theme') || 'light';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+
+        // Load users on page load
+        renderUserCards();
     </script>
 </body>
 </html>
