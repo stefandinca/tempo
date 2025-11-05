@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Better Life - Selectează Profil</title>
+    <link rel="stylesheet" href="netflix-style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="logo.png" alt="Live Better Life" class="logo">
+        </div>
+
+        <div class="main-content">
+            <h1 class="title">Cine urmărește?</h1>
+            
+            <div class="profiles-grid" id="profilesGrid">
+                <!-- Profiles will be dynamically loaded here -->
+            </div>
+
+            <button class="manage-profiles">Gestionează Profiluri</button>
+        </div>
+    </div>
+
+    <script type="module">
+        // API Configuration
+        const API_BASE = 'api.php';
+        
+        // User passwords
+        const USER_PASSWORDS = {
+            'corina': '$C0r1n4',
+            'dana': '#D4n4G',
+            'daniela': '@D4n4P',
+            'alexandra': '!Al3x4',
+            'member_1762036330730': '&St3f'
+        };
+
+        // User display configuration
+        const USER_CONFIG = {
+            'alexandra': { name: 'Alexandra', initials: 'AP', role: 'TERAPEUT', color: '#9333ea' },
+            'corina': { name: 'Corina', initials: 'CG', role: 'ADMINISTRATOR', color: '#3b82f6' },
+            'dana': { name: 'Dana G', initials: 'DG', role: 'TERAPEUT', color: '#ef4444' },
+            'daniela': { name: 'Dana P', initials: 'DP', role: 'TERAPEUT', color: '#06b6d4' },
+            'member_1762036330730': { name: 'Ștefan', initials: 'S', role: 'ADMINISTRATOR', color: '#4f46e5' }
+        };
+
+        // Special parent profile
+        const PARENT_PROFILE = {
+            name: 'Acces Părinți',
+            initials: '👨‍👩‍👧',
+            role: 'PĂRINTE',
+            color: '#10b981',
+            isParent: true
+        };
+
+        async function loadTeamMembers() {
+            try {
+                const response = await fetch(`${API_BASE}?path=data`);
+                const data = await response.json();
+                return (data.teamMembers || []).filter(member => USER_PASSWORDS.hasOwnProperty(member.id));
+            } catch (error) {
+                console.error('Error loading team members:', error);
+                return [];
+            }
+        }
+
+        function createProfileCard(profile) {
+            const card = document.createElement('div');
+            card.className = 'profile-card';
+            
+            if (profile.isParent) {
+                card.innerHTML = `
+                    <div class="profile-avatar" style="background-color: ${profile.color}">
+                        <span class="profile-icon">${profile.initials}</span>
+                    </div>
+                    <div class="profile-name">${profile.name}</div>
+                    <div class="profile-role">${profile.role}</div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    showParentLogin();
+                });
+            } else {
+                card.innerHTML = `
+                    <div class="profile-avatar" style="background-color: ${profile.color}">
+                        <span class="profile-initials">${profile.initials}</span>
+                    </div>
+                    <div class="profile-name">${profile.name}</div>
+                    <div class="profile-role">${profile.role}</div>
+                `;
+                
+                card.addEventListener('click', () => {
+                    showPasswordPrompt(profile);
+                });
+            }
+            
+            return card;
+        }
+
+        function showPasswordPrompt(profile) {
+            const password = prompt(`Introduceți parola pentru ${profile.name}:`);
+            
+            if (password === null) return; // User canceled
+            
+            // Find the actual user ID
+            const userId = Object.keys(USER_CONFIG).find(key => USER_CONFIG[key].name === profile.name);
+            
+            if (password === USER_PASSWORDS[userId]) {
+                // Redirect to main page with user ID
+                window.location.href = `index.html?userId=${userId}`;
+            } else {
+                alert('Parolă incorectă!');
+            }
+        }
+
+        function showParentLogin() {
+            const code = prompt('Introduceți codul de acces (ex: cezar_2102):');
+            
+            if (code === null) return; // User canceled
+            
+            if (code.trim()) {
+                // Redirect to parent view
+                window.location.href = `parent-view.html?code=${code}`;
+            } else {
+                alert('Vă rugăm să introduceți un cod valid!');
+            }
+        }
+
+        async function renderProfiles() {
+            const grid = document.getElementById('profilesGrid');
+            grid.innerHTML = '';
+
+            // Add team member profiles
+            const teamMembers = await loadTeamMembers();
+            teamMembers.forEach(member => {
+                const config = USER_CONFIG[member.id];
+                if (config) {
+                    const profile = {
+                        id: member.id,
+                        name: config.name,
+                        initials: config.initials,
+                        role: config.role,
+                        color: config.color
+                    };
+                    grid.appendChild(createProfileCard(profile));
+                }
+            });
+
+            // Add parent profile
+            grid.appendChild(createProfileCard(PARENT_PROFILE));
+        }
+
+        // Initialize on page load
+        renderProfiles();
+    </script>
+</body>
+</html>

@@ -24,20 +24,49 @@
     <link rel="stylesheet" href="select-user.css">
 </head>
 <body>
-    <div class="w-full max-w-6xl">
+    <div class="w-full max-w-7xl">
         <div class="text-center mb-12">
-            <img src="tempo-logo-dark.png" alt="Tempo Logo" class="h-16 mx-auto mb-6">
-            <h1 class="text-4xl font-bold text-white mb-3">Bine ai venit!</h1>
-            <p class="text-xl text-white opacity-90">Selectează contul tău pentru a continua</p>
+            <img src="logo.png" alt="Tempo Logo" class="h-16 mx-auto mb-6">
+            <h1 class="text-4xl font-bold text-blue-800 mb-3">Bine ai venit!</h1>
+            <p class="text-xl text-blue-800 opacity-90">Selectează contul tău pentru a continua</p>
         </div>
+
         
-        <div id="userCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <div id="userCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             </div>
         
-       
+       <div class="flex mt-4">
+        <div class="text-blue-800 mr-4 opacity-70 text-xs">Powered by:  </div>
+        <img class="w-24" src="tempo-logo-dark.png"/>
     </div>
 
-    <div id="parentModal" class="parent-modal">
+        <div class="public-calendar-container">
+            <header class="public-calendar-header">
+                <h2 id="publicCurrentPeriod" class="dark:text-white">Calendar Public</h2>
+                <div class="flex flex-wrap items-center gap-2">
+                    <div class="nav-controls">
+                        <button id="publicPrevBtn" class="nav-btn" title="Perioada precedentă">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                        </button>
+                        <button id="publicTodayBtn" class="nav-btn" style="padding-left: 1rem; padding-right: 1rem; font-weight: 500;">Azi</button>
+                        <button id="publicNextBtn" class="nav-btn" title="Perioada următoare">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+                        </button>
+                    </div>
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="month">Lună</button>
+                        <button class="view-btn" data-view="week">Săptămână</button>
+                        <button class="view-btn" data-view="day">Zi</button>
+                    </div>
+                </div>
+            </header>
+            <div id="publicFilters" class="filters-container">
+                </div>
+            <div id="publicCalendarView" class="calendar-view">
+                </div>
+        </div>
+        </div> <div id="parentModal" class="parent-modal">
         <div class="parent-modal-content">
             <div class="parent-modal-header">
                 <h2 id="parentModalTitle">Profil Client</h2>
@@ -66,6 +95,15 @@
         // Store current selected month for schedule viewing
         let currentScheduleDate = new Date();
 
+        const calendarState = {
+            currentDate: new Date(),
+            currentView: 'month',
+            teamMembers: [],
+            clients: [],
+            events: [],
+            activeFilters: [],
+        };
+
         async function loadTeamMembers() {
             try {
                 const response = await fetch(`${API_BASE}?path=data`);
@@ -74,6 +112,26 @@
                 return (data.teamMembers || []).filter(member => USER_PASSWORDS.hasOwnProperty(member.id));
             } catch (error) {
                 console.error('Error loading team members:', error);
+                return [];
+            }
+        }
+
+        async function loadAllData() {
+            try {
+                const response = await fetch(`${API_BASE}?path=data`);
+                const data = await response.json();
+                
+                // Salvăm datele în state-ul local
+                calendarState.teamMembers = data.teamMembers || [];
+                calendarState.clients = data.clients || [];
+                calendarState.events = data.events || [];
+                // Setăm filtrele active inițial ca fiind toți membrii
+                calendarState.activeFilters = (data.teamMembers || []).map(m => m.id);
+
+                // Filtrăm membrii pentru cardurile de login (logica originală)
+                return (data.teamMembers || []).filter(member => USER_PASSWORDS.hasOwnProperty(member.id));
+            } catch (error) {
+                console.error('Error loading all data:', error);
                 return [];
             }
         }
@@ -127,7 +185,8 @@
 
         async function renderUserCards() {
             const container = document.getElementById('userCardsContainer');
-            const teamMembers = await loadTeamMembers();
+            const teamMembers = await loadAllData();
+            
 
             let cardsHTML = '';
 
@@ -138,7 +197,7 @@
                         <div class="user-avatar" style="background-color: ${member.color}">
                             ${member.initials}
                         </div>
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">${member.name}</h3>
+                        <h3 class="user-card-name">${member.name}</h3>
                         <span class="role-badge ${getRoleClass(member.role)}">${getRoleLabel(member.role)}</span>
                         
                         <div class="password-input-container">
@@ -162,7 +221,7 @@
                     <div class="user-avatar" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%)">
                         👨‍👩‍👧
                     </div>
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Acces Părinte</h3>
+                    <h3 class="user-card-name">Acces Părinte</h3>
                     <span class="role-badge role-parent">Părinte</span>
                     <div class="parent-input-container">
                         <input 
@@ -214,6 +273,9 @@
 
             // Add parent card functionality (rămâne neschimbat)
             setupParentCard();
+
+            // --- NOU: Inițializăm calendarul după ce datele au fost încărcate ---
+            initPublicCalendar();
         }
 
         function setupParentCard() {
@@ -407,7 +469,7 @@
         function calculateEndTime(startTime, durationMinutes) {
             if (!startTime) return "N/A";
             const [hours, minutes] = startTime.split(':').map(Number);
-            const totalMinutes = (hours * 60) + minutes + durationMinutes;
+            const totalMinutes = (hours * 60) + minutes + parseInt(durationMinutes, 10);
             const endHours = Math.floor(totalMinutes / 60) % 24;
             const endMinutes = totalMinutes % 60;
             return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
@@ -644,6 +706,468 @@
             }
         });
 
+        // ==========================================================
+        // --- START LOGICĂ NOUĂ PENTRU CALENDARUL PUBLIC ---
+        // ==========================================================
+
+        /**
+         * Inițializează toți ascultătorii de evenimente pentru calendarul public.
+         */
+        function initPublicCalendar() {
+            renderPublicCalendar();
+            renderPublicFilters();
+
+            document.getElementById('publicPrevBtn').addEventListener('click', () => handlePublicNavigation(-1));
+            document.getElementById('publicNextBtn').addEventListener('click', () => handlePublicNavigation(1));
+            document.getElementById('publicTodayBtn').addEventListener('click', navigateToPublicToday);
+            
+            document.querySelectorAll('.view-toggle .view-btn').forEach(btn => {
+                btn.addEventListener('click', handlePublicViewChange);
+            });
+        }
+
+        /**
+         * Funcția principală de randare care apelează vizualizarea corectă.
+         */
+        function renderPublicCalendar() {
+            const { currentDate, currentView } = calendarState;
+            updateCurrentPeriodLabel(currentDate, currentView);
+
+            if (currentView === 'month') {
+                renderPublicMonthView(handlePublicDayClick);
+            } else if (currentView === 'week') {
+                renderPublicWeekView();
+            } else if (currentView === 'day') {
+                renderPublicDayView();
+            }
+        }
+
+        /**
+         * Randează filtrele pentru terapeuți.
+         */
+        function renderPublicFilters() {
+            const { teamMembers, activeFilters } = calendarState;
+            const container = document.getElementById('publicFilters');
+            if (!container) return;
+
+            container.innerHTML = '';
+            
+            teamMembers.forEach(member => {
+                const chip = document.createElement('div');
+                chip.className = 'filter-chip';
+                chip.style.color = member.color;
+                
+                const isActive = activeFilters.includes(member.id);
+                if (isActive) {
+                    chip.classList.add('active');
+                    chip.style.borderColor = member.color;
+                }
+                
+                chip.innerHTML = `<span class="color-dot" style="background-color: ${member.color}"></span><span>${member.name}</span>`;
+                
+                chip.addEventListener('click', () => {
+                    // Toggle filter logic
+                    const index = calendarState.activeFilters.indexOf(member.id);
+                    if (index > -1) {
+                        calendarState.activeFilters.splice(index, 1);
+                    } else {
+                        calendarState.activeFilters.push(member.id);
+                    }
+                    renderPublicFilters(); // Re-render filters
+                    renderPublicCalendar(); // Re-render calendar
+                });
+                
+                container.appendChild(chip);
+            });
+        }
+
+        // --- Handlers Navigare Calendar Public ---
+
+        function handlePublicNavigation(direction) {
+            const { currentDate, currentView } = calendarState;
+            const newDate = new Date(currentDate);
+            if (currentView === 'month') newDate.setMonth(newDate.getMonth() + direction);
+            else if (currentView === 'week') newDate.setDate(newDate.getDate() + (7 * direction));
+            else if (currentView === 'day') newDate.setDate(newDate.getDate() + direction);
+            calendarState.currentDate = newDate;
+            renderPublicCalendar();
+        }
+
+        function navigateToPublicToday() {
+            calendarState.currentDate = new Date();
+            renderPublicCalendar();
+        }
+
+        function handlePublicViewChange(e) {
+            const newView = e.target.dataset.view;
+            if (newView) {
+                calendarState.currentView = newView;
+                document.querySelectorAll('.view-toggle .view-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                renderPublicCalendar();
+            }
+        }
+
+        function handlePublicDayClick(date) {
+            calendarState.currentDate = date;
+            calendarState.currentView = 'day';
+            document.querySelectorAll('.view-toggle .view-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector('.view-toggle .view-btn[data-view="day"]').classList.add('active');
+            renderPublicCalendar();
+        }
+
+        // --- Funcții de Randare Vizualizări (Copiate și adaptate din calendarView.js) ---
+
+        function renderPublicMonthView(onDayClick) {
+            const { currentDate, activeFilters } = calendarState;
+            const container = document.getElementById('publicCalendarView');
+            container.innerHTML = ''; 
+
+            const monthView = document.createElement('div');
+            monthView.className = 'month-view';
+            const grid = document.createElement('div');
+            grid.className = 'calendar-grid';
+
+            const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            dayNames.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'day-header';
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            let startDate = new Date(firstDay);
+            const dayOfWeek = firstDay.getDay();
+            const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            startDate.setDate(startDate.getDate() - diff);
+
+            for (let i = 0; i < 42; i++) {
+                const currentDay = new Date(startDate);
+                currentDay.setDate(startDate.getDate() + i);
+
+                const dayCell = document.createElement('div');
+                dayCell.className = 'day-cell';
+
+                if (currentDay.getMonth() !== month) dayCell.classList.add('other-month');
+                if (isWeekend(currentDay)) dayCell.classList.add('weekend');
+                if (isToday(currentDay)) dayCell.classList.add('current-day');
+
+                const dayNumber = document.createElement('div');
+                dayNumber.className = 'day-number';
+                dayNumber.textContent = currentDay.getDate();
+                dayCell.appendChild(dayNumber);
+
+                const dayEvents = getEventsForDatePublic(currentDay);
+
+                if (dayEvents.length > 0) {
+                    const dotsContainer = document.createElement('div');
+                    dotsContainer.className = 'event-dots';
+                    const addedMembers = new Set(); 
+
+                    dayEvents.forEach(event => {
+                        const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+                        teamMemberIds.forEach(memberId => {
+                            if (addedMembers.has(memberId)) return; 
+                            
+                            const isFilterActive = activeFilters.length === 0 || activeFilters.includes(memberId);
+
+                            if (isFilterActive) {
+                                const member = calendarState.teamMembers.find(m => m.id === memberId);
+                                if (member) {
+                                    const dot = document.createElement('div');
+                                    dot.className = 'event-dot';
+                                    dot.style.backgroundColor = member.color;
+                                    dot.title = member.name;
+                                    dotsContainer.appendChild(dot);
+                                    addedMembers.add(memberId);
+                                }
+                            }
+                        });
+                    });
+                    dayCell.appendChild(dotsContainer);
+                }
+
+                dayCell.addEventListener('click', () => onDayClick(currentDay));
+                grid.appendChild(dayCell);
+            }
+
+            monthView.appendChild(grid);
+            container.appendChild(monthView);
+        }
+
+        function renderPublicWeekView() {
+            const { currentDate } = calendarState;
+            const container = document.getElementById('publicCalendarView');
+            container.innerHTML = '';
+
+            const weekView = document.createElement('div');
+            weekView.className = 'week-view';
+
+            const weekStart = getWeekStart(currentDate);
+            const days = [];
+            for (let i = 0; i < 7; i++) {
+                const day = new Date(weekStart);
+                day.setDate(weekStart.getDate() + i);
+                days.push(day);
+            }
+
+            const header = document.createElement('div');
+            header.className = 'week-header';
+            header.innerHTML = '<div></div>'; 
+
+            days.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header-week';
+                dayHeader.innerHTML = `${day.toLocaleString('ro-RO', { weekday: 'short' })}<br>${day.getDate()}`;
+                if (isToday(day)) dayHeader.classList.add('today');
+                header.appendChild(dayHeader);
+            });
+            weekView.appendChild(header);
+
+            const timeGrid = document.createElement('div');
+            timeGrid.className = 'time-grid-container';
+
+            for (let hour = 8; hour <= 20; hour++) {
+                const timeSlot = document.createElement('div');
+                timeSlot.className = 'time-slot';
+                
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'time-label';
+                timeLabel.textContent = formatHour(hour);
+                timeSlot.appendChild(timeLabel);
+
+                days.forEach(day => {
+                    const hourCell = document.createElement('div');
+                    hourCell.className = 'hour-cell';
+                    const eventContainer = document.createElement('div');
+                    eventContainer.className = 'event-container';
+                    eventContainer.dataset.date = formatDateISO(day);
+                    eventContainer.dataset.hour = hour;
+                    hourCell.appendChild(eventContainer);
+                    timeSlot.appendChild(hourCell);
+                });
+                timeGrid.appendChild(timeSlot);
+            }
+            weekView.appendChild(timeGrid);
+            
+            renderEventsInPublicGrid(days, weekView);
+            container.appendChild(weekView);
+        }
+
+        function renderPublicDayView() {
+            const { currentDate } = calendarState;
+            const container = document.getElementById('publicCalendarView');
+            container.innerHTML = '';
+
+            const dayView = document.createElement('div');
+            dayView.className = 'day-view'; 
+
+            const days = [currentDate];
+
+            const header = document.createElement('div');
+            header.className = 'week-header';
+            header.innerHTML = '<div></div>'; 
+
+            const dayHeader = document.createElement('div');
+            dayHeader.className = 'day-header-week';
+            dayHeader.innerHTML = currentDate.toLocaleString('ro-RO', { weekday: 'long', month: 'long', day: 'numeric' });
+            if (isToday(currentDate)) dayHeader.classList.add('today');
+            header.appendChild(dayHeader);
+            dayView.appendChild(header);
+
+            const timeGrid = document.createElement('div');
+            timeGrid.className = 'time-grid-container';
+
+            for (let hour = 8; hour <= 20; hour++) {
+                const timeSlot = document.createElement('div');
+                timeSlot.className = 'time-slot';
+                
+                const timeLabel = document.createElement('div');
+                timeLabel.className = 'time-label';
+                timeLabel.textContent = formatHour(hour);
+                timeSlot.appendChild(timeLabel);
+
+                const hourCell = document.createElement('div');
+                hourCell.className = 'hour-cell';
+                const eventContainer = document.createElement('div');
+                eventContainer.className = 'event-container';
+                eventContainer.dataset.date = formatDateISO(currentDate);
+                eventContainer.dataset.hour = hour;
+                hourCell.appendChild(eventContainer);
+                timeSlot.appendChild(hourCell);
+                
+                timeGrid.appendChild(timeSlot);
+            }
+            dayView.appendChild(timeGrid);
+
+            renderEventsInPublicGrid(days, dayView);
+            container.appendChild(dayView);
+        }
+
+        /**
+         * Funcția de bază care implementează logica de vizualizare Public/Privat.
+         */
+        function renderEventsInPublicGrid(days, viewElement) {
+            const { activeFilters, teamMembers, clients } = calendarState;
+            
+            const visibleTherapists = activeFilters.length === 0 
+                ? teamMembers 
+                : teamMembers.filter(m => activeFilters.includes(m.id));
+            
+            if (visibleTherapists.length === 0) return;
+            
+            const trackWidth = 100 / visibleTherapists.length;
+            
+            days.forEach((day) => {
+                const dateStr = formatDateISO(day);
+                const dayEvents = getEventsForDatePublic(day);
+                
+                const eventsByTherapist = {};
+                visibleTherapists.forEach(therapist => {
+                    eventsByTherapist[therapist.id] = [];
+                });
+                
+                dayEvents.forEach(event => {
+                    const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+                    teamMemberIds.forEach(memberId => {
+                        if (eventsByTherapist[memberId]) {
+                            eventsByTherapist[memberId].push(event);
+                        }
+                    });
+                });
+                
+                visibleTherapists.forEach((therapist, therapistIndex) => {
+                    const therapistEvents = eventsByTherapist[therapist.id] || [];
+                    
+                    therapistEvents.forEach((event) => {
+                        if (!event.startTime || !event.duration) return;
+
+                        const timeParts = event.startTime.split(':').map(Number);
+                        const startHour = timeParts[0] || 0;
+                        const startMinute = timeParts[1] || 0;
+                        const formattedStartTime = `${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}`;
+                        
+                        const containerSelector = `.event-container[data-date="${dateStr}"][data-hour="${startHour}"]`;
+                        const container = viewElement.querySelector(containerSelector);
+                        
+                        if (!container) return;
+                        
+                        const eventBlock = document.createElement('div');
+                        eventBlock.className = 'event-block';
+                        
+                        const endTime = calculateEndTime(event.startTime, event.duration);
+                        
+                        // Poziționare
+                        const topOffset = (startMinute / 60) * 120; // 120px = înălțimea unei ore
+                        const height = (event.duration / 60) * 120;
+                        eventBlock.style.top = `${topOffset}px`;
+                        eventBlock.style.height = `${height}px`;
+                        eventBlock.style.width = `${trackWidth}%`;
+                        eventBlock.style.left = `${trackWidth * therapistIndex}%`;
+
+                        // --- LOGICA DE VIZUALIZARE PUBLIC/PRIVAT ---
+                        if (event.isPublic) {
+                            // Afișează detalii complete
+                            eventBlock.classList.add('admin-view'); // Folosim clasa admin pentru fundal plin
+                            eventBlock.style.backgroundColor = therapist.color;
+                            
+                            const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
+                            const clientNames = clientIds.map(id => {
+                                const client = calendarState.clients.find(c => c.id === id);
+                                return client ? client.name : '';
+                            }).filter(Boolean).join(', ');
+
+                            eventBlock.innerHTML = `
+                                <div class="event-time">${formattedStartTime} - ${endTime}</div>
+                                <div class="event-title">${event.name}</div>
+                                ${clientNames ? `<div class="event-clients">${clientNames}</div>` : ''}
+                            `;
+                            // O poți face clicabilă dacă vrei, de ex:
+                            // eventBlock.addEventListener('click', () => alert(event.details || event.name));
+                        } else {
+                            // Afișează "Ocupat"
+                            eventBlock.classList.add('public-view-private'); // Clasa CSS nouă
+                            eventBlock.style.borderColor = therapist.color;
+                            eventBlock.style.borderStyle = "dashed";
+                            eventBlock.style.borderWidth = "2px";
+                            eventBlock.style.color = therapist.color;
+                            
+                            eventBlock.innerHTML = `
+                                <div class="event-time">${formattedStartTime} - ${endTime}</div>
+                                <div class="event-title">Ocupat</div>
+                            `;
+                        }
+                        
+                        container.appendChild(eventBlock);
+                    });
+                });
+            });
+        }
+
+        // --- Funcții Helper pentru Calendar (Copiate și adaptate) ---
+
+        function getEventsForDatePublic(dateObj) {
+            const { events, activeFilters } = calendarState;
+            const dateStr = formatDateISO(dateObj);
+            
+            return events.filter(event => {
+                if (event.date !== dateStr) return false;
+                if (activeFilters.length === 0) return true;
+                
+                const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+                return teamMemberIds.some(id => activeFilters.includes(id));
+            });
+        }
+
+        function getWeekStart(date) {
+            const d = new Date(date);
+            const day = d.getDay(); 
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            return new Date(d.setDate(diff));
+        }
+
+        function isToday(date) {
+            const today = new Date();
+            return date.getDate() === today.getDate() &&
+                   date.getMonth() === today.getMonth() &&
+                   date.getFullYear() === today.getFullYear();
+        }
+
+        function isWeekend(date) {
+            const day = date.getDay();
+            return day === 0 || day === 6;
+        }
+
+        function formatDateISO(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function formatHour(hour) {
+            return `${String(hour).padStart(2, '0')}:00`;
+        }
+
+        function updateCurrentPeriodLabel(date, view) {
+            const labelEl = document.getElementById('publicCurrentPeriod');
+            if (!labelEl) return;
+            
+            let label = '';
+            const ro = 'ro-RO';
+            if (view === 'month') {
+                label = date.toLocaleString(ro, { month: 'long', year: 'numeric' });
+            } else if (view === 'week') {
+                const start = getWeekStart(date);
+                const end = new Date(start);
+                end.setDate(end.getDate() + 6);
+                label = `${start.toLocaleDateString(ro, {day: 'numeric', month: 'short'})} - ${end.toLocaleDateString(ro, {day: 'numeric', month: 'short', year: 'numeric'})}`;
+            } else if (view === 'day') {
+                label = date.toLocaleString(ro, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            }
+            labelEl.textContent = label;
+        }
+
         // Initialize theme
         const savedTheme = localStorage.getItem('calendar-theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
@@ -651,5 +1175,7 @@
         // Load users on page load
         renderUserCards();
     </script>
+
+    
 </body>
 </html>
