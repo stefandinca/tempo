@@ -99,17 +99,20 @@ try {
                     $event['teamMemberIds'] = $event['teamMemberIds'] ? explode(',', $event['teamMemberIds']) : [];
                     $event['clientIds'] = $event['clientIds'] ? explode(',', $event['clientIds']) : [];
                     $event['programIds'] = $event['programIds'] ? explode(',', $event['programIds']) : [];
-                    $event['repeating'] = $event['repeating'] ? json_decode($event['repeating']) : [];
-                    // Convertim 'isPublic' și 'isBillable' înapoi în boolean pentru JS
+                    $event['repeating'] = $event['repeating'] ? array_map('intval', json_decode($event['repeating'])) : [];                    // Convertim 'isPublic' și 'isBillable' înapoi în boolean pentru JS
                     $event['isPublic'] = (bool)$event['isPublic'];
                     $event['isBillable'] = (bool)$event['isBillable'];
 
-                    // !!! ADAUGĂ ACESTE 3 LINII AICI !!!
-                    // --- CORECȚIE PENTRU FORMATUL OREI (hh:mm:ss -> hh:mm) ---
+                    // === IMPROVED TIME FORMAT CORRECTION ===
+                    // MySQL returns TIME as hh:mm:ss, but JavaScript expects hh:mm
+                    // We MUST trim the seconds to ensure proper event positioning
                     if (!empty($event['startTime'])) {
-                        $event['startTime'] = substr($event['startTime'], 0, 5);
+                        // Check if the time has seconds (length > 5 means it's hh:mm:ss format)
+                        if (strlen($event['startTime']) > 5) {
+                            $event['startTime'] = substr($event['startTime'], 0, 5);
+                        }
                     }
-                    // --- SFÂRȘIT CORECȚIE ---
+                    // === END TIME FORMAT CORRECTION ===
                 }
 
                 $data['events'] = $events;
@@ -158,9 +161,16 @@ try {
                     $stmt_evt_prog = $pdo->prepare("INSERT INTO event_programs (event_id, program_id) VALUES (?, ?)");
 
                     foreach ($input['events'] as $e) {
+                        // === ENSURE TIME FORMAT IS hh:mm BEFORE SAVING ===
+                        $startTime = $e['startTime'] ?? null;
+                        if ($startTime && strlen($startTime) > 5) {
+                            $startTime = substr($startTime, 0, 5);
+                        }
+                        // === END TIME FORMAT CHECK ===
+                        
                         $stmt_evt->execute([
                             $e['id'], $e['name'] ?? null, $e['details'] ?? null, $e['type'] ?? 'therapy', 
-                            $e['date'], $e['startTime'] ?? null, $e['duration'] ?? null,
+                            $e['date'], $startTime, $e['duration'] ?? null,
                             isset($e['isPublic']) ? (int)$e['isPublic'] : 0, 
                             isset($e['isBillable']) ? (int)$e['isBillable'] : 1, 
                             json_encode($e['repeating'] ?? []), $e['comments'] ?? null

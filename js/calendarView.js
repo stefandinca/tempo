@@ -418,41 +418,50 @@ function groupOverlappingEvents(events) {
         return (startH * 60 + startM);
     };
 
-    // Sortează evenimentele după ora de început
-    const sortedEvents = [...events].sort((a, b) => getStartMinutes(a) - getStartMinutes(b));
-
-    const groups = [];
-    if (sortedEvents.length === 0) return [];
-
-    let currentGroup = [];
-    let maxEndInGroup = 0; // Urmărește cea mai recentă oră de sfârșit din grupul curent
-
-    sortedEvents.forEach(event => {
-        const startMinutes = getStartMinutes(event);
+    // === FIX: Check if events are for the SAME THERAPIST ===
+    // Events should only stack if they're for DIFFERENT therapists at the SAME time
+    // If they're the same therapist at different times, they should be in separate groups
+    
+    // First, group by therapist
+    const byTherapist = {};
+    events.forEach(event => {
+        const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+        const therapistKey = teamMemberIds.sort().join(',') || 'none'; // Create unique key for therapist combo
         
-        // Verifică dacă evenimentul începe înainte de sfârșitul maxim al grupului curent
-        if (currentGroup.length === 0 || startMinutes < maxEndInGroup) {
-            // Evenimentul se suprapune cu grupul curent (sau e primul event)
-            currentGroup.push(event);
-            // Actualizează ora de sfârșit maximă a grupului
-            maxEndInGroup = Math.max(maxEndInGroup, getEndMinutes(event));
+        if (!byTherapist[therapistKey]) {
+            byTherapist[therapistKey] = [];
+        }
+        byTherapist[therapistKey].push(event);
+    });
+    
+    // Now check for overlaps ONLY within events at the same time for DIFFERENT therapists
+    const allGroups = [];
+    
+    // Process events by start time
+    const eventsByTime = {};
+    events.forEach(event => {
+        const startMinutes = getStartMinutes(event);
+        if (!eventsByTime[startMinutes]) {
+            eventsByTime[startMinutes] = [];
+        }
+        eventsByTime[startMinutes].push(event);
+    });
+    
+    // Group events that start at the exact same time
+    Object.keys(eventsByTime).forEach(startTime => {
+        const sameTimeEvents = eventsByTime[startTime];
+        
+        if (sameTimeEvents.length > 1) {
+            // Multiple events at same time - they should stack
+            allGroups.push(sameTimeEvents);
         } else {
-            // Evenimentul NU se suprapune, deci grupul anterior e gata
-            groups.push(currentGroup);
-            // Începe un grup nou cu acest eveniment
-            currentGroup = [event];
-            maxEndInGroup = getEndMinutes(event);
+            // Single event at this time - put in its own group
+            allGroups.push([sameTimeEvents[0]]);
         }
     });
-
-    // Adaugă ultimul grup
-    if (currentGroup.length > 0) {
-        groups.push(currentGroup);
-    }
-
-    return groups;
+    
+    return allGroups;
 }
-
 
 // --- Funcții Helper Utilitare (private) ---
 

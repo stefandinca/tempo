@@ -371,14 +371,29 @@ async function handleSaveEvent(e) {
     const clientIds = Array.from(calendarState.getState().selectedClientIds);
     const programIds = Array.from(calendarState.getState().selectedProgramIds);
     
+    
     const repeatingDays = [];
-    ['repeatMon', 'repeatTue', 'repeatWed', 'repeatThu', 'repeatFri'].forEach((id, index) => {
-        if (formData.has(id)) repeatingDays.push(index + 1);
-    });
+['repeatMon', 'repeatTue', 'repeatWed', 'repeatThu', 'repeatFri'].forEach((id, index) => {
+    const checkbox = document.getElementById(id);
+    if (checkbox && checkbox.checked) {
+        repeatingDays.push(index + 1); // Mon=1, Tue=2, Wed=3, Thu=4, Fri=5
+    }
+});
+
+console.log('Repeating Days array:', repeatingDays);
+console.log('Repeating Days types:', repeatingDays.map(d => typeof d));
+console.log('Final repeatingDays array:', repeatingDays);
+
     
     const eventType = formData.get('eventType');
     let startTime = formData.get('startTime');
     let duration = parseInt(formData.get('duration'));
+
+    console.log('=== REPEATING DAYS DEBUG ===');
+console.log('Raw array:', repeatingDays);
+console.log('Types:', repeatingDays.map(d => typeof d));
+console.log('Values:', repeatingDays);
+console.log('===========================');
 
     if (eventType === 'day-off' || eventType === 'pauza-masa' || eventType === 'sedinta') {
         if (!startTime) startTime = '08:00';
@@ -401,7 +416,8 @@ async function handleSaveEvent(e) {
         teamMemberIds,
         clientIds: clientIds.length > 0 ? clientIds : undefined,
         programIds: programIds.length > 0 ? programIds : undefined,
-        repeating: repeatingDays
+        repeating: repeatingDays.map(d => parseInt(d)) // Ensure integers
+        
     };
 
     if (editingEventId) {
@@ -658,14 +674,23 @@ function createRecurringEvents(eventBase) {
     const startDate = new Date(parts[0], parts[1] - 1, parts[2]);
     const endOfMonth = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
     let currentDate = new Date(startDate);
+    
     while (currentDate <= endOfMonth) {
         const dayOfWeek = currentDate.getDay();
         const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek;
+        
         if (eventBase.repeating.includes(adjustedDay)) {
-            events.push({ ...eventBase, id: generateEventId(), date: formatDate(currentDate, 'iso') });
+            // FIX: Use a timezone-safe date formatting method
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+            
+            events.push({ ...eventBase, id: generateEventId(), date: dateStr });
         }
         currentDate.setDate(currentDate.getDate() + 1);
     }
+    
     return events;
 }
 
