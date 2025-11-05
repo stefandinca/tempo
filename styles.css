@@ -665,13 +665,16 @@ body.public-view {
   border-radius: 0.5rem;
 }
 
-
+.event-block {
+  margin: 0 !important;
+  border: 1px solid currentColor;
+}
 
 .time-slot {
   display: grid;
   grid-template-columns: 80px repeat(7, 1fr);
   gap: 0.5rem;
-  margin-bottom: 0.25rem;
+  
 }
 
 .time-label {
