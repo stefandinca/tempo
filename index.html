@@ -91,7 +91,7 @@
             'dana': '#D4n4G',
             'daniela': '@D4n4P',
             'alexandra': '!Al3x4',
-            'member_1762036330730': '&St3f'
+            'stefan': '&St3f'
         };
 
         // Store current selected month for schedule viewing
@@ -138,7 +138,7 @@
             try {
                 const [dataResponse, evolutionResponse] = await Promise.all([
                     fetch(`${API_BASE}?path=data`),
-                    fetch(`${API_BASE}?path=evolution.json`)
+                    fetch(`${API_BASE}?path=evolution`)
                 ]);
                 
                 const data = await dataResponse.json();

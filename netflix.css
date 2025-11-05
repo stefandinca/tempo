@@ -1,0 +1,785 @@
+/* Netflix-Style Body */
+.netflix-body {
+    min-height: 100vh;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.95)), 
+                url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23141414" width="100" height="100"/></svg>');
+    background-color: #141414;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Netflix Container */
+.netflix-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Netflix Logo */
+.netflix-logo-container {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    z-index: 100;
+}
+
+.netflix-logo {
+    height: 40px;
+    width: auto;
+}
+
+/* Netflix Content */
+.netflix-content {
+    padding-top: 8rem;
+    padding-bottom: 4rem;
+    text-align: center;
+}
+
+/* Netflix Title */
+.netflix-title {
+    font-size: 3.5rem;
+    font-weight: 400;
+    color: #fff;
+    margin-bottom: 3rem;
+    letter-spacing: 0.5px;
+}
+
+/* Netflix Profiles Grid */
+.netflix-profiles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 200px));
+    gap: 2rem;
+    justify-content: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* Netflix Profile Card */
+.netflix-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.netflix-profile:hover .netflix-avatar {
+    transform: scale(1.1);
+    border-color: #fff;
+}
+
+/* Netflix Avatar */
+.netflix-avatar {
+    width: 180px;
+    height: 180px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+    border: 4px solid transparent;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Netflix Profile Name */
+.netflix-profile-name {
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #808080;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+}
+
+.netflix-profile:hover .netflix-profile-name {
+    color: #fff;
+}
+
+/* Netflix Password Container */
+.netflix-password-container,
+.netflix-parent-container {
+    display: none;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    width: 100%;
+    max-width: 250px;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Netflix Input Styles */
+.netflix-password-input,
+.netflix-code-input {
+    width: 100%;
+    padding: 1rem;
+    background: rgba(51, 51, 51, 0.7);
+    border: 2px solid rgba(128, 128, 128, 0.5);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.netflix-password-input:focus,
+.netflix-code-input:focus {
+    background: rgba(51, 51, 51, 0.9);
+    border-color: #fff;
+}
+
+.netflix-password-input::placeholder,
+.netflix-code-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Netflix Button Styles */
+.netflix-login-btn,
+.netflix-view-btn {
+    width: 100%;
+    padding: 1rem;
+    background: #E50914;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+}
+
+.netflix-login-btn:hover:not(:disabled),
+.netflix-view-btn:hover:not(:disabled) {
+    background: #f40612;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(229, 9, 20, 0.5);
+}
+
+.netflix-login-btn:disabled,
+.netflix-view-btn:disabled {
+    background: rgba(229, 9, 20, 0.5);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Netflix Calendar Styling */
+.netflix-calendar {
+    background: rgba(20, 20, 20, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 4rem;
+}
+
+.netflix-calendar .public-calendar-header {
+    background: rgba(20, 20, 20, 0.98);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.netflix-calendar .public-calendar-header h2 {
+    color: #fff;
+}
+
+/* Parent Profile Modal - Netflix Style */
+.parent-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 2rem;
+    overflow-y: auto;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.parent-modal.active {
+    display: flex;
+}
+
+.parent-modal-content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 2rem auto;
+    background: #1f1f1f;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.parent-modal-header {
+    padding: 2rem;
+    background: linear-gradient(135deg, #E50914 0%, #b20710 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.parent-modal-header h2 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.parent-modal-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.parent-modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+.parent-modal-body {
+    padding: 2rem;
+    max-height: 70vh;
+    overflow-y: auto;
+    background: #1f1f1f;
+    color: #fff;
+}
+
+.client-info-section {
+    background: rgba(40, 40, 40, 0.5);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.client-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.info-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #808080;
+    letter-spacing: 0.05em;
+}
+
+.info-value {
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #fff;
+}
+
+.error-message {
+    padding: 1.5rem;
+    background: rgba(229, 9, 20, 0.1);
+    color: #E50914;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 500;
+    border: 1px solid rgba(229, 9, 20, 0.3);
+}
+
+.chart-container-parent {
+    min-height: 400px;
+    background: rgba(40, 40, 40, 0.5);
+    border-radius: 8px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.program-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(40, 40, 40, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.program-history-table th,
+.program-history-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.program-history-table thead th {
+    background: rgba(20, 20, 20, 0.8);
+    font-weight: 600;
+    color: #808080;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.05em;
+}
+
+.program-history-score {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: 2px solid;
+}
+
+.program-history-score[data-score="0"] { color: #ef4444; border-color: #ef4444; background: rgba(239, 68, 68, 0.1); }
+.program-history-score[data-score="-"] { color: #f59e0b; border-color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+.program-history-score[data-score="P"] { color: #3b82f6; border-color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+.program-history-score[data-score="+"] { color: #10b981; border-color: #10b981; background: rgba(16, 185, 129, 0.1); }
+
+/* Monthly Schedule Stats */
+.schedule-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.stat-card {
+    background: rgba(40, 40, 40, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    background: rgba(50, 50, 50, 0.7);
+    transform: translateY(-2px);
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value.hours { color: #4A90E2; }
+.stat-value.present { color: #10b981; }
+.stat-value.absent { color: #ef4444; }
+
+.stat-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #808080;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.schedule-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.schedule-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(40, 40, 40, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.schedule-item:hover {
+    background: rgba(50, 50, 50, 0.7);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateX(4px);
+}
+
+.schedule-date {
+    font-weight: 600;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.schedule-time {
+    font-size: 0.875rem;
+    color: #808080;
+    margin-top: 0.25rem;
+}
+
+.schedule-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.375rem 0.875rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.status-badge.present {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.5);
+}
+
+.status-badge.absent {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.5);
+}
+
+.month-selector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(40, 40, 40, 0.5);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.month-selector button {
+    padding: 0.75rem;
+    background: rgba(60, 60, 60, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.month-selector button:hover {
+    background: #E50914;
+    border-color: #E50914;
+    transform: scale(1.1);
+}
+
+.month-selector span {
+    font-weight: 600;
+    font-size: 1.125rem;
+    color: #fff;
+    min-width: 200px;
+    text-align: center;
+}
+
+/* Calendar Filters - Netflix Style */
+#publicFilters {
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    background: rgba(20, 20, 20, 0.8);
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(40, 40, 40, 0.5);
+    color: #fff;
+}
+
+.filter-chip:hover {
+    background-color: rgba(60, 60, 60, 0.7);
+    transform: translateY(-2px);
+}
+
+.filter-chip.active {
+    border-color: currentColor;
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 12px currentColor;
+}
+
+.color-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* Calendar Navigation */
+.nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 0.25rem;
+    background: rgba(40, 40, 40, 0.5);
+    padding: 0.25rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.view-btn {
+    padding: 0.625rem 1.25rem;
+    border: none;
+    background: transparent;
+    color: #808080;
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+}
+
+.view-btn:hover {
+    background: rgba(60, 60, 60, 0.5);
+    color: #fff;
+}
+
+.view-btn.active {
+    background: #E50914;
+    color: white;
+    box-shadow: 0 2px 8px rgba(229, 9, 20, 0.3);
+}
+
+.nav-btn {
+    padding: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(40, 40, 40, 0.5);
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+    background: rgba(60, 60, 60, 0.7);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.05);
+}
+
+/* Event styling for private events */
+.event-block.public-view-private {
+    background: rgba(40, 40, 40, 0.5);
+    border: 2px dashed currentColor;
+    color: inherit;
+    opacity: 0.8;
+    cursor: default !important;
+}
+
+.event-block.public-view-private:hover {
+    transform: none;
+    z-index: 1;
+    box-shadow: none;
+}
+
+.event-block.public-view-private .event-title {
+    font-style: italic;
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .netflix-title {
+        font-size: 2.5rem;
+    }
+    
+    .netflix-profiles-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 180px));
+        gap: 1.5rem;
+    }
+    
+    .netflix-avatar {
+        width: 150px;
+        height: 150px;
+        font-size: 3rem;
+    }
+    
+    .netflix-profile-name {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .netflix-container {
+        padding: 1rem;
+    }
+    
+    .netflix-logo-container {
+        top: 1rem;
+        left: 1rem;
+    }
+    
+    .netflix-logo {
+        height: 30px;
+    }
+    
+    .netflix-content {
+        padding-top: 5rem;
+        padding-bottom: 2rem;
+    }
+    
+    .netflix-title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .netflix-profiles-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 150px));
+        gap: 1rem;
+        padding: 0 1rem;
+    }
+    
+    .netflix-avatar {
+        width: 120px;
+        height: 120px;
+        font-size: 2.5rem;
+    }
+    
+    .netflix-profile-name {
+        font-size: 1rem;
+    }
+    
+    .netflix-password-container,
+    .netflix-parent-container {
+        max-width: 200px;
+    }
+    
+    .parent-modal {
+        padding: 0;
+    }
+    
+    .parent-modal-content {
+        width: 100%;
+        max-width: 100%;
+        min-height: 100vh;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    
+    .parent-modal-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .parent-modal-body {
+        padding: 1.5rem;
+        max-height: none;
+    }
+    
+    .netflix-calendar {
+        margin-top: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .netflix-title {
+        font-size: 1.75rem;
+    }
+    
+    .netflix-profiles-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 120px));
+        gap: 0.75rem;
+    }
+    
+    .netflix-avatar {
+        width: 100px;
+        height: 100px;
+        font-size: 2rem;
+    }
+    
+    .netflix-profile-name {
+        font-size: 0.875rem;
+    }
+}
+
+/* Calendar view specific styles that need Netflix theming */
+#publicCalendarView {
+    padding: 1.5rem;
+    background: rgba(20, 20, 20, 0.5);
+}
+
+/* Scrollbar styling for Netflix theme */
+.parent-modal-body::-webkit-scrollbar,
+.schedule-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.parent-modal-body::-webkit-scrollbar-track,
+.schedule-list::-webkit-scrollbar-track {
+    background: rgba(40, 40, 40, 0.5);
+    border-radius: 4px;
+}
+
+.parent-modal-body::-webkit-scrollbar-thumb,
+.schedule-list::-webkit-scrollbar-thumb {
+    background: rgba(229, 9, 20, 0.5);
+    border-radius: 4px;
+}
+
+.parent-modal-body::-webkit-scrollbar-thumb:hover,
+.schedule-list::-webkit-scrollbar-thumb:hover {
+    background: rgba(229, 9, 20, 0.7);
+}
