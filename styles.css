@@ -690,6 +690,55 @@ body.public-view {
   position: relative;
 }
 
+/* ADD THIS CSS TO YOUR styles.css FILE - INSERT AFTER THE "hour-cell" STYLES */
+
+/* --- Current Time Indicator --- */
+.current-time-indicator {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, #ef4444 0%, #ef4444 80px, rgba(239, 68, 68, 0.4) 100%);
+    z-index: 50;
+    pointer-events: none;
+    box-shadow: 0 0 4px rgba(239, 68, 68, 0.5);
+}
+
+.current-time-indicator::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 12px;
+    height: 12px;
+    background: #ef4444;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+}
+
+.current-time-label {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #ef4444;
+    color: white;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+/* Ensure the time grid container has relative positioning */
+.time-grid-container {
+    position: relative;
+}
+
 .event-container {
   position: relative;
   min-height: 60px;

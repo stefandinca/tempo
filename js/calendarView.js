@@ -17,6 +17,7 @@ import { calendarState } from './calendarState.js';
  * Randează vizualizarea lunară.
  */
 export function renderMonthView(onDayClick) {
+    stopTimeIndicatorUpdates();
     // 1. ADĂUGĂM "activeFilters" AICI
     const { currentDate, isAdminView, clients, activeFilters } = calendarState.getState();
     const container = document.getElementById('calendarView');
@@ -193,8 +194,14 @@ export function renderWeekView(onEventClick) {
     // --- Randează evenimentele ---
     // Această funcție va popula grila goală
     renderEventsInGrid(days, weekView, onEventClick);
+
+    setTimeout(() => {
+    startTimeIndicatorUpdates();
+}, 100);
     
     container.appendChild(weekView);
+
+    
 }
 
 /**
@@ -250,6 +257,10 @@ export function renderDayView(onEventClick) {
 
     // --- Randează evenimentele ---
     renderEventsInGrid(days, dayView, onEventClick);
+
+    setTimeout(() => {
+    startTimeIndicatorUpdates();
+}, 100);
 
     container.appendChild(dayView);
 }
@@ -389,6 +400,94 @@ function renderEventsInGrid(days, viewElement, onEventClick) {
         });
     });
 }
+
+/**
+ * Calculate the position of the current time indicator
+ * @returns {Object} { hours, minutes, topPosition } or null if outside business hours
+ */
+function getCurrentTimePosition() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    
+    // Only show indicator during business hours (8:00 - 20:00)
+    if (hours < 8 || hours >= 20) {
+        return null;
+    }
+    
+    // Calculate position relative to 8:00 AM
+    const hoursFromStart = hours - 8;
+    const totalMinutes = (hoursFromStart * 60) + minutes;
+    const topPosition = (totalMinutes / 60) * 60; // 60px per hour
+    
+    return { hours, minutes, topPosition };
+}
+
+/**
+ * Format time for display (HH:MM)
+ */
+function formatCurrentTime(hours, minutes) {
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
+
+/**
+ * Render the current time indicator in the calendar
+ */
+function renderCurrentTimeIndicator() {
+    const timeGrid = document.querySelector('.time-grid-container');
+    if (!timeGrid) return;
+    
+    // Remove existing indicator if any
+    const existingIndicator = timeGrid.querySelector('.current-time-indicator');
+    if (existingIndicator) {
+        existingIndicator.remove();
+    }
+    
+    const timePos = getCurrentTimePosition();
+    if (!timePos) return; // Don't show outside business hours
+    
+    const indicator = document.createElement('div');
+    indicator.className = 'current-time-indicator';
+    indicator.style.top = `${timePos.topPosition}px`;
+    
+    const label = document.createElement('div');
+    label.className = 'current-time-label';
+    label.textContent = formatCurrentTime(timePos.hours, timePos.minutes);
+    indicator.appendChild(label);
+    
+    timeGrid.appendChild(indicator);
+}
+
+/**
+ * Start updating the current time indicator every minute
+ */
+let timeIndicatorInterval = null;
+
+function startTimeIndicatorUpdates() {
+    // Clear any existing interval
+    if (timeIndicatorInterval) {
+        clearInterval(timeIndicatorInterval);
+    }
+    
+    // Update immediately
+    renderCurrentTimeIndicator();
+    
+    // Update every minute
+    timeIndicatorInterval = setInterval(() => {
+        renderCurrentTimeIndicator();
+    }, 60000); // 60 seconds
+}
+
+function stopTimeIndicatorUpdates() {
+    if (timeIndicatorInterval) {
+        clearInterval(timeIndicatorInterval);
+        timeIndicatorInterval = null;
+    }
+}
+
+// Export these functions if using modules
+export { renderCurrentTimeIndicator, startTimeIndicatorUpdates, stopTimeIndicatorUpdates };
+
 
 /**
  * Grupează evenimentele care se suprapun ca timp.
