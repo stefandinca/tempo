@@ -622,6 +622,23 @@ body.public-view {
   border-radius: 50%;
 }
 
+.event-container::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--border-color);
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+/* Hide the separator on the last track */
+.hour-cell:last-child .event-container::after {
+    display: none;
+}
+
 /* --- Week & Day Views --- */
 .week-header {
   display: grid;
@@ -692,9 +709,9 @@ body.public-view {
   box-sizing: border-box;
 }
 .event-block:hover {
-  transform: scale(1.02);
-  z-index: 2;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transform: scale(1.01); /* Changed from 1.02 */
+    z-index: 2;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
 .event-block.public-view {
@@ -718,6 +735,21 @@ body.public-view {
   white-space: nowrap;
 }
 
+.event-clients {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 0.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.event-block.public-view .event-clients {
+    color: inherit;
+    opacity: 0.8;
+}
+
+
 .event-badge {
   font-size: 0.625rem;
   font-weight: 700;
@@ -734,6 +766,8 @@ body.public-view {
   background: rgba(0,0,0,0.2);
   color: #f1f5f9;
 }
+
+
 
 .event-initials-container {
   position: absolute;
