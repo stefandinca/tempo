@@ -17,7 +17,7 @@ import { calendarState } from './calendarState.js';
  * Randează vizualizarea lunară.
  */
 export function renderMonthView(onDayClick) {
-    stopTimeIndicatorUpdates();
+   
     // 1. ADĂUGĂM "activeFilters" AICI
     const { currentDate, isAdminView, clients, activeFilters } = calendarState.getState();
     const container = document.getElementById('calendarView');
@@ -195,9 +195,7 @@ export function renderWeekView(onEventClick) {
     // Această funcție va popula grila goală
     renderEventsInGrid(days, weekView, onEventClick);
 
-    setTimeout(() => {
-    startTimeIndicatorUpdates();
-}, 100);
+    
     
     container.appendChild(weekView);
 
@@ -258,9 +256,7 @@ export function renderDayView(onEventClick) {
     // --- Randează evenimentele ---
     renderEventsInGrid(days, dayView, onEventClick);
 
-    setTimeout(() => {
-    startTimeIndicatorUpdates();
-}, 100);
+    
 
     container.appendChild(dayView);
 }

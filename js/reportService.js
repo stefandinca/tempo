@@ -772,9 +772,9 @@ function getEventTypeLabel(type) {
         'therapy': 'Terapie',
         'group-therapy': 'Terapie de grup',
         'coordination': 'Coordonare',
-        'day-off': 'Zi liberă',
-        'pauza-masa': 'Pauză de masă',
-        'sedinta': 'Ședință'
+        'day-off': 'Zi libera',
+        'pauza-masa': 'Pauza de masa',
+        'sedinta': 'Sedinta'
     };
     return types[type] || type;
 }

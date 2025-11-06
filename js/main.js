@@ -215,11 +215,17 @@ function render() {
     updateCurrentPeriodLabel(currentDate, currentView);
 
     if (currentView === 'month') {
+        // Stop the timer on month view
+        view.stopTimeIndicatorUpdates(); 
         view.renderMonthView(handleDayClick);
     } else if (currentView === 'week') {
         view.renderWeekView(handleEventClick);
+        // Start the timer *after* rendering week view
+        view.startTimeIndicatorUpdates(); 
     } else if (currentView === 'day') {
         view.renderDayView(handleEventClick);
+        // Start the timer *after* rendering day view
+        view.startTimeIndicatorUpdates(); 
     }
 }
 
