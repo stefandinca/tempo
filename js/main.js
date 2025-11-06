@@ -518,6 +518,9 @@ async function handleSaveClient(e) {
         return;
     }
     
+    // (MODIFICAT) Verifică dacă ID-ul s-a schimbat
+    const idHasChanged = editingClientId && editingClientId !== clientId;
+
     // Check for duplicate IDs (only when creating new or changing ID)
     if (clientId !== editingClientId) {
         const { clients } = calendarState.getState();
@@ -536,26 +539,57 @@ async function handleSaveClient(e) {
         medical: formData.get('clientMedical') || ''
     };
 
+    // Salvează în starea locală (aici are loc migrarea ID-ului)
     calendarState.saveClient(clientData);
-    await api.saveData(calendarState.getState());
-
-    // logs saving activity
-    window.logActivity(editingClientId ? "Client actualizat" : "Client adăugat", clientData.name, 'generic', clientData.id);
     
-    ui.renderClientsList(dom.clientSearchBar.value);
-    ui.resetClientForm();
+    // (MODIFICAT) Salvează TOATE datele dacă ID-ul s-a schimbat
+    try {
+        // Salvează datele principale (clients, events, etc.)
+        await api.saveData(calendarState.getState());
+
+        // DACĂ ID-ul s-a schimbat, salvează și celelalte fișiere
+        // care au fost migrate în state
+        if (idHasChanged) {
+            const { evolutionData, billingsData } = calendarState.getState();
+            await api.saveEvolutionData(evolutionData);
+            await api.saveBillingsData(billingsData);
+            ui.showCustomAlert('Clientul și toate datele asociate (evoluție, plăți) au fost actualizate cu noul ID.', 'Migrare ID completă');
+        }
+
+        // logs saving activity
+        window.logActivity(editingClientId ? "Client actualizat" : "Client adăugat", clientData.name, 'generic', clientData.id);
+        
+        ui.renderClientsList(dom.clientSearchBar.value);
+        ui.resetClientForm();
+
+    } catch (error) {
+        console.error('Eroare la salvarea datelor clientului:', error);
+        ui.showCustomAlert('A apărut o eroare la salvarea datelor clientului.', 'Eroare API');
+    }
 }
 
 async function handleDeleteClient() {
     const { editingClientId } = calendarState.getState();
     if (!editingClientId) return;
 
-    const confirmed = await ui.showCustomConfirm('Ești sigur că vrei să ștergi acest client? Acțiunile sunt ireversibile.', 'Șterge Client');
+    const confirmed = await ui.showCustomConfirm('Ești sigur că vrei să ștergi acest client? Toate datele (inclusiv evoluția și plățile) vor fi șterse ireversibil.', 'Șterge Client');
     if (confirmed) {
-        calendarState.deleteClient(editingClientId);
-        await api.saveData(calendarState.getState());
-        ui.renderClientsList(dom.clientSearchBar.value);
-        ui.resetClientForm();
+        // Starea locală este curățată (inclusiv evolution și billings)
+        calendarState.deleteClient(editingClientId); 
+        
+        // (MODIFICAT) Salvăm toate cele 3 fișiere pentru a reflecta ștergerea
+        try {
+            const { evolutionData, billingsData } = calendarState.getState();
+            await api.saveData(calendarState.getState()); // Salvează clients/events
+            await api.saveEvolutionData(evolutionData); // Salvează evolution
+            await api.saveBillingsData(billingsData); // Salvează billings
+            
+            ui.renderClientsList(dom.clientSearchBar.value);
+            ui.resetClientForm();
+        } catch (error) {
+            console.error('Eroare la ștergerea datelor clientului:', error);
+            ui.showCustomAlert('A apărut o eroare la ștergerea datelor clientului.', 'Eroare API');
+        }
     }
 }
 

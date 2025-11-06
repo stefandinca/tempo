@@ -136,7 +136,7 @@
     { "id": "MF_110", "age": "66–68 luni (fin)", "months": 68, "text": "Leagă șireturile cu buclă simplă (semi-fundă, cu ajutor verbal minim)." }
   ],
 
-  "Motricitate grosieră": [
+  "Motricitate grosiera": [
     { "id": "MG_001", "age": "0–3 luni", "months": 3, "text": "Ridică ușor capul când este așezat pe burtă." },
     { "id": "MG_002", "age": "0–3 luni", "months": 3, "text": "Mișcă brațele și picioarele activ și simetric." },
     { "id": "MG_003", "age": "0–3 luni", "months": 3, "text": "Își ține capul pe linia mediană când este pe spate." },
@@ -630,7 +630,7 @@
     { "id": "SO_096", "age": "70–72 luni", "months": 72, "text": "Respectă reguli sociale fără supraveghere constantă." }
   ],
 
-  "Autonomie personală": [
+  "Autonomie personala": [
     { "id": "AP_001", "age": "0–3 luni", "months": 3, "text": "Se liniștește când este ținut în brațe sau legănat." },
     { "id": "AP_002", "age": "0–3 luni", "months": 3, "text": "Își coordonează suptul și respirația în timpul hrănirii." },
     { "id": "AP_003", "age": "0–3 luni", "months": 3, "text": "Își duce mâna la gură spontan." },

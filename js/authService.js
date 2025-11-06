@@ -18,7 +18,7 @@ export function initAuth() {
     
     if (!userId) {
         // Redirect to user selection if no user is logged in
-        window.location.href = 'select-user.html';
+        window.location.href = 'index.html';
         return null;
     }
     
@@ -28,7 +28,7 @@ export function initAuth() {
     if (!user) {
         // User not found, redirect to selection
         sessionStorage.removeItem('currentUserId');
-        window.location.href = 'select-user.html';
+        window.location.href = 'index.html';
         return null;
     }
     
@@ -247,5 +247,5 @@ export function getUserStats() {
 export function logout() {
     sessionStorage.removeItem('currentUserId');
     currentUser = null;
-    window.location.href = 'select-user.html';
+    window.location.href = 'index.html';
 }

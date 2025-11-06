@@ -1195,7 +1195,7 @@ function renderPortageDomains() {
 
             // 2. Listener direct pe checkbox (pentru a prinde și click-ul pe el)
             checkbox.addEventListener('change', (e) => {
-                // Sincronizează clasa vizuală când checkbox-ul se schimbă
+                // Sincronizează clasa vizuală când checkbox-ul se change
                 item.classList.toggle('checked', e.target.checked);
             });
         });
@@ -1328,8 +1328,15 @@ async function savePortageEvaluation() {
         
         // Nu rerandăm graficele (Portage), dar actualizăm lista de rapoarte
         // și închidem tab-ul de evaluare.
-        const client = calendarState.getClientById(currentClientId); // Asigurăm că avem clientul
-        renderEvaluationReportsList(evolutionData[currentClientId], client); // <-- ADĂUGAT
+        
+        // ***** START CORECȚIE *****
+        // Linia de mai jos era cea greșită. Am șters-o.
+        // const client = calendarState.getClientById(currentClientId); 
+        
+        // Folosim variabila 'client' deja definită la începutul funcției.
+        renderEvaluationReportsList(evolutionData[currentClientId], client);
+        // ***** SFÂRȘIT CORECȚIE *****
+        
         activateTab('tabGrafice');
 
     } catch (err) {
@@ -1401,8 +1408,8 @@ async function saveLogopedicaEvaluation() {
             window.logActivity("Evaluare Logopedică salvată", client.name, 'evaluation', currentClientId);
         }
         
-        // Nu rerandăm graficele (deoarece acestea sunt pentru Portage),
-        // ci doar închidem tab-ul de evaluare.
+        // (MODIFICAT) Actualizăm și lista de rapoarte după salvarea evaluării logopedice
+        renderEvaluationReportsList(evolutionData[currentClientId], client);
         activateTab('tabGrafice');
 
     } catch (err) {

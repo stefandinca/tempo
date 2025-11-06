@@ -76,14 +76,24 @@ export const calendarState = {
      * Setează datele de evoluție.
      */
     setEvolutionData: (data) => {
-        state.evolutionData = data || {};
+        // (MODIFICAT) Asigură-te că este un obiect
+        if (Array.isArray(data)) {
+            state.evolutionData = {};
+        } else {
+            state.evolutionData = data || {};
+        }
     },
 
     /**
      * Setează datele de facturare.
      */
     setBillingsData: (data) => {
-        state.billingsData = data || {};
+        // (MODIFICAT) Asigură-te că este un obiect
+        if (Array.isArray(data)) {
+            state.billingsData = {};
+        } else {
+            state.billingsData = data || {};
+        }
     },
 
     /**
@@ -335,7 +345,9 @@ export const calendarState = {
                         delete state.evolutionData[originalId];
                         
                         // De asemenea, actualizează numele în datele de evoluție migrate
-                        state.evolutionData[newId].name = clientData.name;
+                        if (state.evolutionData[newId]) {
+                            state.evolutionData[newId].name = clientData.name;
+                        }
                     }
                     
                     // 2. Migrează referințele din 'events' (istoricul programelor)
@@ -349,6 +361,12 @@ export const calendarState = {
                             event.clientIds = event.clientIds.map(id => id === originalId ? newId : id);
                         }
                     });
+
+                    // 3. (MODIFICAT) Migrează datele din billingsData (plăți)
+                    if (state.billingsData[originalId]) {
+                        state.billingsData[newId] = state.billingsData[originalId];
+                        delete state.billingsData[originalId];
+                    }
                 }
             } else {
                 // Fallback: dacă clientul original nu e găsit, adaugă-l ca nou
@@ -379,6 +397,14 @@ export const calendarState = {
                 event.clientIds = event.clientIds.filter(id => id !== clientId);
             }
         });
+        
+        // (MODIFICAT) Șterge și datele de evoluție și facturare
+        if (state.evolutionData[clientId]) {
+            delete state.evolutionData[clientId];
+        }
+        if (state.billingsData[clientId]) {
+            delete state.billingsData[clientId];
+        }
     },
 
     /**

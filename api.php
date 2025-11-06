@@ -9,6 +9,20 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1); // Setează pe 0 în producție
 ini_set('log_errors', 1);
 
+// --- START DEBUG LOGGING ---
+/**
+ * Scrie un mesaj în fișierul debug.log
+ * Asigură-te că fișierul debug.log există și are permisiuni de scriere (ex: 644 sau 666)
+ */
+function debugLog($message) {
+    $timestamp = date('Y-m-d H:i:s');
+    $logEntry = "[$timestamp] " . $message . "\n";
+    // Folosim error_log pentru o compatibilitate mai bună
+    error_log($logEntry, 3, __DIR__ . '/debug.log'); 
+}
+// --- END DEBUG LOGGING ---
+
+
 // CORS headers
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
@@ -47,6 +61,7 @@ function sendResponse($data, $statusCode = 200) {
  * Send error response
  */
 function sendError($message, $statusCode = 500) {
+    debugLog("EROARE TRIMISĂ CLIENTULUI: " . $message); // Loghează eroarea
     sendResponse(['error' => $message], $statusCode);
 }
 
@@ -54,6 +69,15 @@ function sendError($message, $statusCode = 500) {
 $method = $_SERVER['REQUEST_METHOD'];
 $path   = isset($_GET['path']) ? $_GET['path'] : '';
 $input  = json_decode(file_get_contents('php://input'), true);
+
+// Loghează cererea (cu excepția GET-urilor simple)
+if ($method === 'POST') {
+    debugLog("--- Cerere $method pentru $path ---");
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        debugLog("Eroare la decodarea JSON: " . json_last_error_msg());
+    }
+}
+
 
 // Asigură-te că $pdo există
 if (!isset($pdo)) {
@@ -125,6 +149,7 @@ try {
                 if (!$input) {
                     sendError('Invalid JSON data', 400);
                 }
+                debugLog("Salvare 'data'. Se salvează " . count($input['clients']) . " clienți și " . count($input['events']) . " evenimente.");
 
                 try {
                     $pdo->beginTransaction();
@@ -182,6 +207,7 @@ try {
                     }
 
                     $pdo->commit();
+                    debugLog("Salvare 'data' reușită.");
                     sendResponse(['success' => true, 'message' => 'Data saved successfully']);
 
                 } catch (Exception $e) {
@@ -198,18 +224,27 @@ try {
         // ==========================================================
         case 'evolution':
             if ($method === 'GET') {
-                $evolutionData = [];
+                $evolutionData = new stdClass(); // Inițializează ca obiect gol
 
                 // 1. Portage
                 $stmt_portage = $pdo->query("SELECT * FROM portage_evaluations");
                 while ($row = $stmt_portage->fetch()) {
-                    $evolutionData[$row['client_id']]['evaluations'][$row['domain']][$row['eval_date']] = (int)$row['score'];
+                    $clientId = $row['client_id'];
+                    $domain = $row['domain'];
+                    $date = $row['eval_date'];
+                    if (!isset($evolutionData->$clientId)) $evolutionData->$clientId = new stdClass();
+                    if (!isset($evolutionData->$clientId->evaluations)) $evolutionData->$clientId->evaluations = new stdClass();
+                    if (!isset($evolutionData->$clientId->evaluations->$domain)) $evolutionData->$clientId->evaluations->$domain = new stdClass();
+                    $evolutionData->$clientId->evaluations->$domain->$date = (int)$row['score'];
                 }
 
                 // 2. Program History
                 $stmt_history = $pdo->query("SELECT * FROM program_history ORDER BY eval_date DESC");
                 while ($row = $stmt_history->fetch()) {
-                    $evolutionData[$row['client_id']]['programHistory'][] = [
+                    $clientId = $row['client_id'];
+                    if (!isset($evolutionData->$clientId)) $evolutionData->$clientId = new stdClass();
+                    if (!isset($evolutionData->$clientId->programHistory)) $evolutionData->$clientId->programHistory = [];
+                    $evolutionData->$clientId->programHistory[] = [
                         "date" => $row['eval_date'],
                         "programId" => $row['program_id'],
                         "score" => $row['score'],
@@ -220,7 +255,11 @@ try {
                 // 3. Logopedic
                 $stmt_logo = $pdo->query("SELECT * FROM logopedic_evaluations");
                 while ($row = $stmt_logo->fetch()) {
-                    $evolutionData[$row['client_id']]['evaluationsLogopedica'][$row['eval_date']] = [
+                    $clientId = $row['client_id'];
+                    $date = $row['eval_date'];
+                    if (!isset($evolutionData->$clientId)) $evolutionData->$clientId = new stdClass();
+                    if (!isset($evolutionData->$clientId->evaluationsLogopedica)) $evolutionData->$clientId->evaluationsLogopedica = new stdClass();
+                    $evolutionData->$clientId->evaluationsLogopedica->$date = [
                         'scores' => json_decode($row['scores_json'], true),
                         'comments' => $row['comments']
                     ];
@@ -229,35 +268,56 @@ try {
                 // 4. Monthly Themes
                 $stmt_theme = $pdo->query("SELECT * FROM monthly_themes");
                 while ($row = $stmt_theme->fetch()) {
-                    $evolutionData[$row['client_id']]['monthlyThemes'][$row['month_key']] = $row['theme_text'];
+                    $clientId = $row['client_id'];
+                    $monthKey = $row['month_key'];
+                    if (!isset($evolutionData->$clientId)) $evolutionData->$clientId = new stdClass();
+                    if (!isset($evolutionData->$clientId->monthlyThemes)) $evolutionData->$clientId->monthlyThemes = new stdClass();
+                    $evolutionData->$clientId->monthlyThemes->$monthKey = $row['theme_text'];
                 }
                 
                 sendResponse($evolutionData);
 
             } elseif ($method === 'POST') {
+                
+                if (!$input) {
+                    sendError('Invalid JSON data for evolution', 400);
+                }
+                debugLog("Salvare 'evolution'. Se primesc date pentru " . count($input) . " clienți.");
+                
                 try {
+                    // 1. Obține ID-uri valide DOAR pentru programe (necesar pentru program_history)
+                    $valid_program_ids = $pdo->query("SELECT id FROM programs")->fetchAll(PDO::FETCH_COLUMN, 0);
+
                     $pdo->beginTransaction();
                     
-                    // Șterge datele vechi
+                    // 2. Șterge datele vechi
                     $pdo->exec("DELETE FROM portage_evaluations;");
                     $pdo->exec("DELETE FROM program_history;");
                     $pdo->exec("DELETE FROM logopedic_evaluations;");
                     $pdo->exec("DELETE FROM monthly_themes;");
+                    debugLog("Tabelele de evoluție au fost golite.");
 
+                    // 3. Pregătește statement-urile
                     $stmt_portage = $pdo->prepare("INSERT INTO portage_evaluations (client_id, domain, eval_date, score) VALUES (?, ?, ?, ?)");
                     $stmt_history = $pdo->prepare("INSERT INTO program_history (client_id, event_id, program_id, score, eval_date) VALUES (?, ?, ?, ?, ?)");
                     $stmt_logo = $pdo->prepare("INSERT INTO logopedic_evaluations (client_id, eval_date, scores_json, comments) VALUES (?, ?, ?, ?)");
                     $stmt_theme = $pdo->prepare("INSERT INTO monthly_themes (client_id, month_key, theme_text) VALUES (?, ?, ?)");
 
-                    // Inserează datele noi
+                    // 4. Inserează datele noi (fără validare client_id)
                     foreach ($input as $clientId => $data) {
+                        debugLog("Se procesează evoluția pentru client: $clientId");
+                        
                         foreach ($data['evaluations'] ?? [] as $domain => $dates) {
                             foreach ($dates as $date => $score) {
                                 $stmt_portage->execute([$clientId, $domain, $date, $score]);
                             }
                         }
                         foreach ($data['programHistory'] ?? [] as $entry) {
-                            $stmt_history->execute([$clientId, $entry['eventId'], $entry['programId'], $entry['score'], $entry['date']]);
+                            if (in_array($entry['programId'], $valid_program_ids)) {
+                                $stmt_history->execute([$clientId, $entry['eventId'] ?? null, $entry['programId'], $entry['score'], $entry['date']]);
+                            } else {
+                                debugLog("SKIPPED program history: programId invalid " . $entry['programId']);
+                            }
                         }
                         foreach ($data['evaluationsLogopedica'] ?? [] as $date => $entry) {
                             $stmt_logo->execute([$clientId, $date, json_encode($entry['scores']), $entry['comments']]);
@@ -268,13 +328,15 @@ try {
                     }
                     
                     $pdo->commit();
+                    debugLog("Salvare 'evolution' reușită.");
                     sendResponse(['success' => true, 'message' => 'Evolution data saved']);
                 } catch (Exception $e) {
                     if ($pdo->inTransaction()) {
-                    $pdo->rollBack();
+                        $pdo->rollBack();
+                    }
+                    debugLog("EROARE DB la salvarea 'evolution': " . $e->getMessage());
+                    sendError('Failed to write evolution data: ' . $e->getMessage());
                 }
-                sendError('Failed to write evolution data: ' . $e->getMessage());
-            }
             }
             break;
 
@@ -284,14 +346,16 @@ try {
         case 'billings':
             if ($method === 'GET') {
                 $stmt = $pdo->query("SELECT * FROM payments ORDER BY payment_date ASC");
-                $billingsData = [];
+                // (MODIFICAT) Inițializează ca obiect
+                $billingsData = new stdClass(); 
                 while ($row = $stmt->fetch()) {
                     $clientId = $row['client_id'];
                     $monthKey = $row['month_key'];
-                    if (!isset($billingsData[$clientId])) $billingsData[$clientId] = [];
-                    if (!isset($billingsData[$clientId][$monthKey])) $billingsData[$clientId][$monthKey] = [];
+                    // (MODIFICAT) Folosește sintaxa de obiect
+                    if (!isset($billingsData->$clientId)) $billingsData->$clientId = new stdClass();
+                    if (!isset($billingsData->$clientId->$monthKey)) $billingsData->$clientId->$monthKey = [];
                     
-                    $billingsData[$clientId][$monthKey][] = [
+                    $billingsData->$clientId->$monthKey[] = [
                         'id' => $row['id'],
                         'date' => $row['payment_date'],
                         'amount' => (float)$row['amount'],
@@ -301,29 +365,43 @@ try {
                 sendResponse($billingsData);
 
             } elseif ($method === 'POST') {
+                
+                if (!$input) {
+                    sendError('Invalid JSON data for billings', 400);
+                }
+                debugLog("Salvare 'billings'. Se primesc date pentru " . count($input) . " clienți.");
+                
                 try {
                     $pdo->beginTransaction();
                     $pdo->exec("DELETE FROM payments;");
+                    debugLog("Tabelul 'payments' a fost golit.");
+
                     $stmt = $pdo->prepare("INSERT INTO payments (id, client_id, month_key, payment_date, amount, notes) VALUES (?, ?, ?, ?, ?, ?)");
                     
+                    $insertCount = 0;
                     foreach ($input as $clientId => $months) {
+                        debugLog("Se procesează plăți pentru client: $clientId");
                         foreach ($months as $monthKey => $payments) {
                             foreach ($payments as $payment) {
                                 $stmt->execute([
                                     $payment['id'], $clientId, $monthKey,
                                     $payment['date'], $payment['amount'], $payment['notes']
                                 ]);
+                                $insertCount++;
                             }
                         }
                     }
+                    
                     $pdo->commit();
+                    debugLog("Salvare 'billings' reușită. $insertCount înregistrări adăugate.");
                     sendResponse(['success' => true, 'message' => 'Billings data saved']);
                 } catch (Exception $e) {
                     if ($pdo->inTransaction()) {
-                    $pdo->rollBack();
+                        $pdo->rollBack();
+                    }
+                    debugLog("EROARE DB la salvarea 'billings': " . $e->getMessage());
+                    sendError('Failed to write billings data: ' . $e->getMessage());
                 }
-                sendError('Failed to write billings data: ' . $e->getMessage());
-            }
             }
             break;
 
@@ -370,6 +448,7 @@ try {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
+            debugLog("EROARE PHP GLOBALĂ: " . $e->getMessage());
             sendError('Failed to write data (transaction failed): ' . $e->getMessage());
         }
 ?>
