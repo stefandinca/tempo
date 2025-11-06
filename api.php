@@ -286,15 +286,22 @@ try {
                     $evolutionData->$clientId->evaluations->$domain->$date = (int)$row['score'];
                 }
 
-                // 2. Program History
-                $stmt_history = $pdo->query("SELECT * FROM program_history ORDER BY eval_date DESC");
+              // 2. Program History (MODIFIED to JOIN with programs table)
+                $stmt_history = $pdo->query("
+                    SELECT ph.*, p.title as programTitle
+                    FROM program_history ph
+                    LEFT JOIN programs p ON ph.program_id = p.id
+                    ORDER BY ph.eval_date DESC
+                ");
                 while ($row = $stmt_history->fetch()) {
                     $clientId = $row['client_id'];
                     if (!isset($evolutionData->$clientId)) $evolutionData->$clientId = new stdClass();
                     if (!isset($evolutionData->$clientId->programHistory)) $evolutionData->$clientId->programHistory = [];
+                    
                     $evolutionData->$clientId->programHistory[] = [
                         "date" => $row['eval_date'],
                         "programId" => $row['program_id'],
+                        "programTitle" => $row['programTitle'], // <-- FIX: Add the joined title
                         "score" => $row['score'],
                         "eventId" => $row['event_id']
                     ];
