@@ -85,34 +85,45 @@ if (!isset($pdo)) {
 }
 
 // Handle login action BEFORE routing
+// Handle login action BEFORE routing
 if (isset($_GET['action']) && $_GET['action'] === 'login') {
     try {
-        $username = $_POST['username'] ?? '';
+        $username = $_POST['username'] ?? ''; // This variable holds the user ID (e.g., 'stefan')
         $password = $_POST['password'] ?? '';
-        
+
         if (empty($username) || empty($password)) {
             sendResponse(['success' => false, 'message' => 'Username and password required'], 400);
         }
-        
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+
+        // --- START MODIFICATION ---
+
+        // 1. Query the 'team_members' table instead of 'users'
+        //    We check against the 'id' column, since the login form sends the ID.
+        $stmt = $pdo->prepare("SELECT * FROM team_members WHERE id = ?");
         $stmt->execute([$username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        if ($user && password_verify($password, $user['password_hash'])) {
+
+        // 2. Check the plain-text 'password' column (no password_verify)
+        if ($user && $password === $user['password']) {
+
+        // --- END MODIFICATION ---
+
             session_start();
             $_SESSION['user_id'] = $user['id'];
-            $_SESSION['username'] = $user['username'];
+            $_SESSION['username'] = $user['name']; // Use the 'name' field for the session
             $_SESSION['role'] = $user['role'] ?? 'therapist';
-            
+
             sendResponse([
                 'success' => true,
                 'user' => [
                     'id' => $user['id'],
-                    'username' => $user['username'],
+                    'username' => $user['name'],
                     'role' => $_SESSION['role']
                 ]
             ]);
         } else {
+            // Login failed
+            debugLog("Login failed for ID: " . $username); // Good for debugging
             sendResponse(['success' => false, 'message' => 'Invalid credentials'], 401);
         }
     } catch (Exception $e) {
