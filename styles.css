@@ -18,6 +18,7 @@
  * 10. COMPONENTS (BILLING)
  * 11. COMPONENTS (EVOLUTION EXTRAS)
  * 12. RESPONSIVE MEDIA QUERIES (CONSOLIDATED)
+ * 13. GLOBAL API LOADER (MODIFICAT)
  *
  * ==========================================================
  */
@@ -2349,7 +2350,7 @@ textarea.form-input {
 
 
 /* ==========================================================
-   13. GLOBAL API LOADER
+   13. GLOBAL API LOADER (MODIFICAT)
    ========================================================== */
 
 @keyframes spin {
@@ -2360,18 +2361,24 @@ textarea.form-input {
 .loader-backdrop {
   display: none; /* Ascuns by default */
   position: fixed;
-  bottom: 1.5rem;
-  left: 1.5rem;
+  inset: 0; /* Acoperă tot ecranul: top, left, right, bottom = 0 */
   z-index: 9999;
-  background-color: rgba(31, 41, 55, 0.9); /* O culoare închisă */
-  color: white;
-  padding: 0.75rem 1.25rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.6); /* Fundal întunecat semitransparent */
+  backdrop-filter: blur(4px); /* Efect de blur */
+  
+  /* Centrare conținut */
   
   align-items: center;
-  gap: 0.75rem;
-  animation: fadeInUp 0.3s ease;
+  justify-content: center;
+  
+  /* Containerul pentru spinner și text */
+  flex-direction: column;
+  gap: 1rem;
+  
+  /* Stil pentru textul de sub spinner */
+  color: white;
+  
+  animation: fadeIn 0.3s ease; /* Folosim fadeIn în loc de fadeInUp */
 }
 
 /* Starea activă, când este vizibil */
@@ -2380,9 +2387,9 @@ textarea.form-input {
 }
 
 .loader-spinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
+  width: 40px; /* Mărit pentru vizibilitate */
+  height: 40px; /* Mărit pentru vizibilitate */
+  border: 4px solid rgba(255, 255, 255, 0.3); /* Mărit */
   border-top-color: #FFFFFF;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
@@ -2390,7 +2397,7 @@ textarea.form-input {
 
 .loader-backdrop span {
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 1rem; /* Mărit */
 }
 
 /* ==========================================================
