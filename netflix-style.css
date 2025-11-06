@@ -6,15 +6,11 @@
 body {
     min-height: 100vh;
     display: flex;
-    /* Aliniere sus pentru a vedea începutul paginii */
     align-items: flex-start;
     justify-content: center;
-    /* Fundal gri deschis ca în imaginea de referință */
     background: #f3f4f6; 
-    
     padding: 2rem;
 }
-
 
 /* Container pentru a centra conținutul și a plasa footer-ul */
 .page-container {
@@ -22,11 +18,12 @@ body {
     flex-direction: column;
     align-items: center;
     width: 100%;
+    max-width: 1400px; /* Increased for better spacing */
 }
+
 .main-content {
     width: 100%;
-    /* Lățime maximă pentru 4 carduri */
-    max-width: 64rem; /* lg:max-w-4xl */
+    max-width: 100%;
 }
 
 /* Stil pentru "Powered by" */
@@ -43,10 +40,24 @@ body {
 }
 
 /* --- Stiluri Card Utilizator --- */
+/* UPDATED: Smaller cards with 5 columns */
+#userCardsContainer {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* Changed from 4 to 5 columns */
+    gap: 1rem; /* Reduced from 1.5rem */
+    margin-bottom: 2rem;
+}
+
 .user-card {
+    background: white;
+    border-radius: 0.75rem; /* Reduced from 1rem */
+    padding: 1.25rem; /* Reduced from 1.5rem */
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
     cursor: pointer;
 }
+
 .user-card.parent-card {
     cursor: default;
 }
@@ -61,31 +72,31 @@ body {
     transform: scale(1.03);
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
-/* Cardul de părinte se estompează și el */
 #userCardsContainer.selection-active .user-card.parent-card {
     opacity: 0.6;
     transform: scale(0.95);
 }
 
+/* UPDATED: Smaller avatar */
 .user-avatar {
-    width: 80px;
-    height: 80px;
+    width: 60px; /* Reduced from 80px */
+    height: 60px; /* Reduced from 80px */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
+    font-size: 1.5rem; /* Reduced from 2rem */
     font-weight: 700;
     color: white;
-    margin: 0 auto 1rem;
-    /* Am scos bordura albă, nu e în imaginea de referință */
+    margin: 0 auto 0.75rem; /* Reduced margin */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* UPDATED: Smaller text */
 .user-card h3, .user-card-name {
-    font-size: 1.125rem;
+    font-size: 0.95rem; /* Reduced from 1.125rem */
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.375rem; /* Reduced margin */
     color: #111827; 
 }
 
@@ -94,38 +105,35 @@ body {
     color: white;
 }
 
+/* UPDATED: Smaller role badge */
 .role-badge {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
+    padding: 0.2rem 0.6rem; /* Reduced padding */
     border-radius: 9999px;
-    font-size: 0.75rem;
+    font-size: 0.7rem; /* Reduced from 0.75rem */
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
-/* Culori actualizate ca în imaginea de referință */
 .role-therapist { background: #dbeafe; color: #1e40af; }
 .role-admin { background: #fce7f3; color: #9f1239; }
 .role-parent { background: #dcfce7; color: #166534; }
-/* Rolul coordinator nu era în imagine, l-am păstrat pe cel vechi */
 .role-coordinator { background: #fef3c7; color: #92400e; }
 
-
 .parent-input-container {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    /* Fără bordură, ca în imagine */
+    margin-top: 0.75rem; /* Reduced margin */
+    padding-top: 0.75rem; /* Reduced padding */
 }
 
 .client-code-input {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db; /* Bordură standard gri */
+    padding: 0.625rem 0.875rem; /* Reduced padding */
+    border: 1px solid #d1d5db;
     border-radius: 0.5rem;
-    font-size: 0.875rem;
+    font-size: 0.8rem; /* Reduced font size */
     transition: all 0.2s;
-    background: #f9fafb; /* Fundal gri deschis */
+    background: #f9fafb;
     color: #1f2937;
 }
 [data-theme="dark"] .client-code-input {
@@ -147,33 +155,33 @@ body {
 
 .view-profile-btn {
     width: 100%;
-    margin-top: 0.75rem;
-    padding: 0.75rem 1rem;
-    background: #9ca3af; /* Gri, ca în imagine */
+    margin-top: 0.625rem; /* Reduced margin */
+    padding: 0.625rem 0.875rem; /* Reduced padding */
+    background: #9ca3af;
     color: white;
     border: none;
     border-radius: 0.5rem;
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 0.8rem; /* Reduced font size */
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .view-profile-btn:hover:not(:disabled) {
-    background: #6b7280; /* Gri mai închis */
+    background: #6b7280;
     transform: translateY(-1px);
 }
 
 .view-profile-btn:disabled {
-    background: #d1d5db; /* Gri și mai deschis pt disabled */
+    background: #d1d5db;
     cursor: not-allowed;
 }
 
 /* Stiluri pentru câmpul de parolă al echipei */
 .password-input-container {
-    display: none; /* ASCUNS by default */
-    margin-top: 1rem;
-    padding-top: 1rem;
+    display: none;
+    margin-top: 0.75rem; /* Reduced margin */
+    padding-top: 0.75rem; /* Reduced padding */
     border-top: 1px solid #e5e7eb;
     animation: fadeInUp 0.3s;
 }
@@ -181,19 +189,18 @@ body {
     border-top-color: #374151;
 }
 
-/* Afișează containerul parolei când cardul e activ */
 .user-card.active .password-input-container {
     display: block;
 }
 
 .password-input {
     width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db; /* Bordură standard gri */
+    padding: 0.625rem 0.875rem; /* Reduced padding */
+    border: 1px solid #d1d5db;
     border-radius: 0.5rem;
-    font-size: 0.875rem;
+    font-size: 0.8rem; /* Reduced font size */
     transition: all 0.2s;
-    background: #f9fafb; /* Fundal gri deschis */
+    background: #f9fafb;
     color: #1f2937;
 }
 [data-theme="dark"] .password-input {
@@ -215,14 +222,14 @@ body {
 
 .login-btn {
     width: 100%;
-    margin-top: 0.75rem;
-    padding: 0.75rem 1rem;
+    margin-top: 0.625rem; /* Reduced margin */
+    padding: 0.625rem 0.875rem; /* Reduced padding */
     background: #4A90E2; 
     color: white;
     border: none;
     border-radius: 0.5rem;
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 0.8rem; /* Reduced font size */
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -714,12 +721,12 @@ body {
 }
 
 .loader-backdrop {
-  display: none; /* Ascuns by default */
+  display: none;
   position: fixed;
   bottom: 1.5rem;
   left: 1.5rem;
   z-index: 9999;
-  background-color: rgba(31, 41, 55, 0.9); /* O culoare închisă */
+  background-color: rgba(31, 41, 55, 0.9);
   color: white;
   padding: 0.75rem 1.25rem;
   border-radius: 0.5rem;
@@ -730,7 +737,6 @@ body {
   animation: fadeInUp 0.3s ease;
 }
 
-/* Starea activă, când este vizibil */
 .loader-backdrop.active {
   display: flex;
 }
@@ -749,10 +755,37 @@ body {
   font-size: 0.875rem;
 }
 
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    #userCardsContainer {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    #userCardsContainer {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
 
 @media (max-width: 768px) {
     body {
-        padding: 1rem; /* Reducem padding-ul pe mobil */
+        padding: 1rem;
+    }
+    
+    #userCardsContainer {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+    
+    .user-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
+    
+    .user-card {
+        padding: 1rem;
     }
     
     .parent-modal {
@@ -776,6 +809,10 @@ body {
 }
 
 @media (max-width: 640px) {
+    #userCardsContainer {
+        grid-template-columns: 1fr;
+    }
+    
     #publicCalendarView {
         padding: 0.75rem;
     }
