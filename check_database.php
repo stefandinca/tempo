@@ -3,9 +3,9 @@
 
 // CONFIGURE YOUR DATABASE CONNECTION HERE:
 $host = 'localhost';
-$dbname = 'stefand1_tempo_db'; // CHANGE THIS
-$db_username = 'stefand1_tempo'; // CHANGE THIS
-$db_password = 'livebetterlife'; // CHANGE THIS
+$dbname = 'stefand1_tempo_demo'; // CHANGE THIS
+$db_username = 'stefand1_tempo_demo'; // CHANGE THIS
+$db_password = 'Parola1988'; // CHANGE THIS
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $db_username, $db_password);
