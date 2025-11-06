@@ -183,7 +183,7 @@ try {
             // CAZUL 'data' (POST) - Salvează totul în DB (Metoda Truncate)
             // ==========================================================
             } elseif ($method === 'POST') {
-                if (!$input) {
+                if ($input === null) {
                     sendError('Invalid JSON data', 400);
                 }
                 debugLog("Salvare 'data'. Se salvează " . count($input['clients']) . " clienți și " . count($input['events']) . " evenimente.");
@@ -316,7 +316,7 @@ try {
 
             } elseif ($method === 'POST') {
                 
-                if (!$input) {
+                if ($input === null) {
                     sendError('Invalid JSON data for evolution', 400);
                 }
                 debugLog("Salvare 'evolution'. Se primesc date pentru " . count($input) . " clienți.");
@@ -403,7 +403,7 @@ try {
 
             } elseif ($method === 'POST') {
                 
-                if (!$input) {
+                if ($input === null) {
                     sendError('Invalid JSON data for billings', 400);
                 }
                 debugLog("Salvare 'billings'. Se primesc date pentru " . count($input) . " clienți.");
