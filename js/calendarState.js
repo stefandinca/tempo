@@ -403,14 +403,20 @@ export const calendarState = {
                     // --- ID-ul s-a schimbat, trebuie migrate datele ---
                     
                     // 1. Migrează datele din evolutionData (evaluări)
+                    const legacyOriginalId = `client_${originalId}`;
                     if (state.evolutionData[originalId]) {
                         state.evolutionData[newId] = state.evolutionData[originalId];
                         delete state.evolutionData[originalId];
-                        
-                        // De asemenea, actualizează numele în datele de evoluție migrate
-                        if (state.evolutionData[newId]) {
-                            state.evolutionData[newId].name = clientData.name;
-                        }
+                    }
+                    // Verifică și cheia veche
+                    if (state.evolutionData[legacyOriginalId]) {
+                        state.evolutionData[newId] = state.evolutionData[legacyOriginalId];
+                        delete state.evolutionData[legacyOriginalId];
+                    }
+                    
+                    // De asemenea, actualizează numele în datele de evoluție migrate
+                    if (state.evolutionData[newId]) {
+                        state.evolutionData[newId].name = clientData.name;
                     }
                     
                     // 2. Migrează referințele din 'events' (istoricul programelor)
@@ -429,6 +435,11 @@ export const calendarState = {
                     if (state.billingsData[originalId]) {
                         state.billingsData[newId] = state.billingsData[originalId];
                         delete state.billingsData[originalId];
+                    }
+                    // Verifică și cheia veche
+                    if (state.billingsData[legacyOriginalId]) {
+                        state.billingsData[newId] = state.billingsData[legacyOriginalId];
+                        delete state.billingsData[legacyOriginalId];
                     }
                 }
             } else {
@@ -461,12 +472,21 @@ export const calendarState = {
             }
         });
         
-        // (MODIFICAT) Șterge și datele de evoluție și facturare
+        // (CORECTAT) Șterge și datele de evoluție și facturare, verificând ambele formate
+        const legacyClientId = `client_${clientId}`;
+
         if (state.evolutionData[clientId]) {
             delete state.evolutionData[clientId];
         }
+        if (state.evolutionData[legacyClientId]) {
+            delete state.evolutionData[legacyClientId];
+        }
+
         if (state.billingsData[clientId]) {
             delete state.billingsData[clientId];
+        }
+        if (state.billingsData[legacyClientId]) {
+            delete state.billingsData[legacyClientId];
         }
     },
 
