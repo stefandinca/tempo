@@ -24,6 +24,7 @@ const state = {
 
     // Starea filtrelor
     activeFilters: [], // O listă de ID-uri ale membrilor echipei
+    activeClientFilterId: null, // Filtru pentru un singur client
 
     // Starea modalelor (pentru a ști ce se editează)
     editingEventId: null,
@@ -124,6 +125,14 @@ export const calendarState = {
             state.activeFilters.push(memberId);
         }
     },
+
+    /**
+     * Setează filtrul activ pentru client.
+     * @param {string | null} clientId - ID-ul clientului sau null pentru "Toți"
+     */
+    setClientFilter: (clientId) => {
+        state.activeClientFilterId = clientId || null;
+    },
     
     // --- Getters (funcții de citire a datelor) ---
     // Aceștia vor înlocui logica de filtrare din interiorul funcțiilor de randare
@@ -146,17 +155,25 @@ export const calendarState = {
                 return false;
             }
             
-            // 2. Verifică potrivirea filtrelor
-            // Dacă nu există filtre active, arată tot
-            if (state.activeFilters.length === 0) {
-                return true;
+            // 2. Verifică filtrul de TERAPEUT (activeFilters)
+            const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+            const hasMatchingMember = state.activeFilters.length === 0 || teamMemberIds.some(id => state.activeFilters.includes(id));
+
+            if (!hasMatchingMember) {
+                return false; // Nu se potrivește terapeutul, nu mai verifica clientul
+            }
+
+            // 3. Verifică filtrul de CLIENT (NOU)
+            // Dacă un filtru de client este activ...
+            if (state.activeClientFilterId) {
+                const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
+                // Verifică dacă evenimentul include clientul selectat
+                const hasMatchingClient = clientIds.includes(state.activeClientFilterId);
+                return hasMatchingClient; // Returnează true doar dacă se potrivește și clientul
             }
             
-            // Verifică formatul nou (teamMemberIds array) și cel vechi (teamMemberId)
-            const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
-            const hasMatchingMember = teamMemberIds.some(id => state.activeFilters.includes(id));
-            
-            return hasMatchingMember;
+            // Dacă a trecut filtrul de terapeut și nu este setat niciun filtru de client, evenimentul este valid
+            return true;
         });
     },
     

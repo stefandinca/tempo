@@ -458,7 +458,7 @@ body.public-view {
 .filters-container {
   padding: 1rem 2rem;
   background-color: var(--bg-card);
-  border-bottom: 1px solid var(--border-color);
+  
 }
 /* Public filter bar */
 .filters {
@@ -522,6 +522,8 @@ body.public-view {
 /* ==========================================================
    5. COMPONENTS (CALENDAR)
    ========================================================== */
+
+
 
 #calendarView {
   width: 100%;
@@ -2398,6 +2400,56 @@ textarea.form-input {
 .loader-backdrop span {
   font-weight: 500;
   font-size: 1rem; /* Mărit */
+}
+
+   /* Stil pentru filtrul de client din header-ul calendarului */
+.client-filter-container {
+    display: flex;
+    align-items: center;
+}
+
+.calendar-filter-select {
+    /* 1. Resetare Webkit/Appearance */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    /* 2. Stil de bază (existent) */
+    padding-top: 0.6rem;
+    padding-bottom: 0.6rem;
+    padding-left: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    background-color: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem; /* Ajustat la 6px pt a se potrivi cu butonul 'Azi' */
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+
+    /* 3. Adăugare săgeată custom (inline SVG) */
+    /* Culoarea #6B7280 este var(--text-secondary) */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%236B7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center; /* Poziționează săgeata */
+    background-size: 1em; /* Dimensiunea săgeții */
+    
+    /* 4. Ajustare padding-right pentru a face loc săgeții */
+    padding-right: 2.5rem; /* Spațiu mai mult pt săgeată */
+    
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.calendar-filter-select:hover {
+    border-color: var(--text-secondary);
+}
+
+.calendar-filter-select:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
 }
 
 /* ==========================================================

@@ -39,6 +39,7 @@ const dom = {
     filtersContainer: $('filters'),
     addEventBtn: $('addEventBtn'),
     addEventBtnCalendar: $('addEventBtnCalendar'),
+    calendarClientFilter: $('calendarClientFilter'), // Filtru client
     
     // Modal Evenimente (Adăugare/Editare)
     closeModalBtn: $('closeModal'),
@@ -375,17 +376,29 @@ async function handleSaveEvent(e) {
     const clientIds = Array.from(calendarState.getState().selectedClientIds);
     const programIds = Array.from(calendarState.getState().selectedProgramIds);
     
+    
     const repeatingDays = [];
-    ['repeatMon', 'repeatTue', 'repeatWed', 'repeatThu', 'repeatFri'].forEach((id, index) => {
-        const checkbox = document.getElementById(id);
-        if (checkbox && checkbox.checked) {
-            repeatingDays.push(index + 1); // Mon=1, Tue=2, Wed=3, Thu=4, Fri=5
-        }
-    });
+['repeatMon', 'repeatTue', 'repeatWed', 'repeatThu', 'repeatFri'].forEach((id, index) => {
+    const checkbox = document.getElementById(id);
+    if (checkbox && checkbox.checked) {
+        repeatingDays.push(index + 1); // Mon=1, Tue=2, Wed=3, Thu=4, Fri=5
+    }
+});
+
+console.log('Repeating Days array:', repeatingDays);
+console.log('Repeating Days types:', repeatingDays.map(d => typeof d));
+console.log('Final repeatingDays array:', repeatingDays);
+
     
     const eventType = formData.get('eventType');
     let startTime = formData.get('startTime');
     let duration = parseInt(formData.get('duration'));
+
+    console.log('=== REPEATING DAYS DEBUG ===');
+console.log('Raw array:', repeatingDays);
+console.log('Types:', repeatingDays.map(d => typeof d));
+console.log('Values:', repeatingDays);
+console.log('===========================');
 
     if (eventType === 'day-off' || eventType === 'pauza-masa' || eventType === 'sedinta') {
         if (!startTime) startTime = '08:00';
@@ -396,7 +409,6 @@ async function handleSaveEvent(e) {
         return;
     }
 
-    // This is the BASE DATA from the form, to be applied
     const eventBase = {
         name: formData.get('eventName'),
         details: formData.get('eventDetails') || undefined,
@@ -409,7 +421,8 @@ async function handleSaveEvent(e) {
         teamMemberIds,
         clientIds: clientIds.length > 0 ? clientIds : undefined,
         programIds: programIds.length > 0 ? programIds : undefined,
-        repeating: repeatingDays.map(d => parseInt(d))
+        repeating: repeatingDays.map(d => parseInt(d)) // Ensure integers
+        
     };
 
     // --- START NEW RECURRENCE EDIT LOGIC ---
@@ -587,6 +600,7 @@ async function handleSaveClient(e) {
         
         ui.renderClientsList(dom.clientSearchBar.value);
         ui.resetClientForm();
+        populateClientFilterDropdown(); // Actualizează dropdown-ul
 
     } catch (error) {
         console.error('Eroare la salvarea datelor clientului:', error);
@@ -612,6 +626,7 @@ async function handleDeleteClient() {
             
             ui.renderClientsList(dom.clientSearchBar.value);
             ui.resetClientForm();
+            populateClientFilterDropdown(); // Actualizează dropdown-ul
         } catch (error) {
             console.error('Eroare la ștergerea datelor clientului:', error);
             ui.showCustomAlert('A apărut o eroare la ștergerea datelor clientului.', 'Eroare API');
@@ -795,6 +810,34 @@ window.logActivity = function(action, details, actionType = 'generic', relatedId
 
     // Save back to localStorage
     localStorage.setItem('recentActivity', JSON.stringify(activityLog));
+}
+
+/**
+ * Populează dropdown-ul de filtrare a clienților din header-ul calendarului.
+ */
+function populateClientFilterDropdown() {
+    if (!dom.calendarClientFilter) return;
+    
+    const { clients } = calendarState.getState();
+    const currentValue = dom.calendarClientFilter.value; // Salvează valoarea curentă
+    
+    // Sortează clienții alfabetic
+    const sortedClients = [...clients].sort((a, b) => a.name.localeCompare(b.name));
+    
+    dom.calendarClientFilter.innerHTML = '<option value="">Toți Clienții</option>'; // Opțiunea default
+    
+    sortedClients.forEach(client => {
+        // Nu adăuga clienți "speciali" în filtru
+        if (!['Pauza de masa', 'Sedinta', 'Concediu'].some(name => client.name.includes(name))) {
+            const option = document.createElement('option');
+            option.value = client.id;
+            option.textContent = client.name;
+            dom.calendarClientFilter.appendChild(option);
+        }
+    });
+
+    // Restabilește valoarea selectată anterior, dacă mai există
+    dom.calendarClientFilter.value = currentValue;
 }
 
 function generateEventId() {
@@ -1120,6 +1163,15 @@ async function init() {
     if (dom.addEventBtn) dom.addEventBtn.addEventListener('click', () => ui.openEventModal(null));
     if (dom.addEventBtnCalendar) dom.addEventBtnCalendar.addEventListener('click', () => ui.openEventModal(null));
 
+    // Listener pentru noul filtru de client
+    if (dom.calendarClientFilter) {
+        dom.calendarClientFilter.addEventListener('change', (e) => {
+            const clientId = e.target.value;
+            calendarState.setClientFilter(clientId); // Setează filtrul în state
+            render(); // Re-randează calendarul
+        });
+    }
+
     // Modal Evenimente (Adăugare/Editare) (with null checks)
     if (dom.closeModalBtn) dom.closeModalBtn.addEventListener('click', ui.closeEventModal);
     if (dom.cancelModalBtn) dom.cancelModalBtn.addEventListener('click', ui.closeEventModal);
@@ -1184,6 +1236,7 @@ async function init() {
         billing.init();
     }
     // --- Randare Inițială ---
+    populateClientFilterDropdown(); // Populează dropdown-ul de clienți
     renderFilters();
     render();
     
