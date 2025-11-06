@@ -87,14 +87,28 @@
         // API Configuration
         const API_BASE = 'api.php';
         
-        // Parole hardcodate
-        const USER_PASSWORDS = {
-            'corina': '$C0r1n4',
-            'dana': '#D4n4G',
-            'daniela': '@D4n4P',
-            'alexandra': '!Al3x4',
-            'stefan': '&St3f'
-        };
+        // Function to verify password via API
+        async function verifyPassword(userId, password) {
+            try {
+                const formData = new FormData();
+                formData.append('username', userId);
+                formData.append('password', password);
+                
+                const response = await fetch(`${API_BASE}?action=login`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    return result.success;
+                }
+                return false;
+            } catch (error) {
+                console.error('Login error:', error);
+                return false;
+            }
+        }
 
         // Store current selected month for schedule viewing
         let currentScheduleDate = new Date();
@@ -112,7 +126,7 @@
             try {
                 const response = await fetch(`${API_BASE}?path=data`);
                 const data = await response.json();
-                return (data.teamMembers || []).filter(member => USER_PASSWORDS.hasOwnProperty(member.id));
+                return data.teamMembers || [];
             } catch (error) {
                 console.error('Error loading team members:', error);
                 return [];
@@ -121,17 +135,34 @@
 
         async function loadAllData() {
             try {
+                console.log('Loading data from API...');
                 const response = await fetch(`${API_BASE}?path=data`);
+                console.log('API response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    console.error('Response is not JSON:', text.substring(0, 200));
+                    throw new Error('Server returned non-JSON response. Check api.php for errors.');
+                }
+                
                 const data = await response.json();
+                console.log('Data received:', data);
+                console.log('Team members count:', data.teamMembers ? data.teamMembers.length : 0);
                 
                 calendarState.teamMembers = data.teamMembers || [];
                 calendarState.clients = data.clients || [];
                 calendarState.events = data.events || [];
                 calendarState.activeFilters = (data.teamMembers || []).map(m => m.id);
 
-                return (data.teamMembers || []).filter(member => USER_PASSWORDS.hasOwnProperty(member.id));
+                return data.teamMembers || [];
             } catch (error) {
                 console.error('Error loading all data:', error);
+                alert('Eroare la încărcarea datelor din API. Verificați consola pentru detalii.\n\n' + error.message);
                 return [];
             }
         }
@@ -185,6 +216,15 @@
         async function renderUserCards() {
             const container = document.getElementById('userCardsContainer');
             const teamMembers = await loadAllData();
+            
+            console.log('Rendering user cards...');
+            console.log('Team members to render:', teamMembers);
+            
+            if (!teamMembers || teamMembers.length === 0) {
+                console.warn('No team members found!');
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: white;"><p style="font-size: 1.2rem; margin-bottom: 1rem;">⚠️ Nu s-au găsit utilizatori</p><p style="opacity: 0.8;">Verificați conexiunea la baza de date și asigurați-vă că există utilizatori în tabelul <code>team_members</code>.</p></div>';
+                return;
+            }
             
             let cardsHTML = '';
 
@@ -271,16 +311,30 @@
                 
                 if (!loginBtn || !passInput) return;
 
-                const handleLogin = () => {
+                const handleLogin = async () => {
                     const userId = loginBtn.dataset.userId;
                     const password = passInput.value;
                     
-                    if (USER_PASSWORDS[userId] && password === USER_PASSWORDS[userId]) {
+                    if (!password) {
+                        alert('Vă rugăm introduceți parola!');
+                        return;
+                    }
+                    
+                    // Disable button and show loading state
+                    loginBtn.disabled = true;
+                    const originalText = loginBtn.textContent;
+                    loginBtn.textContent = 'Se verifică...';
+                    
+                    const isValid = await verifyPassword(userId, password);
+                    
+                    if (isValid) {
                         selectUser(userId);
                     } else {
                         alert('Parolă incorectă!');
                         passInput.value = '';
                         passInput.focus();
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = originalText;
                     }
                 };
 

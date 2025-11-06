@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #333;
+            border-bottom: 2px solid #4A90E2;
+            padding-bottom: 10px;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .success {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        button {
+            background: #4A90E2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #357abd;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 API Test Page</h1>
+    
+    <div class="test-section">
+        <h2>1. Test Data Loading (api.php?path=data)</h2>
+        <button onclick="testDataLoad()">Test Data Load</button>
+        <div id="dataResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Test Login Endpoint</h2>
+        <input type="text" id="testUsername" placeholder="Username" value="corina">
+        <input type="password" id="testPassword" placeholder="Password" value="$C0r1n4">
+        <button onclick="testLogin()">Test Login</button>
+        <div id="loginResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Browser Console</h2>
+        <p>Open browser console (F12) to see detailed errors</p>
+    </div>
+
+    <script>
+        const API_BASE = 'api.php';
+
+        async function testDataLoad() {
+            const resultDiv = document.getElementById('dataResult');
+            resultDiv.innerHTML = '<p>Loading...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}?path=data`);
+                console.log('Data load response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Data loaded:', data);
+                
+                resultDiv.innerHTML = `
+                    <p class="success">✓ Success!</p>
+                    <p><strong>Team Members:</strong> ${data.teamMembers ? data.teamMembers.length : 0}</p>
+                    <p><strong>Clients:</strong> ${data.clients ? data.clients.length : 0}</p>
+                    <p><strong>Events:</strong> ${data.events ? data.events.length : 0}</p>
+                    <pre>${JSON.stringify(data.teamMembers, null, 2)}</pre>
+                `;
+            } catch (error) {
+                console.error('Data load error:', error);
+                resultDiv.innerHTML = `
+                    <p class="error">✗ Error loading data</p>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        }
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('loginResult');
+            const username = document.getElementById('testUsername').value;
+            const password = document.getElementById('testPassword').value;
+            
+            resultDiv.innerHTML = '<p>Testing login...</p>';
+            
+            try {
+                const formData = new FormData();
+                formData.append('username', username);
+                formData.append('password', password);
+                
+                const response = await fetch(`${API_BASE}?action=login`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                console.log('Login response status:', response.status);
+                console.log('Login response headers:', response.headers);
+                
+                const responseText = await response.text();
+                console.log('Login response text:', responseText);
+                
+                let result;
+                try {
+                    result = JSON.parse(responseText);
+                } catch (e) {
+                    throw new Error(`Invalid JSON response: ${responseText}`);
+                }
+                
+                if (response.ok && result.success) {
+                    resultDiv.innerHTML = `
+                        <p class="success">✓ Login successful!</p>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <p class="error">✗ Login failed</p>
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                resultDiv.innerHTML = `
+                    <p class="error">✗ Error during login</p>
+                    <pre>${error.message}</pre>
+                `;
+            }
+        }
+
+        // Auto-run data load test on page load
+        window.addEventListener('load', () => {
+            testDataLoad();
+        });
+    </script>
+</body>
+</html>

@@ -6,7 +6,7 @@
 
 // Erori (dezactivează 'display_errors' în producție)
 error_reporting(E_ALL);
-ini_set('display_errors', 1); // Setează pe 0 în producție
+ini_set('display_errors', 0); // IMPORTANT: 0 pentru a preveni output-ul HTML în JSON
 ini_set('log_errors', 1);
 
 // --- START DEBUG LOGGING ---
@@ -82,6 +82,43 @@ if ($method === 'POST') {
 // Asigură-te că $pdo există
 if (!isset($pdo)) {
     sendError('Database connection object is not available.', 500);
+}
+
+// Handle login action BEFORE routing
+if (isset($_GET['action']) && $_GET['action'] === 'login') {
+    try {
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+        
+        if (empty($username) || empty($password)) {
+            sendResponse(['success' => false, 'message' => 'Username and password required'], 400);
+        }
+        
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($user && password_verify($password, $user['password_hash'])) {
+            session_start();
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['username'] = $user['username'];
+            $_SESSION['role'] = $user['role'] ?? 'therapist';
+            
+            sendResponse([
+                'success' => true,
+                'user' => [
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'role' => $_SESSION['role']
+                ]
+            ]);
+        } else {
+            sendResponse(['success' => false, 'message' => 'Invalid credentials'], 401);
+        }
+    } catch (Exception $e) {
+        debugLog("Login error: " . $e->getMessage());
+        sendError('Login error: ' . $e->getMessage(), 500);
+    }
 }
 
 // Route requests
