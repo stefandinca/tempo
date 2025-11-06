@@ -278,6 +278,52 @@ export const calendarState = {
     },
 
     /**
+     * Actualizează toate evenimentele dintr-o serie recurentă.
+     * @param {object} originalEvent - Evenimentul original care a fost editat.
+     * @param {object} newEventBaseData - Noile date din formular (fără ID).
+     */
+    updateRecurringEvents: (originalEvent, newEventBaseData) => {
+        // Define criteria to find matching recurring events
+        // Based on deleteRecurringEvents logic
+        const criteria = {
+            name: originalEvent.name,
+            teamMemberIds: originalEvent.teamMemberIds || (originalEvent.teamMemberId ? [originalEvent.teamMemberId] : []),
+            startTime: originalEvent.startTime,
+            duration: originalEvent.duration,
+            repeating: originalEvent.repeating
+        };
+
+        // Normalize criteria teamMemberIds for comparison
+        const criteriaTeamIds = JSON.stringify(criteria.teamMemberIds.sort());
+        const criteriaRepeating = JSON.stringify((criteria.repeating || []).map(d => parseInt(d)).sort());
+
+        state.events.forEach((event, index) => {
+            // Check if this event matches the original criteria
+            const eventTeamIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+            const eventRepeating = (event.repeating || []).map(d => parseInt(d));
+
+            const matches = 
+                event.name === criteria.name &&
+                event.startTime === criteria.startTime &&
+                event.duration === criteria.duration &&
+                JSON.stringify(eventTeamIds.sort()) === criteriaTeamIds &&
+                JSON.stringify(eventRepeating.sort()) === criteriaRepeating;
+
+            if (matches) {
+                // Found a matching event in the series. Update it.
+                // Preserve the original event's ID and Date
+                // Apply all other new data from the form
+                state.events[index] = {
+                    ...event, // Preserves id, date, attendance, programScores, comments
+                    ...newEventBaseData, // Applies new name, details, type, time, duration, members, clients, programs, repeating
+                    id: event.id, // Explicitly preserve ID
+                    date: event.date // Explicitly preserve Date
+                };
+            }
+        });
+    },
+
+    /**
      * Salvează un membru al echipei.
      * @param {object} memberData - Datele membrului (include ID)
      */

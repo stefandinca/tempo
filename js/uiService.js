@@ -130,6 +130,50 @@ export function showRecurringDeleteModal(message = 'Acesta este un eveniment rec
     });
 }
 
+export function showRecurringEditModal(message = 'Acesta este un eveniment recurent. Ce dorești să editezi?') {
+    return new Promise((resolve) => {
+        const modal = $('recurringEditModal');
+        if (!modal) {
+            console.error('recurringEditModal not found in DOM');
+            resolve('cancel'); // Failsafe
+            return;
+        }
+        
+        $('recurringEditModalMessage').textContent = message;
+        modal.style.display = 'flex';
+
+        const cancelBtn = $('recurringEditCancel');
+        const singleBtn = $('recurringEditSingle');
+        const allBtn = $('recurringEditAll');
+        const closeBtn = $('closeRecurringEditModal');
+
+        const handle = (result) => {
+            modal.style.display = 'none';
+            cleanup();
+            resolve(result);
+        };
+        const handleBackdrop = (e) => { if (e.target === modal) handle('cancel'); };
+        
+        const cleanup = () => {
+            cancelBtn.removeEventListener('click', cancelHandler);
+            singleBtn.removeEventListener('click', singleHandler);
+            allBtn.removeEventListener('click', allHandler);
+            closeBtn.removeEventListener('click', cancelHandler);
+            modal.removeEventListener('click', handleBackdrop);
+        };
+        
+        const cancelHandler = () => handle('cancel');
+        const singleHandler = () => handle('single');
+        const allHandler = () => handle('all');
+
+        cancelBtn.addEventListener('click', cancelHandler);
+        singleBtn.addEventListener('click', singleHandler);
+        allBtn.addEventListener('click', allHandler);
+        closeBtn.addEventListener('click', cancelHandler);
+        modal.addEventListener('click', handleBackdrop);
+    });
+}
+
 // --- Management Modal Evenimente (Adăugare/Editare) ---
 
 export function openEventModal(eventId) {

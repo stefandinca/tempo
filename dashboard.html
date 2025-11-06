@@ -1369,6 +1369,26 @@
             </div>
         </div>
     </div>
+
+    <div id="recurringEditModal" class="modal-backdrop modal-small">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="recurringEditModalTitle" class="modal-title">Editare Eveniment Recurent</h2>
+                <button id="closeRecurringEditModal" class="btn-icon btn-close" title="Inchide">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="recurringEditModalMessage">Acesta este un eveniment recurent. Ce dorești să editezi?</p>
+            </div>
+            <div class="modal-footer column-footer">
+                <button id="recurringEditSingle" class="btn btn-primary">Doar acest eveniment</button>
+                <button id="recurringEditAll" class="btn btn-secondary">Toate evenimentele din serie</button>
+                <button id="recurringEditCancel" class="btn btn-secondary">Anulează</button>
+            </div>
+        </div>
+    </div>
+
     <!-- (All modal HTML code from original dashboard.html should be included here) -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -1539,6 +1559,9 @@
             });
         });
     </script>
+
+    
+
     <div id="mobileMenuBackdrop" class="mobile-menu-backdrop md:hidden"></div>
     <div id="globalLoader" class="loader-backdrop">
     <div class="loader-spinner"></div>

@@ -355,14 +355,12 @@ function handleEventClick(eventId) {
 async function handleSaveEvent(e) {
     e.preventDefault();
     const { editingEventId } = calendarState.getState();
+    const existingEvent = editingEventId ? calendarState.getEventById(editingEventId) : null;
 
      // === ADD PERMISSION CHECK FOR EDITING ===
-    if (editingEventId) {
-        const existingEvent = calendarState.getEventById(editingEventId);
-        if (!auth.canModifyEvent(existingEvent)) {
-            auth.showPermissionDenied('editați acest eveniment');
-            return;
-        }
+    if (existingEvent && !auth.canModifyEvent(existingEvent)) {
+        auth.showPermissionDenied('editați acest eveniment');
+        return;
     }
     // === END PERMISSION CHECK ===
 
@@ -377,29 +375,17 @@ async function handleSaveEvent(e) {
     const clientIds = Array.from(calendarState.getState().selectedClientIds);
     const programIds = Array.from(calendarState.getState().selectedProgramIds);
     
-    
     const repeatingDays = [];
-['repeatMon', 'repeatTue', 'repeatWed', 'repeatThu', 'repeatFri'].forEach((id, index) => {
-    const checkbox = document.getElementById(id);
-    if (checkbox && checkbox.checked) {
-        repeatingDays.push(index + 1); // Mon=1, Tue=2, Wed=3, Thu=4, Fri=5
-    }
-});
-
-console.log('Repeating Days array:', repeatingDays);
-console.log('Repeating Days types:', repeatingDays.map(d => typeof d));
-console.log('Final repeatingDays array:', repeatingDays);
-
+    ['repeatMon', 'repeatTue', 'repeatWed', 'repeatThu', 'repeatFri'].forEach((id, index) => {
+        const checkbox = document.getElementById(id);
+        if (checkbox && checkbox.checked) {
+            repeatingDays.push(index + 1); // Mon=1, Tue=2, Wed=3, Thu=4, Fri=5
+        }
+    });
     
     const eventType = formData.get('eventType');
     let startTime = formData.get('startTime');
     let duration = parseInt(formData.get('duration'));
-
-    console.log('=== REPEATING DAYS DEBUG ===');
-console.log('Raw array:', repeatingDays);
-console.log('Types:', repeatingDays.map(d => typeof d));
-console.log('Values:', repeatingDays);
-console.log('===========================');
 
     if (eventType === 'day-off' || eventType === 'pauza-masa' || eventType === 'sedinta') {
         if (!startTime) startTime = '08:00';
@@ -410,6 +396,7 @@ console.log('===========================');
         return;
     }
 
+    // This is the BASE DATA from the form, to be applied
     const eventBase = {
         name: formData.get('eventName'),
         details: formData.get('eventDetails') || undefined,
@@ -422,23 +409,62 @@ console.log('===========================');
         teamMemberIds,
         clientIds: clientIds.length > 0 ? clientIds : undefined,
         programIds: programIds.length > 0 ? programIds : undefined,
-        repeating: repeatingDays.map(d => parseInt(d)) // Ensure integers
-        
+        repeating: repeatingDays.map(d => parseInt(d))
     };
 
-    if (editingEventId) {
-        const existingEvent = calendarState.getEventById(editingEventId);
-        const updatedEvent = { ...existingEvent, ...eventBase, id: editingEventId };
-        calendarState.saveEvent(updatedEvent);
+    // --- START NEW RECURRENCE EDIT LOGIC ---
+    if (existingEvent && existingEvent.repeating && existingEvent.repeating.length > 0) {
+        // This is an edit of a recurring event, ask the user what to do
+        const choice = await ui.showRecurringEditModal();
+
+        if (choice === 'cancel') {
+            return; // User cancelled, do nothing
+        }
+
+        if (choice === 'single') {
+            // Update only this event and detach it from the series by removing 'repeating'
+            const updatedEvent = { 
+                ...existingEvent, 
+                ...eventBase, 
+                id: editingEventId, 
+                repeating: [] // Detach from series
+            };
+            calendarState.saveEvent(updatedEvent);
+        } else if (choice === 'all') {
+            // Update all events in the series
+            // Note: eventBase already contains the new 'repeating' days from the form
+            calendarState.updateRecurringEvents(existingEvent, eventBase);
+        }
+
     } else {
-        if (repeatingDays.length > 0) {
-            const newEvents = createRecurringEvents(eventBase);
-            calendarState.saveEvent(newEvents);
+        // This is a simple edit OR a new event
+        if (editingEventId) {
+            // Simple edit (of a non-recurring or newly detached event)
+            const updatedEvent = { ...existingEvent, ...eventBase, id: editingEventId };
+            // Dacă evenimentul existent *nu* era recurent, dar acum *este* (utilizatorul a adăugat recurență la un eveniment singular)
+            if ((!existingEvent.repeating || existingEvent.repeating.length === 0) && eventBase.repeating.length > 0) {
+                // Tratează-l ca pe o creare de noi evenimente recurente, dar șterge-l pe cel vechi
+                calendarState.deleteEvent(editingEventId); // Șterge originalul
+                const newEvents = createRecurringEvents(eventBase); // Creează seria
+                calendarState.saveEvent(newEvents);
+            } else {
+                // Editare simplă
+                calendarState.saveEvent(updatedEvent);
+            }
         } else {
-            const newEvent = { ...eventBase, id: generateEventId() };
-            calendarState.saveEvent(newEvent);
+            // New event
+            if (eventBase.repeating.length > 0) {
+                // New recurring event
+                const newEvents = createRecurringEvents(eventBase);
+                calendarState.saveEvent(newEvents);
+            } else {
+                // New single event
+                const newEvent = { ...eventBase, id: generateEventId() };
+                calendarState.saveEvent(newEvent);
+            }
         }
     }
+    // --- END NEW RECURRENCE EDIT LOGIC ---
     
     await api.saveData(calendarState.getState());
     // logs saving activity
