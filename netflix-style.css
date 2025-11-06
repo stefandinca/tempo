@@ -11,11 +11,10 @@ body {
     justify-content: center;
     /* Fundal gri deschis ca în imaginea de referință */
     background: #f3f4f6; 
+    
     padding: 2rem;
 }
-[data-theme="dark"] body {
-    background: #111827;
-}
+
 
 /* Container pentru a centra conținutul și a plasa footer-ul */
 .page-container {
