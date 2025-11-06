@@ -748,6 +748,95 @@
             });
         }
 
+        function showPublicEventDetails(event) {
+            const modal = document.getElementById('parentModal');
+            const modalTitle = document.getElementById('parentModalTitle');
+            const modalContent = document.getElementById('parentModalContent');
+
+            modalTitle.textContent = `Detalii Eveniment Public`;
+
+            // --- Build HTML for event details ---
+            
+            // Get Therapists
+            const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+            const therapists = teamMemberIds.map(id => {
+                const member = calendarState.teamMembers.find(m => m.id === id);
+                return member ? member : null;
+            }).filter(Boolean); // Filter out any nulls
+
+            // Get Clients
+            const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
+            const clients = clientIds.map(id => {
+                const client = calendarState.clients.find(c => c.id === id);
+                return client ? client : null;
+            }).filter(Boolean);
+
+            // Format Date/Time
+            const eventDate = new Date(event.date + 'T00:00:00'); // Ensure correct date parsing
+            const formattedDate = eventDate.toLocaleDateString('ro-RO', { 
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+            });
+            const endTime = calculateEndTime(event.startTime, event.duration);
+
+            let contentHTML = `
+                <div class="client-info-section">
+                    <h3 class="section-title">Informații Eveniment</h3>
+                    <div class="client-info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Nume</span>
+                            <span class="info-value">${event.name}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Data</span>
+                            <span class="info-value">${formattedDate}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Ora</span>
+                            <span class="info-value">${event.startTime} - ${endTime}</span>
+                        </div>
+                        ${event.details ? `
+                        <div class="info-item" style="grid-column: 1 / -1;">
+                            <span class="info-label">Detalii</span>
+                            <span class="info-value" style="white-space: pre-wrap;">${event.details}</span>
+                        </div>` : ''}
+                    </div>
+                </div>
+            `;
+
+            if (therapists.length > 0) {
+                contentHTML += `
+                    <div class="client-info-section">
+                        <h3 class="section-title">Terapeuți</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                            ${therapists.map(m => `
+                                <span style="background-color: ${m.color}; color: white; padding: 0.375rem 0.75rem; border-radius: 99px; font-size: 0.875rem; font-weight: 500;">
+                                    ${m.name}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (clients.length > 0) {
+                contentHTML += `
+                    <div class="client-info-section">
+                        <h3 class="section-title">Clienți Participanți</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                            ${clients.map(c => `
+                                <span style="background-color: #f3f4f6; color: #1f2937; padding: 0.375rem 0.75rem; border-radius: 99px; font-size: 0.875rem; font-weight: 500;">
+                                    ${c.name}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            modalContent.innerHTML = contentHTML;
+            modal.classList.add('active');
+        }
+
         function closeParentModal() {
             const modal = document.getElementById('parentModal');
             modal.classList.remove('active');
@@ -1125,6 +1214,11 @@
                                 <div class="event-title">${event.name}</div>
                                 ${clientNames ? `<div class="event-clients">${clientNames}</div>` : ''}
                             `;
+
+                            eventBlock.addEventListener('click', () => {
+                                showPublicEventDetails(event);
+                            });
+                            
                         } else {
                             eventBlock.classList.add('public-view-private'); 
                             eventBlock.style.borderColor = therapist.color;
@@ -1177,8 +1271,12 @@
         }
 
         function formatDateISO(date) {
-            return date.toISOString().split('T')[0];
-        }
+    // FIX: Use local date parts to avoid timezone conversion errors from .toISOString()
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
 
         function formatHour(hour) {
             return `${String(hour).padStart(2, '0')}:00`;
