@@ -215,3 +215,67 @@
     overflow-y: auto;  /* Adaugă scrollbar vertical la nevoie */
     padding-right: 0.5rem; /* Un mic spațiu pentru a nu lipi scrollbar-ul de conținut */
 }
+
+/* --- Stil PENTRU BUTOANELE de scor (în modal) --- */
+
+.program-score-buttons {
+  gap: 0.75rem; /* Spațiu între butoane */
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* Butonul de scor (pătrat) */
+.score-btn {
+  position: relative;
+  width: 44px; /* Lățime fixă */
+  height: 44px; /* Înălțime fixă */
+  padding: 0;
+  font-size: 1.5rem; /* Mărime literă (ex: 'P') */
+  font-weight: 700;
+  color: white;
+  background-color: var(--border-color); /* Culoare de bază (gri) */
+  border: none;
+  border-radius: 0.5rem; /* Colțuri rotunjite */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.score-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Contorul (badge-ul de sus) */
+.score-badge {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: white;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  /* Asigură-te că nu blochează click-ul pe buton */
+  pointer-events: none; 
+}
+
+/* Litera/simbolul din interior */
+.score-label {
+  display: block;
+  margin-top: 2px; /* Mică ajustare pt a centra litera */
+  /* Asigură-te că nu blochează click-ul pe buton */
+  pointer-events: none;
+}
+
+/* Culorile pentru BUTOANE (folosind data-score) */
+.score-btn[data-score="0"] { background-color: #ef4444; } /* Roșu */
+.score-btn[data-score="-"] { background-color: #f59e0b; } /* Portocaliu */
+.score-btn[data-score="P"] { background-color: #3b82f6; } /* Albastru */
+.score-btn[data-score="+"] { background-color: #10b981; } /* Verde */

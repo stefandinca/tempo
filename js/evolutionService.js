@@ -10,6 +10,8 @@ import * as api from './apiService.js';
 // MODIFICAT: Am adăugat showCustomConfirm
 import { showCustomAlert, showCustomConfirm } from './uiService.js';
 
+
+
 let portrigeData = null; // Cache pentru datele Portage
 let currentClientId = null; // Clientul selectat curent
 let evolutionChartInstance = null; // Instanța graficului Chart.js
@@ -18,6 +20,71 @@ let evolutionChartInstance = null; // Instanța graficului Chart.js
 const $ = (id) => document.getElementById(id);
 const evolutionModal = $('evolutionModal');
 const addEvaluationModal = $('addEvaluationModal');
+
+
+/**
+ * Funcție Helper (ACTUALIZATĂ)
+ * Generează HTML-ul pentru afișarea scorurilor (folosind stilul .score-btn)
+ * @param {object | string} scoreData - Obiectul de scoruri (ex: {P: 1, +: 3}) sau un string (format vechi).
+ */
+function generateScoreHTML(scoreData) {
+    let scores = scoreData;
+
+    // 1. Verifică dacă datele sunt în formatul vechi (string) și convertește-le
+    if (typeof scores === 'string') {
+        // Convertește "P" în { P: 1 } sau "P (1), + (3)" în { P: 1, +: 3 }
+        const convertedScores = { "0": 0, "-": 0, "P": 0, "+": 0 };
+        if (scores.includes('(')) {
+            // Format "P (1), + (3)"
+            scores.split(',').forEach(part => {
+                const match = part.match(/([0\-P+])\s*\((\d+)\)/);
+                if (match && match[1] in convertedScores) {
+                    convertedScores[match[1]] = parseInt(match[2], 10);
+                }
+            });
+        } else if (scores.length > 0 && scores in convertedScores) {
+            // Format vechi "P"
+            convertedScores[scores] = 1;
+        }
+        scores = convertedScores;
+    }
+
+    // 2. Asigură-te că este un obiect valid, altfel creează unul gol
+    if (typeof scores !== 'object' || scores === null) {
+        scores = { "0": 0, "-": 0, "P": 0, "+": 0 };
+    }
+
+    // --- MODIFICARE AICI ---
+    // Folosim clasa .program-score-display pentru aliniere (flex)
+    // și .program-score-buttons pentru a prelua spațierea (gap)
+    let html = '<div class="program-score-display program-score-buttons">';
+    
+    const scoreOrder = ['0', '-', 'P', '+'];
+    
+    scoreOrder.forEach(key => {
+        const count = scores[key] || 0;
+        if (count > 0) {
+            // Folosim clasa .score-btn pentru a prelua stilul
+            // dar folosim un <div> în loc de <button> și adăugăm cursor: default
+            html += `
+                <div class="score-btn" data-score="${key}" style="cursor: default;">
+                    <span class="score-badge">${count}</span>
+                    <span class="score-label">${key}</span>
+                </div>
+            `;
+        }
+    });
+
+    html += '</div>';
+    
+    // Dacă nu există niciun scor, returnează un placeholder
+    if (html === '<div class="program-score-display program-score-buttons"></div>') {
+        return '<span class="note-program-no-score" style="font-weight: 600; color: #6b7280;">—</span>';
+    }
+    
+    return html;
+}
+
 
 /**
  * Inițializează și afișează modalul de evoluție pentru un client.
@@ -712,7 +779,17 @@ function generateLogopedicaReportHTML(client, clientData, date) {
     `;
 }
 
+
+
+
 // --- Secțiunea Istoric Programe ---
+
+// În: js/evolutionService.js
+
+// ... (adaugă funcția generateScoreHTML de mai sus aici) ...
+
+// În: js/evolutionService.js
+// ROL: Afișează istoricul în modalul "Evoluție" (Tab-ul "Istoric Programe")
 
 function renderProgramHistory(clientData) {
     const container = $('programHistoryContainer');
@@ -734,19 +811,27 @@ function renderProgramHistory(clientData) {
 
     let html = `
         <table class="program-history-table">
-            <thead><tr><th>Program</th><th>Data</th><th>Scor</th></tr></thead>
+            <thead><tr><th>Program</th><th>Data</th><th style="text-align: left;">Scor</th></tr></thead>
             <tbody>
     `;
     
     Object.entries(grouped).forEach(([programTitle, entries]) => {
         entries.slice(0, 10).forEach((entry, index) => { // Limitează la ultimele 10
             const formattedDate = new Date(entry.date).toLocaleDateString('ro-RO');
+            
+            // --- MODIFICARE AICI ---
+            const scoreHtml = generateScoreHTML(entry.score); // Folosim noul helper
+            // --- SFÂRȘIT MODIFICARE ---
+            
             html += `<tr>`;
             if (index === 0) {
                 html += `<td rowspan="${Math.min(entries.length, 10)}">${programTitle}</td>`;
             }
             html += `<td>${formattedDate}</td>`;
-            html += `<td><span class="program-history-score" data-score="${entry.score}">${entry.score}</span></td>`;
+            
+            // --- MODIFICARE AICI ---
+            html += `<td style="text-align: left;">${scoreHtml}</td>`; // Afișăm HTML-ul generat
+            // --- SFÂRȘIT MODIFICARE ---
             html += `</tr>`;
         });
     });
@@ -834,104 +919,99 @@ function generatePortageSummaryHTML(clientData, client) {
     `;
 }
 
-/**
-     * Randează notițele private (comentariile) pentru un client.
-     * @param {string} clientId
-     */
-    function renderPrivateNotes(clientId) {
-        const container = $('privateNotesContainer');
-        if (!container) return;
+// În: js/evolutionService.js
+// ROL: Afișează notițele private (inclusiv scorurile) în modalul "Evoluție"
 
-        const { events } = calendarState.getState();
+function renderPrivateNotes(clientId) {
+    const container = $('privateNotesContainer');
+    if (!container) return;
 
-        // 1. Filtrează evenimentele care au comentarii pentru acest client
-        const eventsWithComments = events.filter(event => {
-            const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
-            const hasClient = clientIds.includes(clientId);
-            const hasComment = event.comments && event.comments.trim() !== '';
-            return hasClient && hasComment;
-        });
+    const { events } = calendarState.getState();
 
-        // 2. Sortează (cele mai noi primele)
-        eventsWithComments.sort((a, b) => {
-            const dateA = new Date(`${a.date}T${a.startTime || '00:00'}`);
-            const dateB = new Date(`${b.date}T${b.startTime || '00:00'}`);
-            return dateB - dateA; // Sortare descrescătoare
-        });
+    // 1. Filtrează evenimentele care au comentarii pentru acest client
+    const eventsWithComments = events.filter(event => {
+        const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
+        const hasClient = clientIds.includes(clientId);
+        const hasComment = event.comments && event.comments.trim() !== '';
+        return hasClient && hasComment;
+    });
 
-        // 3. Randează HTML-ul
-        if (eventsWithComments.length === 0) {
-            container.innerHTML = '<p class="private-notes-empty">Nu există notițe private salvate pentru acest client.</p>';
-            return;
-        }
+    // 2. Sortează (cele mai noi primele)
+    eventsWithComments.sort((a, b) => {
+        const dateA = new Date(`${a.date}T${a.startTime || '00:00'}`);
+        const dateB = new Date(`${b.date}T${b.startTime || '00:00'}`);
+        return dateB - dateA; // Sortare descrescătoare
+    });
 
-        container.innerHTML = eventsWithComments.map(event => {
-            // Găsește terapeuții
-            const memberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
-            const members = memberIds
-                .map(id => calendarState.getTeamMemberById(id))
-                .filter(Boolean) // Elimină membrii negăsiți
-                .map(m => m.name)
-                .join(', ');
-
-            // Formatează data și ora
-            const formattedDate = new Date(event.date).toLocaleDateString('ro-RO', {
-                day: '2-digit', month: '2-digit', year: 'numeric'
-            });
-            const time = event.startTime || 'N/A';
-
-            // --- NOU: LOGICĂ PENTRU SCORURI ---
-            let scoresHtml = '';
-            const programIds = event.programIds || [];
-            const programScores = event.programScores || {};
-
-            if (programIds.length > 0) {
-                scoresHtml = '<div class="private-note-scores">';
-                programIds.forEach(pId => {
-                    const program = calendarState.getProgramById(pId);
-                    const score = programScores[pId];
-                    
-                    if (program) { // Afișăm doar dacă programul există
-                        scoresHtml += `
-                            <div class="note-score-item">
-                                <span class="note-program-title">${program.title}</span>
-                        `;
-                        
-                        if (score) {
-                            // Folosim stilul din programHistory
-                            scoresHtml += `<span class="program-history-score" data-score="${score}">${score}</span>`;
-                        } else {
-                            // Dacă nu e scor, punem un placeholder
-                            scoresHtml += `<span class="note-program-no-score">—</span>`;
-                        }
-                        
-                        scoresHtml += `</div>`;
-                    }
-                });
-                scoresHtml += '</div>';
-            }
-            // --- SFÂRȘIT LOGICĂ SCORURI ---
-
-            return `
-                <div class="private-note-item">
-                    <div class="private-note-header">
-                        <span class="note-meta-item">
-                            Terapeut: <strong>${members || 'Nespecificat'}</strong>
-                        </span>
-                        <span class="note-meta-item">
-                            Data: <strong>${formattedDate}</strong>
-                        </span>
-                        <span class="note-meta-item">
-                            Ora: <strong>${time}</strong>
-                        </span>
-                    </div>
-                    <div class="private-note-body">
-                        ${scoresHtml} ${event.comments}
-                    </div>
-                </div>
-            `;
-        }).join('');
+    // 3. Randează HTML-ul
+    if (eventsWithComments.length === 0) {
+        container.innerHTML = '<p class="private-notes-empty">Nu există notițe private salvate pentru acest client.</p>';
+        return;
     }
+
+    container.innerHTML = eventsWithComments.map(event => {
+        // Găsește terapeuții
+        const memberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
+        const members = memberIds
+            .map(id => calendarState.getTeamMemberById(id))
+            .filter(Boolean) // Elimină membrii negăsiți
+            .map(m => m.name)
+            .join(', ');
+
+        // Formatează data și ora
+        const formattedDate = new Date(event.date).toLocaleDateString('ro-RO', {
+            day: '2-digit', month: '2-digit', year: 'numeric'
+        });
+        const time = event.startTime || 'N/A';
+
+        // --- AICI E MODIFICAREA ---
+        let scoresHtml = '';
+        const programIds = event.programIds || [];
+        const programScores = event.programScores || {}; // Acesta conține obiectele de scor
+
+        if (programIds.length > 0) {
+            let scoreItemsHtml = '';
+            programIds.forEach(pId => {
+                const program = calendarState.getProgramById(pId);
+                const scoreData = programScores[pId]; // Acesta este {P: 1, +: 3} etc.
+                
+                if (program) { // Afișăm doar dacă programul există
+                    scoreItemsHtml += `
+                        <div class="note-score-item">
+                            <span class="note-program-title">${program.title}</span>
+                            ${generateScoreHTML(scoreData)} 
+                        </div>
+                    `;
+                }
+            });
+
+            if (scoreItemsHtml) {
+                 scoresHtml = `<div class="private-note-scores">${scoreItemsHtml}</div>`;
+            }
+        }
+        // --- SFÂRȘIT MODIFICARE ---
+
+        return `
+            <div class="private-note-item">
+                <div class="private-note-header">
+                    <span class="note-meta-item">
+                        Terapeut: <strong>${members || 'Nespecificat'}</strong>
+                    </span>
+                    <span class="note-meta-item">
+                        Data: <strong>${formattedDate}</strong>
+                    </span>
+                    <span class="note-meta-item">
+                        Ora: <strong>${time}</strong>
+                    </span>
+                </div>
+                <div class="private-note-body">
+                    ${scoresHtml} 
+                    ${event.comments || ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
 
     // --- Secțiunea Temă Lunară ---
 

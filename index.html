@@ -524,6 +524,69 @@
             `;
         }
 
+/**
+ * Funcție Helper (ACTUALIZATĂ)
+ * Generează HTML-ul pentru afișarea scorurilor (folosind stilul .score-btn)
+ * @param {object | string} scoreData - Obiectul de scoruri (ex: {P: 1, +: 3}) sau un string (format vechi).
+ */
+function generateScoreHTML(scoreData) {
+    let scores = scoreData;
+
+    // 1. Verifică dacă datele sunt în formatul vechi (string) și convertește-le
+    if (typeof scores === 'string') {
+        // Convertește "P" în { P: 1 } sau "P (1), + (3)" în { P: 1, +: 3 }
+        const convertedScores = { "0": 0, "-": 0, "P": 0, "+": 0 };
+        if (scores.includes('(')) {
+            // Format "P (1), + (3)"
+            scores.split(',').forEach(part => {
+                const match = part.match(/([0\-P+])\s*\((\d+)\)/);
+                if (match && match[1] in convertedScores) {
+                    convertedScores[match[1]] = parseInt(match[2], 10);
+                }
+            });
+        } else if (scores.length > 0 && scores in convertedScores) {
+            // Format vechi "P"
+            convertedScores[scores] = 1;
+        }
+        scores = convertedScores;
+    }
+
+    // 2. Asigură-te că este un obiect valid, altfel creează unul gol
+    if (typeof scores !== 'object' || scores === null) {
+        scores = { "0": 0, "-": 0, "P": 0, "+": 0 };
+    }
+
+    // --- MODIFICARE AICI ---
+    // Folosim clasa .program-score-display pentru aliniere (flex)
+    // și .program-score-buttons pentru a prelua spațierea (gap)
+    let html = '<div class="program-score-display program-score-buttons">';
+    
+    const scoreOrder = ['0', '-', 'P', '+'];
+    
+    scoreOrder.forEach(key => {
+        const count = scores[key] || 0;
+        if (count > 0) {
+            // Folosim clasa .score-btn pentru a prelua stilul
+            // dar folosim un <div> în loc de <button> și adăugăm cursor: default
+            html += `
+                <div class="score-btn" data-score="${key}" style="cursor: default;">
+                    <span class="score-badge">${count}</span>
+                    <span class="score-label">${key}</span>
+                </div>
+            `;
+        }
+    });
+
+    html += '</div>';
+    
+    // Dacă nu există niciun scor, returnează un placeholder
+    if (html === '<div class="program-score-display program-score-buttons"></div>') {
+        return '<span class="note-program-no-score" style="font-weight: 600; color: #6b7280;">—</span>';
+    }
+    
+    return html;
+}
+
         function generateScheduleHTML(clientData) {
             const year = currentScheduleDate.getFullYear();
             const month = currentScheduleDate.getMonth();
@@ -763,46 +826,64 @@
             }
         }
 
-        function generateProgramHistoryTable(programHistory) {
-            if (!programHistory || programHistory.length === 0) {
-                return '<p class="error-message">Nu există istoric de programe.</p>';
+
+        /**
+ * Funcție Helper (NOUĂ)
+ * Generează HTML-ul pentru afișarea scorurilor sub formă de badge-uri.
+ * @param {object | string} scoreData - Obiectul de scoruri (ex: {P: 1, +: 3}) sau un string (format vechi).
+ */
+
+        // În: index.html (în <script type="module">)
+// ROL: Afișează istoricul în modalul "Acces Părinte"
+
+function generateProgramHistoryTable(programHistory) {
+    if (!programHistory || programHistory.length === 0) {
+        return '<p class="error-message">Nu există istoric de programe.</p>';
+    }
+
+    const sorted = [...programHistory].sort((a, b) => new Date(b.date) - new Date(a.date));
+    const grouped = {};
+    sorted.forEach(entry => {
+        if (!grouped[entry.programTitle]) grouped[entry.programTitle] = [];
+        grouped[entry.programTitle].push(entry);
+    });
+
+    let html = `
+        <table class="program-history-table">
+            <thead>
+                <tr>
+                    <th>Program</th>
+                    <th>Data</th>
+                    <th style="text-align: left;">Scor</th> 
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    Object.entries(grouped).forEach(([programTitle, entries]) => {
+        entries.slice(0, 10).forEach((entry, index) => {
+            const formattedDate = new Date(entry.date).toLocaleDateString('ro-RO');
+            
+            // --- MODIFICARE AICI ---
+            const scoreHtml = generateScoreHTML(entry.score); // Folosim noul helper
+            // --- SFÂRȘIT MODIFICARE ---
+
+            html += `<tr>`;
+            if (index === 0) {
+                html += `<td rowspan="${Math.min(entries.length, 10)}">${programTitle}</td>`;
             }
+            html += `<td>${formattedDate}</td>`;
+            
+            // --- MODIFICARE AICI ---
+            html += `<td style="text-align: left;">${scoreHtml}</td>`; // Afișăm HTML-ul
+            // --- SFÂRȘIT MODIFICARE ---
+            html += `</tr>`;
+        });
+    });
 
-            const sorted = [...programHistory].sort((a, b) => new Date(b.date) - new Date(a.date));
-            const grouped = {};
-            sorted.forEach(entry => {
-                if (!grouped[entry.programTitle]) grouped[entry.programTitle] = [];
-                grouped[entry.programTitle].push(entry);
-            });
-
-            let html = `
-                <table class="program-history-table">
-                    <thead>
-                        <tr>
-                            <th>Program</th>
-                            <th>Data</th>
-                            <th style="text-align: center;">Scor</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            Object.entries(grouped).forEach(([programTitle, entries]) => {
-                entries.slice(0, 10).forEach((entry, index) => {
-                    const formattedDate = new Date(entry.date).toLocaleDateString('ro-RO');
-                    html += `<tr>`;
-                    if (index === 0) {
-                        html += `<td rowspan="${Math.min(entries.length, 10)}">${programTitle}</td>`;
-                    }
-                    html += `<td>${formattedDate}</td>`;
-                    html += `<td style="text-align: center;"><span class="program-history-score" data-score="${entry.score}">${entry.score}</span></td>`;
-                    html += `</tr>`;
-                });
-            });
-
-            html += `</tbody></table>`;
-            return html;
-        }
+    html += `</tbody></table>`;
+    return html;
+}
 
         function renderEvolutionChart(evaluations) {
             const canvas = document.getElementById('parentEvolutionChart');

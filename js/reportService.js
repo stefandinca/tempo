@@ -12,6 +12,69 @@ import { calendarState } from './calendarState.js';
 import { showCustomAlert } from './uiService.js';
 
 /**
+ * Funcție Helper (ACTUALIZATĂ)
+ * Generează HTML-ul pentru afișarea scorurilor (folosind stilul .score-btn)
+ * @param {object | string} scoreData - Obiectul de scoruri (ex: {P: 1, +: 3}) sau un string (format vechi).
+ */
+function generateScoreHTML(scoreData) {
+    let scores = scoreData;
+
+    // 1. Verifică dacă datele sunt în formatul vechi (string) și convertește-le
+    if (typeof scores === 'string') {
+        // Convertește "P" în { P: 1 } sau "P (1), + (3)" în { P: 1, +: 3 }
+        const convertedScores = { "0": 0, "-": 0, "P": 0, "+": 0 };
+        if (scores.includes('(')) {
+            // Format "P (1), + (3)"
+            scores.split(',').forEach(part => {
+                const match = part.match(/([0\-P+])\s*\((\d+)\)/);
+                if (match && match[1] in convertedScores) {
+                    convertedScores[match[1]] = parseInt(match[2], 10);
+                }
+            });
+        } else if (scores.length > 0 && scores in convertedScores) {
+            // Format vechi "P"
+            convertedScores[scores] = 1;
+        }
+        scores = convertedScores;
+    }
+
+    // 2. Asigură-te că este un obiect valid, altfel creează unul gol
+    if (typeof scores !== 'object' || scores === null) {
+        scores = { "0": 0, "-": 0, "P": 0, "+": 0 };
+    }
+
+    // --- MODIFICARE AICI ---
+    // Folosim clasa .program-score-display pentru aliniere (flex)
+    // și .program-score-buttons pentru a prelua spațierea (gap)
+    let html = '<div class="program-score-display program-score-buttons">';
+    
+    const scoreOrder = ['0', '-', 'P', '+'];
+    
+    scoreOrder.forEach(key => {
+        const count = scores[key] || 0;
+        if (count > 0) {
+            // Folosim clasa .score-btn pentru a prelua stilul
+            // dar folosim un <div> în loc de <button> și adăugăm cursor: default
+            html += `
+                <div class="score-btn" data-score="${key}" style="cursor: default;">
+                    <span class="score-badge">${count}</span>
+                    <span class="score-label">${key}</span>
+                </div>
+            `;
+        }
+    });
+
+    html += '</div>';
+    
+    // Dacă nu există niciun scor, returnează un placeholder
+    if (html === '<div class="program-score-display program-score-buttons"></div>') {
+        return '<span class="note-program-no-score" style="font-weight: 600; color: #6b7280;">—</span>';
+    }
+    
+    return html;
+}
+
+/**
  * Generează și descarcă un raport HTML pentru un client.
  * (Modificat pentru a genera HTML cu date de evoluție)
  * @param {string} clientId
@@ -681,10 +744,18 @@ function generatePortageSummaryHTML(clientData, client) {
     `;
 }
 
+
 /**
  * Generates HTML for the program history table.
  * Copied and modified from evolutionService.js
  */
+// În: js/reportService.js
+
+// ... (adaugă funcția generateScoreHTML de mai sus aici) ...
+
+// În: js/reportService.js
+// ROL: Afișează istoricul în raportul HTML descărcabil
+
 function generateProgramHistoryHTML(programHistory) {
     if (!programHistory || programHistory.length === 0) {
         return `
@@ -705,21 +776,44 @@ function generateProgramHistoryHTML(programHistory) {
     Object.entries(grouped).forEach(([programTitle, entries]) => {
         entries.slice(0, 10).forEach((entry, index) => { // Limitează la ultimele 10
             const formattedDate = new Date(entry.date).toLocaleDateString('ro-RO');
+            
+            // --- MODIFICARE AICI ---
+            const scoreHtml = generateScoreHTML(entry.score); // Folosim noul helper
+            // --- SFÂRȘIT MODIFICARE ---
+
             tableRows += `<tr>`;
             if (index === 0) {
                 tableRows += `<td rowspan="${Math.min(entries.length, 10)}">${programTitle}</td>`;
             }
             tableRows += `<td>${formattedDate}</td>`;
-            tableRows += `<td style="text-align: center;"><span class="program-history-score" data-score="${entry.score}">${entry.score}</span></td>`;
+            
+            // --- MODIFICARE AICI ---
+            tableRows += `<td style="text-align: left;">${scoreHtml}</td>`; // Afișăm HTML-ul
+            // --- SFÂRȘIT MODIFICARE ---
             tableRows += `</tr>`;
         });
     });
     
-    return `
+    // Adaugă stilurile CSS direct în HTML-ul raportului
+    const styles = `
+        <style>
+            .program-score-display { display: flex; gap: 0.5rem; justify-content: flex-start; padding: 4px 0; }
+            .score-item { position: relative; width: 36px; height: 36px; font-size: 1.25rem; font-weight: 700; color: white; border-radius: 0.375rem; display: flex; align-items: center; justify-content: center; }
+            .score-item.score-0 { background-color: #ef4444; }
+            .score-item.score-minus { background-color: #f59e0b; }
+            .score-item.score-P { background-color: #3b82f6; }
+            .score-item.score-plus { background-color: #10b981; }
+            .score-item .score-badge { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); background-color: white; color: #1f2937; border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0 0.375rem; font-size: 0.75rem; font-weight: 700; min-width: 20px; text-align: center; }
+            .score-item .score-label { margin-top: 1px; }
+            .note-program-no-score { font-weight: 600; color: #6b7280; }
+        </style>
+    `;
+
+    return styles + `
         <h2 style="color: #FF6B6B; border-bottom-color: #FF6B6B50;">Istoric Programe Recente</h2>
         <div class="summary-box" style="border-left-color: #FF6B6B; background: #fff5f5;">
             <table style="box-shadow: none;">
-                <thead><tr style="background: #fee2e2; color: #991b1b;"><th>Program</th><th>Data</th><th style="text-align: center;">Scor</th></tr></thead>
+                <thead><tr style="background: #fee2e2; color: #991b1b;"><th>Program</th><th>Data</th><th style="text-align: left;">Scor</th></tr></thead>
                 <tbody>
                     ${tableRows}
                 </tbody>
