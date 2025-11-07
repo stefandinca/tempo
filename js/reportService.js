@@ -774,7 +774,10 @@ function getEventTypeLabel(type) {
         'coordination': 'Coordonare',
         'day-off': 'Zi libera',
         'pauza-masa': 'Pauza de masa',
-        'sedinta': 'Sedinta'
+        'sedinta': 'Sedinta',
+        'evaluare':'Evaluare',
+        'psihoterapie':'Psihoterapie',
+        'dezvoltare-personala':'Dezvoltare personala'
     };
     return types[type] || type;
 }
