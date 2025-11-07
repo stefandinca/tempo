@@ -145,23 +145,102 @@ function renderEvolutionChart(clientData) {
     });
 }
 
-// În fișierul: js/evolutionService.js
+/**
+ * NOU: Generator HTML pentru sumarul Portage (CA/DA/DQ)
+ * (Copiat din reportService.js pentru a fi afișat în modal)
+ */
+function generatePortageSummaryHTML(clientData, client) {
+    // Verifică dacă există datele necesare
+    if (!client.birthDate || !clientData.evaluations || Object.keys(clientData.evaluations).length === 0) {
+        return ''; // Nu afișa nimic dacă nu există date
+    }
+
+    const birthDate = new Date(client.birthDate);
+    const allDates = new Set();
+    // Adună toate datele de evaluare unice
+    Object.values(clientData.evaluations).forEach(domain => {
+        Object.keys(domain).forEach(date => allDates.add(date));
+    });
+    // Sortează datele cronologic
+    const sortedDates = Array.from(allDates).sort((a, b) => new Date(a) - new Date(b));
+    
+    const results = [];
+    sortedDates.forEach(date => {
+        // Obține toate scorurile (DA) pentru o anumită dată
+        const evalValues = Object.values(clientData.evaluations)
+            .map(domain => domain[date])
+            .filter(v => typeof v === 'number' && !isNaN(v));
+        
+        if (evalValues.length === 0) return; // Continuă dacă nu există scoruri pentru această dată
+
+        // Calculează media DA (Vârsta Dezvoltării)
+        const avgDevAge = evalValues.reduce((a, b) => a + b, 0) / evalValues.length;
+        // Calculează CA (Vârsta Cronologică) în luni la data evaluării
+        const chronoAge = getAgeInMonths(birthDate, date); // Folosește helper-ul existent
+        
+        if (chronoAge === 0) return; // Evită împărțirea la zero
+        
+        // Calculează DQ (Coeficientul de Dezvoltare)
+        const dq = (avgDevAge / chronoAge) * 100;
+        results.push({ date, avgDevAge, chronoAge, dq });
+    });
+
+    if (results.length === 0) {
+        return ''; // Nu s-au putut calcula rezultate
+    }
+
+    // Generează rândurile tabelului
+    const tableRows = results.map(r => {
+        const color = r.dq < 70 ? '#e74c3c' : r.dq < 85 ? '#f39c12' : '#27ae60';
+        return `<tr>
+            <td>${new Date(r.date).toLocaleDateString('ro-RO')}</td>
+            <td>${r.chronoAge.toFixed(1)} luni</td>
+            <td>${r.avgDevAge.toFixed(1)} luni</td>
+            <td style="font-weight:600;color:${color};">${r.dq.toFixed(1)}</td>
+        </tr>`;
+    }).join('');
+
+    // Returnează HTML-ul complet al tabelului
+    return `
+        <h3 class="evolution-summary-title" style="margin-top: 2rem;">Istoric Evoluție Generală (DQ)</h3>
+        <div class="evolution-table-container">
+            <table class="evolution-table">
+                <thead>
+                    <tr>
+                        <th>Data Evaluării</th>
+                        <th>Vârstă Cronologică (CA)</th>
+                        <th>Vârstă Dezvoltare (DA)</th>
+                        <th>Indice Dezvoltare (DQ)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
 
 /**
  * NOU: Randează lista de butoane pentru rapoartele de evaluare (înlocuiește renderPortageSummary)
+ * (MODIFICAT: Acum randează ȘI tabelul de istoric DQ)
  */
 function renderEvaluationReportsList(clientData, client) {
     const container = $('evolutionSummary');
     if (!container) return;
 
+    // --- NOU: Partea 1 - Generează și adaugă tabelul de istoric DQ ---
+    const summaryTableHTML = generatePortageSummaryHTML(clientData, client);
+    container.innerHTML = summaryTableHTML; // Începe cu tabelul
+
+    // --- Partea 2: Logica existentă pentru butoanele de raport (modificată să adauge, nu să suprascrie) ---
     const allEvaluations = [];
 
     // 1. Adaugă evaluările Portage
-    // Grupăm după dată, deoarece o evaluare Portage conține mai multe domenii la aceeași dată
     if (clientData.evaluations) {
         Object.keys(clientData.evaluations).forEach(domain => {
             Object.keys(clientData.evaluations[domain]).forEach(date => {
-                // Adăugăm data doar o singură dată
                 if (!allEvaluations.some(e => e.type === 'portage' && e.date === date)) {
                     allEvaluations.push({
                         type: 'portage',
@@ -187,41 +266,43 @@ function renderEvaluationReportsList(clientData, client) {
     // 3. Sortează evaluările (cele mai noi primele)
     allEvaluations.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-    // 4. Generează HTML
+    // 4. Generează HTML pentru butoane
+    let buttonsHTML = '';
     if (allEvaluations.length === 0) {
-        container.innerHTML = `
-            <h3 class="evolution-summary-title">Rapoarte Evaluări Salvate</h3>
-            <p class="empty-list-message" style="margin-top: 1rem; text-align: center;">Nu există evaluări salvate pentru acest client.</p>
+        // Dacă nu există rapoarte (dar poate exista un tabel de sumar), nu adăuga nimic
+        if (summaryTableHTML === '') { // Doar dacă și sumarul e gol
+            container.innerHTML = `
+                <p class="empty-list-message" style="margin-top: 1rem; text-align: center;">Nu există evaluări salvate pentru acest client.</p>
+            `;
+        }
+        // Nu face return, trebuie să adăugăm listener-ul
+    } else {
+        buttonsHTML = allEvaluations.map(ev => {
+            const formattedDate = new Date(ev.date).toLocaleDateString('ro-RO', {
+                day: '2-digit', month: '2-digit', year: 'numeric'
+            });
+            const icon = ev.type === 'portage' 
+                ? '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9l-5 5-4-4-6 6"/></svg>'
+                : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-megaphone" viewBox="0 0 16 16"><path d="M13 2.5a1.5 1.5 0 0 1 3 0v11a1.5 1.5 0 0 1-3 0v-.214c-2.162-1.241-4.49-1.843-6.912-2.083l.405 2.712A1 1 0 0 1 5.51 15.1h-.548a1 1 0 0 1-.916-.599l-1.85-3.49-.202-.003A2.014 2.014 0 0 1 0 9V7a2.02 2.02 0 0 1 1.992-2.013 75 75 0 0 0 2.483-.075c3.043-.154 6.148-.849 8.525-2.199zm1 0v11a.5.5 0 0 0 1 0v-11a.5.5 0 0 0-1 0m-1 1.35c-2.344 1.205-5.209 1.842-8 2.033v4.233q.27.015.537.036c2.568.189 5.093.744 7.463 1.993zm-9 6.215v-4.13a95 95 0 0 1-1.992.052A1.02 1.02 0 0 0 1 7v2c0 .55.448 1.002 1.006 1.009A61 61 0 0 1 4 10.065m-.657.975 1.609 3.037.01.024h.548l-.002-.014-.443-2.966a68 68 0 0 0-1.722-.082z"/></svg>';
+    
+            return `
+                <button class="btn btn-action-text evaluation-report-button" data-type="${ev.type}" data-date="${ev.date}">
+                    ${icon}
+                    <span>${ev.title} - ${formattedDate}</span>
+                </button>
+            `;
+        }).join('');
+
+        // --- MODIFICAT: Adaugă (+=) în loc de a suprascrie ---
+        container.innerHTML += `
+            <h3 class="evolution-summary-title" style="margin-top: 2rem;">Rapoarte Evaluări Salvate</h3>
+            <div class="evaluation-report-list">
+                ${buttonsHTML}
+            </div>
         `;
-        return;
     }
 
-    const buttonsHTML = allEvaluations.map(ev => {
-        const formattedDate = new Date(ev.date).toLocaleDateString('ro-RO', {
-            day: '2-digit', month: '2-digit', year: 'numeric'
-        });
-        // Pictograme diferite pentru fiecare tip de raport
-        const icon = ev.type === 'portage' 
-            ? '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M18 17V9l-5 5-4-4-6 6"/></svg>'
-            : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-megaphone" viewBox="0 0 16 16"><path d="M13 2.5a1.5 1.5 0 0 1 3 0v11a1.5 1.5 0 0 1-3 0v-.214c-2.162-1.241-4.49-1.843-6.912-2.083l.405 2.712A1 1 0 0 1 5.51 15.1h-.548a1 1 0 0 1-.916-.599l-1.85-3.49-.202-.003A2.014 2.014 0 0 1 0 9V7a2.02 2.02 0 0 1 1.992-2.013 75 75 0 0 0 2.483-.075c3.043-.154 6.148-.849 8.525-2.199zm1 0v11a.5.5 0 0 0 1 0v-11a.5.5 0 0 0-1 0m-1 1.35c-2.344 1.205-5.209 1.842-8 2.033v4.233q.27.015.537.036c2.568.189 5.093.744 7.463 1.993zm-9 6.215v-4.13a95 95 0 0 1-1.992.052A1.02 1.02 0 0 0 1 7v2c0 .55.448 1.002 1.006 1.009A61 61 0 0 1 4 10.065m-.657.975 1.609 3.037.01.024h.548l-.002-.014-.443-2.966a68 68 0 0 0-1.722-.082z"/></svg>';
-
-        return `
-            <button class="btn btn-action-text evaluation-report-button" data-type="${ev.type}" data-date="${ev.date}">
-                ${icon}
-                <span>${ev.title} - ${formattedDate}</span>
-            </button>
-        `;
-    }).join('');
-
-    container.innerHTML = `
-        <h3 class="evolution-summary-title">Rapoarte Evaluări Salvate</h3>
-        <div class="evaluation-report-list">
-            ${buttonsHTML}
-        </div>
-    `;
-
     // 5. Adaugă event listener (delegare)
-    // Asigură-te că nu adaugi listeneri multipli
     container.removeEventListener('click', handleEvaluationReportDownload); 
     container.addEventListener('click', handleEvaluationReportDownload);
 }
@@ -1032,11 +1113,10 @@ function updateChildAgeDisplay(birthDate) {
     span.textContent = `${years} ani și ${rem} luni (${months} luni)`;
 }
 
+
 /**
  * Randează domeniile și itemii Portage în container.
- */
-/**
- * Randează domeniile și itemii Portage în container.
+ * (Versiune corectată pentru a activa toate check-urile și a re-adăuga "Select All" pe grup)
  */
 function renderPortageDomains() {
     const container = $('portageDomainsContainer');
@@ -1063,7 +1143,7 @@ function renderPortageDomains() {
         // Group items by age range
         const ageGroups = {};
         items.forEach(item => {
-            const ageKey = item.age; // e.g., "0–3 luni", "13–15 luni"
+            const ageKey = item.age; // e.g., "0-12 luni"
             if (!ageGroups[ageKey]) {
                 ageGroups[ageKey] = [];
             }
@@ -1072,7 +1152,6 @@ function renderPortageDomains() {
 
         // Check if there are any future items
         const hasFutureItems = items.some(item => item.months > ageMonths);
-        const firstFutureMonth = items.find(item => item.months > ageMonths)?.months;
 
         // Build items HTML with age separators
         let itemsHtml = '';
@@ -1081,38 +1160,44 @@ function renderPortageDomains() {
         
         Object.entries(ageGroups).forEach(([ageRange, groupItems]) => {
             const firstItemInGroup = groupItems[0];
-            const isFutureGroup = firstItemInGroup.months > ageMonths;
             
-            // --- MODIFICARE: Creare groupKey unic ---
-            const groupKey = `${domain}_${ageRange.replace(/[^a-z0-9]/gi, '_')}`;
-            
+            // --- Logica de "viitor" ---
+            // Un grup este "viitor" dacă vârsta copilului este mai mică decât începutul intervalului
+            const bracketCeiling = firstItemInGroup.months;
+            let bracketFloor = 0;
+            if (bracketCeiling > 12) {
+                const allCeilings = Array.from(new Set(items.map(i => i.months))).sort((a,b) => a - b);
+                const currentBracketIndex = allCeilings.indexOf(bracketCeiling);
+                if (currentBracketIndex > 0) {
+                    bracketFloor = allCeilings[currentBracketIndex - 1]; // e.g., 36
+                }
+            }
+            const isFutureGroup = ageMonths < bracketFloor;
+            // --- Sfârșit Logica "viitor" ---
+
             // Format age separator
             let separatorText = formatAgeRange(ageRange, firstItemInGroup.months);
             
-            // --- MODIFICARE: Adăugare checkbox la separator ---
+            // --- Checkbox-ul "Select All" ---
             const groupHtml = `
                 <div class="portage-age-separator">
-                    <input type="checkbox" class="portage-group-toggle" data-group-key="${groupKey}" id="toggle_${groupKey}">
-                    <label for="toggle_${groupKey}">${separatorText}</label>
+                    <input type="checkbox" class="age-group-toggle" title="Selectează/Deselectează grupul">
+                    <span>${separatorText}</span>
                 </div>
             `;
             
             // Build items for this group
             let groupItemsHtml = '';
             groupItems.forEach(item => {
-                const isFuture = item.months > ageMonths;
-
-                // --- START CORECȚIE 1: Logica pentru tag-ul [fin] ---
                 let ageText = `(${item.age})`;
                 if (ageText.includes('(fin)')) {
                     ageText = ageText.replace(/\(fin\)/gi, '<span class="portage-fin-tag">fin</span>');
                 }
-                // --- END CORECȚIE 1 ---
 
-                // --- MODIFICARE: Adăugare data-group-key la item ---
+                // FIX: Nu mai dezactivăm itemii. Toți sunt editabili.
                 groupItemsHtml += `
-                    <div class="portage-item ${isFuture ? 'disabled' : ''}" data-months="${item.months}" data-group-key="${groupKey}">
-                        <input type="checkbox" data-domain="${domain}" data-id="${item.id}" ${isFuture ? 'disabled' : ''}>
+                    <div class="portage-item" data-months="${item.months}">
+                        <input type="checkbox" data-domain="${domain}" data-id="${item.id}">
                         <label>${item.text} <i>${ageText}</i></label>
                     </div>
                 `;
@@ -1153,6 +1238,8 @@ function renderPortageDomains() {
             <div class="checkbox-grid collapsed">${itemsHtml}</div>
         `;
         
+        // --- ADĂUGARE LISTENERI ---
+
         // Toggle domain visibility
         const grid = block.querySelector('.checkbox-grid');
         const toggleBtn = block.querySelector('.domain-header .domain-toggle-btn');
@@ -1183,59 +1270,46 @@ function renderPortageDomains() {
             });
         }
 
-        // --- START CORECȚIE 2: Click pe întregul rând ---
+        // Listener pentru click pe rândul item-ului
         block.querySelectorAll('.portage-item').forEach(item => {
             const checkbox = item.querySelector('input[type="checkbox"]');
             if (!checkbox) return;
-
-            // 1. Listener pe tot item-ul (div)
             item.addEventListener('click', (e) => {
-                if (e.target.tagName === 'INPUT' || checkbox.disabled) {
-                    // Dacă s-a dat click direct pe checkbox, lasă-l să-și facă treaba
-                    // Sau dacă e dezactivat, nu face nimic
-                    return; 
-                }
-                
-                // Comută manual starea checkbox-ului pentru click pe label/padding/etc.
+                if (e.target.tagName === 'INPUT' || checkbox.disabled) return; 
                 checkbox.checked = !checkbox.checked;
-                // Comută și clasa vizuală
                 item.classList.toggle('checked', checkbox.checked);
             });
-
-            // 2. Listener direct pe checkbox (pentru a prinde și click-ul pe el)
             checkbox.addEventListener('change', (e) => {
-                // Sincronizează clasa vizuală când checkbox-ul se change
                 item.classList.toggle('checked', e.target.checked);
             });
         });
-        // --- END CORECȚIE 2 ---
 
-        // --- NOU: Adaugă listener pentru toggle-ul de grup de vârstă ---
-        block.querySelectorAll('.portage-group-toggle').forEach(toggle => {
-            toggle.addEventListener('change', (e) => {
-                const groupKey = e.target.dataset.groupKey;
+        // --- NOU: Listener PENTRU "Select All" (VERSIUNEA CORECTATĂ) ---
+        block.querySelectorAll('.age-group-toggle').forEach(headerCheckbox => {
+            headerCheckbox.addEventListener('change', (e) => {
                 const isChecked = e.target.checked;
+                const separator = e.target.closest('.portage-age-separator');
+                let nextElement = separator.nextElementSibling;
 
-                // Găsește toate item-urile care aparțin acestui grup *în interiorul* blocului de domeniu
-                const itemsInGroup = block.querySelectorAll(`.portage-item[data-group-key="${groupKey}"]`);
-                
-                itemsInGroup.forEach(item => {
-                    const itemCheckbox = item.querySelector('input[type="checkbox"]');
-                    // Bifează/debifează doar item-urile care nu sunt dezactivate (nu sunt din viitor)
+                // Iterează prin toate elementele "frate" PÂNĂ LA următorul separator
+                // *** FIX: Condiția este acum `classList.contains('portage-item')` ***
+                while (nextElement && nextElement.classList.contains('portage-item')) {
+                    
+                    const itemCheckbox = nextElement.querySelector('input[type="checkbox"]');
                     if (itemCheckbox && !itemCheckbox.disabled) {
                         itemCheckbox.checked = isChecked;
-                        // Sincronizează și clasa vizuală 'checked'
-                        item.classList.toggle('checked', isChecked);
+                        nextElement.classList.toggle('checked', isChecked);
                     }
-                });
+
+                    nextElement = nextElement.nextElementSibling;
+                }
             });
         });
-        // --- SFÂRȘIT NOU ---
+        // --- SFÂRȘIT BLOC NOU ---
 
         container.appendChild(block);
     });
 }
-
 /**
  * Format age range with years and months for ranges > 10-12 months
  */
@@ -1302,43 +1376,37 @@ async function savePortageEvaluation() {
     }
 
     const ageMonths = getAgeInMonths(birthDate, evalDate);
-    
-    // Calculează scorurile
-    const domainScores = {};
-    const domainItems = {};
-    
-    // Adună toate itemele relevante (nu viitoare)
-    $('portageDomainsContainer').querySelectorAll('.portage-item:not(.disabled) input').forEach(cb => {
-        const domain = cb.dataset.domain;
-        if (!domainScores[domain]) {
-            domainScores[domain] = { checked: 0 };
-            domainItems[domain] = [];
-        }
-        domainItems[domain].push(cb);
-        if (cb.checked) {
-            domainScores[domain].checked++;
-        }
-    });
-
     const clientEvals = evolutionData[currentClientId]?.evaluations || {};
-    
-    // Calculează vârsta de dezvoltare și salvează scorul
-    for (const domain in domainScores) {
-        const items = portrigeData[domain].filter(item => item.months <= ageMonths);
-        let developmentalAge = 0;
-        if (items.length > 0) {
-            const checkedCount = domainScores[domain].checked;
-            // Găsește ultimul item bifat
-            const checkedItems = domainItems[domain].filter(cb => cb.checked).map(cb => cb.closest('.portage-item'));
-            if(checkedItems.length > 0) {
-                const lastCheckedItem = checkedItems[checkedItems.length-1];
-                developmentalAge = parseInt(lastCheckedItem.dataset.months) || 0;
-            }
-        }
+
+    // Calculează scorurile
+    for (const domain in portrigeData) {
+        if (!portrigeData.hasOwnProperty(domain)) continue;
+
+        // 1. Get ALL items for this domain
+        const allDomainItems = portrigeData[domain];
+        if (!allDomainItems || allDomainItems.length === 0) continue;
         
+        // 2. Get total items in this domain
+        const totalItemsInDomain = allDomainItems.length;
+        
+        // 3. Get the max age for this domain (e.g., 72 months)
+        const maxAge = allDomainItems[totalItemsInDomain - 1].months;
+        
+        // 4. Get the count of *all* checked items for this domain
+        const checkedCount = Array.from(
+            $('portageDomainsContainer').querySelectorAll(`.portage-item input[data-domain="${domain}"]:checked`)
+        ).length;
+
+        // 5. Calculate DA based on ratio
+        let developmentalAge = 0;
+        if (totalItemsInDomain > 0) {
+            developmentalAge = (checkedCount / totalItemsInDomain) * maxAge;
+        }
+
+        // 6. Save the calculated DA
         const key = `Portrige - ${domain}`; // Cheia pentru grafic
         if (!clientEvals[key]) clientEvals[key] = {};
-        clientEvals[key][evalDate] = developmentalAge; // Salvează vârsta de dezvoltare (în luni)
+        clientEvals[key][evalDate] = developmentalAge; // Salvează DA-ul calculat
     }
     
     // Actualizează starea locală
@@ -1357,16 +1425,8 @@ async function savePortageEvaluation() {
             window.logActivity("Evaluare salvată", client.name, 'evaluation', currentClientId);
         }
         
-        // Nu rerandăm graficele (Portage), dar actualizăm lista de rapoarte
-        // și închidem tab-ul de evaluare.
-        
-        // ***** START CORECȚIE *****
-        // Linia de mai jos era cea greșită. Am șters-o.
-        // const client = calendarState.getClientById(currentClientId); 
-        
         // Folosim variabila 'client' deja definită la începutul funcției.
         renderEvaluationReportsList(evolutionData[currentClientId], client);
-        // ***** SFÂRȘIT CORECȚIE *****
         
         activateTab('tabGrafice');
 

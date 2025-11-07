@@ -423,6 +423,107 @@
             };
         }
 
+        function getAgeInMonths(birthDate, evalDate) {
+            const birth = new Date(birthDate);
+            const evalD = evalDate ? new Date(evalDate) : new Date();
+            let months = (evalD.getFullYear() - birth.getFullYear()) * 12;
+            months -= birth.getMonth();
+            months += evalD.getMonth();
+            return months <= 0 ? 0 : months;
+        }
+        
+        function formatYearsMonths(years, months) {
+            if (years === 0) return `${months} ${months === 1 ? 'luna' : 'luni'}`;
+            if (months === 0) return `${years} ${years === 1 ? 'an' : 'ani'}`;
+            const yearText = years === 1 ? 'an' : 'ani';
+            const monthText = months === 1 ? 'luna' : 'luni';
+            return `${years} ${yearText} si ${months} ${monthText}`;
+        }
+
+        function formatAgeInYearsMonths(totalMonths) {
+            const years = Math.floor(totalMonths / 12);
+            const months = totalMonths % 12;
+            return formatYearsMonths(years, months);
+        }
+
+        function generatePortageSummaryHTML(clientData) {
+            const client = clientData.client;
+            const evaluations = clientData.evolution.evaluations;
+
+            // Verifică dacă există datele necesare
+            if (!client.birthDate || !evaluations || Object.keys(evaluations).length === 0) {
+                return ''; // Nu afișa nimic dacă nu există date
+            }
+
+            const birthDate = new Date(client.birthDate);
+            const allDates = new Set();
+            // Adună toate datele de evaluare unice
+            Object.values(evaluations).forEach(domain => {
+                Object.keys(domain).forEach(date => allDates.add(date));
+            });
+            // Sortează datele cronologic
+            const sortedDates = Array.from(allDates).sort((a, b) => new Date(a) - new Date(b));
+            
+            const results = [];
+            sortedDates.forEach(date => {
+                // Obține toate scorurile (DA) pentru o anumită dată
+                const evalValues = Object.values(evaluations)
+                    .map(domain => domain[date])
+                    .filter(v => typeof v === 'number' && !isNaN(v));
+                
+                if (evalValues.length === 0) return; // Continuă dacă nu există scoruri pentru această dată
+
+                // Calculează media DA (Vârsta Dezvoltării)
+                const avgDevAge = evalValues.reduce((a, b) => a + b, 0) / evalValues.length;
+                // Calculează CA (Vârsta Cronologică) în luni la data evaluării
+                const chronoAge = getAgeInMonths(birthDate, date); 
+                
+                if (chronoAge === 0) return; // Evită împărțirea la zero
+                
+                // Calculează DQ (Coeficientul de Dezvoltare)
+                const dq = (avgDevAge / chronoAge) * 100;
+                results.push({ date, avgDevAge, chronoAge, dq });
+            });
+
+            if (results.length === 0) {
+                return ''; // Nu s-au putut calcula rezultate
+            }
+
+            // Generează rândurile tabelului
+            // Folosim clasa 'program-history-table' pentru stilizare consistentă
+            const tableRows = results.map(r => {
+                const color = r.dq < 70 ? '#ef4444' : r.dq < 85 ? '#f59e0b' : '#10b981'; // Roșu, Galben, Verde
+                return `<tr>
+                    <td>${new Date(r.date).toLocaleDateString('ro-RO')}</td>
+                    <td>${r.chronoAge.toFixed(1)} luni</td>
+                    <td>${r.avgDevAge.toFixed(1)} luni</td>
+                    <td style="font-weight:600;color:${color};">${r.dq.toFixed(1)}</td>
+                </tr>`;
+            }).join('');
+
+            // Returnează HTML-ul complet al tabelului
+            return `
+                <div class="client-info-section">
+                    <h3 class="section-title">Istoric Evoluție Generală (DQ)</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="program-history-table">
+                            <thead>
+                                <tr>
+                                    <th>Data Evaluării</th>
+                                    <th>Vârstă Cronologică (CA)</th>
+                                    <th>Vârstă Dezvoltare (DA)</th>
+                                    <th>Indice Dezvoltare (DQ)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+
         function generateScheduleHTML(clientData) {
             const year = currentScheduleDate.getFullYear();
             const month = currentScheduleDate.getMonth();
@@ -443,6 +544,8 @@
                             </p>
                         </div>
                     `;
+
+                    contentHTML += generatePortageSummaryHTML(clientData);
                 }
             }
             

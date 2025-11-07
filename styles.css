@@ -1880,7 +1880,7 @@ textarea.form-input {
   border-top: none;
 }
 
-.portage-group-toggle {
+.age-group-toggle {
   transform: scale(1.3);
   cursor:pointer;
   flex-shrink: 0;
