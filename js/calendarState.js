@@ -483,7 +483,7 @@ export const calendarState = {
             
             // Păstrează evenimentele care nu sunt de tip 'terapie' (ex: pauză, ședință)
             // chiar dacă nu au client
-            if (event.type !== 'therapy' && event.type !== 'group-therapy' && event.type !== 'evaluare' && event.type !== 'psihoterapie' && event.type !== 'dezvoltare-personala') {
+            if (event.type !== 'therapy' && event.type !== 'group-therapy') {
                 return true; 
             }
             

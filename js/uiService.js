@@ -1137,6 +1137,7 @@ function getEventTypeLabel(type) {
     const types = {
         'therapy': 'Terapie',
         'group-therapy': 'Terapie de grup',
+        'logopedie': 'Logopedie',
         'coordination': 'Coordonare',
         'day-off': 'Zi libera',
         'pauza-masa': 'Pauza de masa',
