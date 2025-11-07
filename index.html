@@ -544,13 +544,13 @@
                             </p>
                         </div>
                     `;
-
-                    contentHTML += generatePortageSummaryHTML(clientData);
                 }
             }
             
             const stats = calculateMonthlyStats(clientData.events, clientData.client.id, year, month);
             
+            // --- THIS IS THE FIX ---
+            // The variable was incorrectly named 'contentHTML' instead of 'let html'
             let html = `
                 <div class="client-info-section">
                     <h3 class="section-title">Program Lunar</h3>
@@ -636,7 +636,6 @@
             
             return html;
         }
-
         function calculateEndTime(startTime, durationMinutes) {
             if (!startTime) return "N/A";
             const [hours, minutes] = startTime.split(':').map(Number);
