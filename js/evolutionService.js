@@ -1083,11 +1083,19 @@ function renderPortageDomains() {
             const firstItemInGroup = groupItems[0];
             const isFutureGroup = firstItemInGroup.months > ageMonths;
             
+            // --- MODIFICARE: Creare groupKey unic ---
+            const groupKey = `${domain}_${ageRange.replace(/[^a-z0-9]/gi, '_')}`;
+            
             // Format age separator
             let separatorText = formatAgeRange(ageRange, firstItemInGroup.months);
             
-            // Start age group
-            const groupHtml = `<div class="portage-age-separator">${separatorText}</div>`;
+            // --- MODIFICARE: Adăugare checkbox la separator ---
+            const groupHtml = `
+                <div class="portage-age-separator">
+                    <input type="checkbox" class="portage-group-toggle" data-group-key="${groupKey}" id="toggle_${groupKey}">
+                    <label for="toggle_${groupKey}">${separatorText}</label>
+                </div>
+            `;
             
             // Build items for this group
             let groupItemsHtml = '';
@@ -1101,8 +1109,9 @@ function renderPortageDomains() {
                 }
                 // --- END CORECȚIE 1 ---
 
+                // --- MODIFICARE: Adăugare data-group-key la item ---
                 groupItemsHtml += `
-                    <div class="portage-item ${isFuture ? 'disabled' : ''}" data-months="${item.months}">
+                    <div class="portage-item ${isFuture ? 'disabled' : ''}" data-months="${item.months}" data-group-key="${groupKey}">
                         <input type="checkbox" data-domain="${domain}" data-id="${item.id}" ${isFuture ? 'disabled' : ''}>
                         <label>${item.text} <i>${ageText}</i></label>
                     </div>
@@ -1200,6 +1209,28 @@ function renderPortageDomains() {
             });
         });
         // --- END CORECȚIE 2 ---
+
+        // --- NOU: Adaugă listener pentru toggle-ul de grup de vârstă ---
+        block.querySelectorAll('.portage-group-toggle').forEach(toggle => {
+            toggle.addEventListener('change', (e) => {
+                const groupKey = e.target.dataset.groupKey;
+                const isChecked = e.target.checked;
+
+                // Găsește toate item-urile care aparțin acestui grup *în interiorul* blocului de domeniu
+                const itemsInGroup = block.querySelectorAll(`.portage-item[data-group-key="${groupKey}"]`);
+                
+                itemsInGroup.forEach(item => {
+                    const itemCheckbox = item.querySelector('input[type="checkbox"]');
+                    // Bifează/debifează doar item-urile care nu sunt dezactivate (nu sunt din viitor)
+                    if (itemCheckbox && !itemCheckbox.disabled) {
+                        itemCheckbox.checked = isChecked;
+                        // Sincronizează și clasa vizuală 'checked'
+                        item.classList.toggle('checked', isChecked);
+                    }
+                });
+            });
+        });
+        // --- SFÂRȘIT NOU ---
 
         container.appendChild(block);
     });
