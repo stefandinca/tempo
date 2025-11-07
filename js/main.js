@@ -86,6 +86,7 @@ const dom = {
     mobileMenuToggles: document.querySelectorAll('.mobile-menu-toggle'),
     mobileMenuBackdrop: $('mobileMenuBackdrop'),
     sidebar: document.querySelector('.sidebar'),
+    refreshBtns: document.querySelectorAll('.btn-refresh-data'),
 
     
     
@@ -527,6 +528,81 @@ async function handleDeleteEvent() {
     ui.closeEventModal();
     ui.closeEventDetailsModal();
     render();
+}
+
+/**
+ * Forțează reîncărcarea tuturor datelor de la API și re-randează UI-ul.
+ */
+async function forceRefreshData() {
+    const refreshButtons = document.querySelectorAll('.btn-refresh-data');
+    
+    // Arată starea de încărcare pe butoane
+    refreshButtons.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('is-loading');
+    });
+    
+    // Loader-ul global va fi afișat automat de prima funcție api.loadData()
+
+    try {
+        // 1. Reîncarcă toate datele în paralel
+        const [data, programsData, evolutionData, billingsData] = await Promise.all([
+            api.loadData(),
+            api.loadPrograms(),
+            api.loadEvolutionData(),
+            api.loadBillingsData()
+        ]);
+
+        // 2. Actualizează starea (state) cu noile date
+        calendarState.initializeData(data); // Resetează events, clients, team
+        calendarState.setPrograms(programsData.programs);
+        calendarState.setEvolutionData(evolutionData);
+        calendarState.setBillingsData(billingsData);
+
+        // 3. Re-randează complet UI-ul
+        
+        // Actualizează dashboard-ul (program, statistici, header)
+        updateUserInterface();
+
+        // Actualizează filtrele din calendar
+        renderFilters();
+
+        // Actualizează listele din paginile Admin
+        ui.renderClientsList(dom.clientSearchBar.value);
+        ui.renderTeamMembersList();
+        
+        // Actualizează dropdown-ul de clienți din calendar
+        populateClientFilterDropdown();
+        
+        // Re-randează vizualizarea curentă (calendar, clienți, etc.)
+        const activeSection = document.querySelector('.main-section.active');
+        if (activeSection) {
+            const viewName = activeSection.id.replace('Section', '');
+            if (viewName === 'calendar') {
+                render(); // Re-randează calendarul
+            } else if (viewName === 'billing') {
+                if (auth.isAdmin()) {
+                    billing.renderBillingView(); // Re-randează facturarea
+                }
+            }
+            // Graficele din modalul de evoluție se vor actualiza automat
+            // data viitoare când este deschis, deoarece `calendarState` este actualizat.
+        }
+
+        // Afișează un mesaj de succes
+        ui.showCustomAlert('Datele au fost reîmprospătate cu succes.', 'Actualizare completă');
+
+    } catch (error) {
+        console.error('Eroare la reîmprospătarea datelor:', error);
+        ui.showCustomAlert('A apărut o eroare la reîmprospătarea datelor. Vă rugăm verificați consola.', 'Eroare API');
+    } finally {
+        // Oprește starea de încărcare
+        refreshButtons.forEach(btn => {
+            btn.disabled = false;
+            btn.classList.remove('is-loading');
+        });
+        // Loader-ul global va fi ascuns automat de ultima funcție api
+    }
 }
 
 // --- Handlers Secțiuni Admin (Client/Echipă) ---
@@ -1126,6 +1202,11 @@ async function init() {
     initThemeToggle();
     initFullscreenToggle();
 
+    if (dom.refreshBtns.length > 0) {
+        dom.refreshBtns.forEach(btn => {
+            btn.addEventListener('click', forceRefreshData);
+        });
+    }
     
 
     // Logout (with null checks)
