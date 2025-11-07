@@ -1387,6 +1387,13 @@ body.public-view {
 }
 
 /* Active states */
+/* Stil nou pentru butonul Absent Motivat */
+.attendance-btn[data-status="absent-motivated"].active {
+  background: #f59e0b; /* Portocaliu */
+  color: white;
+  border-color: #f59e0b;
+}
+
 .attendance-btn[data-status="present"].active,
 .score-btn[data-score="+"].active {
   background: #10b981;
@@ -2943,6 +2950,9 @@ textarea.form-input {
       flex: 1;
       justify-content: center;
     }
+
+
+
     .program-score-buttons {
       gap: 0.25rem;
     }

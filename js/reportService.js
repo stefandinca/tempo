@@ -227,18 +227,22 @@ function processEventsForClientReport(events, clientId) {
     let totalHours = 0;
     let presentHours = 0;
     let absentHours = 0;
+    let absentMotivatHours = 0;
 
     events.forEach(event => {
         if (!event.startTime || !event.duration) return;
 
         const hours = event.duration / 60;
         const attendance = (event.attendance && event.attendance[clientId]) || 'present';
-        const isPresent = attendance === 'present';
-
-        if (isPresent) presentHours += hours;
-        else absentHours += hours;
-        totalHours += hours;
+                if (attendance === 'present') {
+            presentHours += hours;
+        } else if (attendance === 'absent-motivated') {
+            absentMotivatHours += hours; // <-- Contorizează separat
+        } else { // 'absent' sau orice altceva
+            absentHours += hours;
+        }
         
+        totalHours += hours;
         const teamMemberIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
         
         teamMemberIds.forEach(memberId => {
@@ -246,16 +250,20 @@ function processEventsForClientReport(events, clientId) {
             if (member) {
                 const therapistName = member.name;
                 if (!therapistTotals[therapistName]) {
-                    therapistTotals[therapistName] = { total: 0, present: 0, absent: 0 };
+                    therapistTotals[therapistName] = { total: 0, present: 0, absent: 0, absentMotivat: 0 }; // <-- ADĂUGAȚI
                 }
-                therapistTotals[therapistName].total += hours;
-                if (isPresent) therapistTotals[therapistName].present += hours;
-                else therapistTotals[therapistName].absent += hours;
+                if (attendance === 'present') {
+                    therapistTotals[therapistName].present += hours;
+                } else if (attendance === 'absent-motivated') {
+                    therapistTotals[therapistName].absentMotivat += hours; // <-- ADĂUGAȚI
+                } else {
+                    therapistTotals[therapistName].absent += hours;
+                }
             }
         });
     });
 
-    return { therapistTotals, grandTotal: totalHours, presentTotal: presentHours, absentTotal: absentHours };
+    return { therapistTotals, grandTotal: totalHours, presentTotal: presentHours, absentTotal: absentHours, absentMotivatTotal: absentMotivatHours }; // <-- ADĂUGAȚI
 }
 
 // În: js/reportService.js
@@ -283,6 +291,7 @@ async function generateClientHTML(reportData) {
                         <td>${name}</td>
                         <td style="text-align: right;">${stats.total.toFixed(1)} ore</td>
                         <td style="text-align: right; color: #059669;">${stats.present.toFixed(1)} ore</td>
+                        <td style="text-align: right; color: #d97706;">${(stats.absentMotivat || 0).toFixed(1)} ore</td>
                         <td style="text-align: right; color: #dc2626;">${stats.absent.toFixed(1)} ore</td>
                     </tr>
                 `;
@@ -297,6 +306,7 @@ async function generateClientHTML(reportData) {
                             <th>Terapeut</th>
                             <th style="text-align: right;">Total Ore</th>
                             <th style="text-align: right;">Ore Prezent</th>
+                            <th style="text-align: right; color: #f59e0b; background: #fffbeb;">Ore Abs. Motivat</th>
                             <th style="text-align: right;">Ore Absent</th>
                         </tr>
                     </thead>
@@ -308,6 +318,7 @@ async function generateClientHTML(reportData) {
                             <td>TOTAL</td>
                             <td style="text-align: right;">${data.grandTotal.toFixed(1)} ore</td>
                             <td style="text-align: right; color: #059669;">${data.presentTotal.toFixed(1)} ore</td>
+                            <td style="text-align: right; color: #d97706;">${(data.absentMotivatTotal || 0).toFixed(1)} ore</td>
                             <td style="text-align: right; color: #dc2626;">${data.absentTotal.toFixed(1)} ore</td>
                         </tr>
                     </tfoot>
@@ -321,6 +332,7 @@ async function generateClientHTML(reportData) {
     const combinedTotal = billable.grandTotal + nonBillable.grandTotal;
     const combinedPresent = billable.presentTotal + nonBillable.presentTotal;
     const combinedAbsent = billable.absentTotal + nonBillable.absentTotal;
+    const combinedAbsentMotivat = (billable.absentMotivatTotal || 0) + (nonBillable.absentMotivatTotal || 0);
 
     // --- Generare secțiuni noi (rămân neschimbate) ---
     let evolutionChartHTML = '';
@@ -448,6 +460,10 @@ async function generateClientHTML(reportData) {
                             <td>Total Ore Absente</td>
                             <td style="text-align: right;">${combinedAbsent.toFixed(1)} ore</td>
                         </tr>
+                        <tr class="total-row" style="background: #fef3c7; border-top-color: #f59e0b;">
+                            <td>Total Ore Absente Motivat</td>
+                            <td style="text-align: right;">${combinedAbsentMotivat.toFixed(1)} ore</td>
+                        </tr>
                         <tr class="total-row" style="background: #e0f2fe; border-top-color: #3b82f6;">
                             <td>Total Ore Programate</td>
                             <td style="text-align: right;">${combinedTotal.toFixed(1)} ore</td>
@@ -501,7 +517,7 @@ function processEventsForTeamReport(events) {
     events.forEach(event => {
         if (!event.startTime || !event.duration) return;
 
-        const eventDate = new Date(event.date);
+        const eventDate = new Date(event.date + 'T00:00:00');
         const monthKey = `${eventDate.getFullYear()}-${String(eventDate.getMonth() + 1).padStart(2, '0')}`;
         const monthName = eventDate.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
 

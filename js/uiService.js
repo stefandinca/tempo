@@ -399,6 +399,7 @@ function buildEventDetailsHTML(event) {
                                 <div class="attendance-toggle" data-event-id="${event.id}" data-client-id="${c.id}">
                                     <button class="attendance-btn ${attendance === 'present' ? 'active' : ''}" data-status="present">Prezent</button>
                                     <button class="attendance-btn ${attendance === 'absent' ? 'active' : ''}" data-status="absent">Absent</button>
+                                    <button class="attendance-btn ${attendance === 'absent-motivated' ? 'active' : ''}" data-status="absent-motivated">Absent Motivat</button>
                                 </div>
                             </div>
                         `;
