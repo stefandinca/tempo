@@ -155,6 +155,9 @@ function renderEvaluationReportsList(clientData, client) {
     const container = $('evolutionSummary');
     if (!container) return;
 
+    // --- MODIFICARE: Apelăm funcția de generare a sumarului ---
+    const summaryTableHTML = generatePortageSummaryHTML(clientData, client);
+
     const allEvaluations = [];
 
     // 1. Adaugă evaluările Portage
@@ -191,6 +194,7 @@ function renderEvaluationReportsList(clientData, client) {
     // 4. Generează HTML
     if (allEvaluations.length === 0) {
         container.innerHTML = `
+            ${summaryTableHTML} 
             <h3 class="evolution-summary-title">Rapoarte Evaluări Salvate</h3>
             <p class="empty-list-message" style="margin-top: 1rem; text-align: center;">Nu există evaluări salvate pentru acest client.</p>
         `;
@@ -214,7 +218,9 @@ function renderEvaluationReportsList(clientData, client) {
         `;
     }).join('');
 
+    // --- MODIFICARE: Adăugăm sumarul HTML înaintea listei de butoane ---
     container.innerHTML = `
+        ${summaryTableHTML} 
         <h3 class="evolution-summary-title">Rapoarte Evaluări Salvate</h3>
         <div class="evaluation-report-list">
             ${buttonsHTML}
@@ -747,6 +753,85 @@ function renderProgramHistory(clientData) {
     
     html += '</tbody></table>';
     container.innerHTML = html;
+}
+
+/**
+ * NOU: Funcție copiată din reportService.js pentru a genera sumarul DQ.
+ * Generează HTML pentru tabelul sumar Portage DQ.
+ */
+function generatePortageSummaryHTML(clientData, client) {
+    // Verifică dacă există datele necesare
+    if (!client.birthDate || !clientData.evaluations || Object.keys(clientData.evaluations).length === 0) {
+        return ''; // Nu afișa nimic dacă nu există date
+    }
+
+    const birthDate = new Date(client.birthDate);
+    const allDates = new Set();
+    // Adună toate datele de evaluare unice
+    Object.values(clientData.evaluations).forEach(domain => {
+        Object.keys(domain).forEach(date => allDates.add(date));
+    });
+    // Sortează datele cronologic
+    const sortedDates = Array.from(allDates).sort((a, b) => new Date(a) - new Date(b));
+    
+    const results = [];
+    sortedDates.forEach(date => {
+        // Obține toate scorurile (DA) pentru o anumită dată
+        const evalValues = Object.values(clientData.evaluations)
+            .map(domain => domain[date])
+            .filter(v => typeof v === 'number' && !isNaN(v));
+        
+        if (evalValues.length === 0) return; // Continuă dacă nu există scoruri pentru această dată
+
+        // Calculează media DA (Vârsta Dezvoltării)
+        const avgDevAge = evalValues.reduce((a, b) => a + b, 0) / evalValues.length;
+        // Calculează CA (Vârsta Cronologică) în luni la data evaluării
+        const chronoAge = getAgeInMonths(birthDate, date); 
+        
+        if (chronoAge === 0) return; // Evită împărțirea la zero
+        
+        // Calculează DQ (Coeficientul de Dezvoltare)
+        const dq = (avgDevAge / chronoAge) * 100;
+        results.push({ date, avgDevAge, chronoAge, dq });
+    });
+
+    if (results.length === 0) {
+        return ''; // Nu s-au putut calcula rezultate
+    }
+
+    // Generează rândurile tabelului
+    // Folosim clasa 'evolution-table' pentru a prelua stilurile
+    const tableRows = results.map(r => {
+        const color = r.dq < 70 ? '#e74c3c' : r.dq < 85 ? '#f39c12' : '#27ae60'; // Roșu, Galben, Verde
+        // Adăugăm atributele data-label pentru responsivitate (preluat din styles.css)
+        return `<tr>
+            <td data-label="Data">${new Date(r.date).toLocaleDateString('ro-RO')}</td>
+            <td data-label="Vârstă Cronologică">${r.chronoAge.toFixed(1)} luni</td>
+            <td data-label="Vârstă Mentală">${r.avgDevAge.toFixed(1)} luni</td>
+            <td data-label="Indice Dezvoltare (DQ)" style="font-weight:600;color:${color};">${r.dq.toFixed(1)}</td>
+        </tr>`;
+    }).join('');
+
+    // Returnează HTML-ul complet al tabelului
+    // Folosim clasele CSS existente
+    return `
+        <h3 class="evolution-summary-title">Evoluție Generală Portage (DQ)</h3>
+        <div class="evolution-table-container" style="margin-top: 0; padding-top: 0;">
+            <table class="evolution-table">
+                <thead>
+                    <tr>
+                        <th>Data Evaluării</th>
+                        <th>Vârstă Cronologică (CA)</th>
+                        <th>Vârstă Mentală (DA)</th>
+                        <th>Indice Dezvoltare (DQ)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        </div>
+    `;
 }
 
 /**
