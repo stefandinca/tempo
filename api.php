@@ -94,7 +94,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'login') {
             sendResponse(['success' => false, 'message' => 'Username and password required'], 400);
         }
         
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
         $stmt->execute([$username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
