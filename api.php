@@ -276,7 +276,12 @@ try {
                 }
 
                 // 2. Program History
-                $stmt_history = $pdo->query("SELECT * FROM program_history ORDER BY eval_date DESC");
+                $stmt_history = $pdo->query("
+                    SELECT h.*, p.title as programTitle 
+                    FROM program_history h
+                    LEFT JOIN programs p ON h.program_id = p.id
+                    ORDER BY h.eval_date DESC
+                ");
                 while ($row = $stmt_history->fetch()) {
                     $clientId = $row['client_id'];
                     if (!isset($evolutionData->$clientId)) $evolutionData->$clientId = new stdClass();
@@ -284,6 +289,7 @@ try {
                     $evolutionData->$clientId->programHistory[] = [
                         "date" => $row['eval_date'],
                         "programId" => $row['program_id'],
+                        "programTitle" => $row['programTitle'],
                         "score" => $row['score'],
                         "eventId" => $row['event_id']
                     ];
