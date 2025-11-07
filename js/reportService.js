@@ -258,11 +258,19 @@ function processEventsForClientReport(events, clientId) {
     return { therapistTotals, grandTotal: totalHours, presentTotal: presentHours, absentTotal: absentHours };
 }
 
-async function generateClientHTML(reportData) { // <-- Add async
-    const { client, billable, nonBillable, currentDate, clientEvolution } = reportData; // <-- Add clientEvolution
+// În: js/reportService.js
+// ROL: Generează raportul HTML pentru client (CU STILURI INCLUSE)
+// (Înlocuiește întreaga funcție)
+
+// În: js/reportService.js
+// ROL: Generează raportul HTML pentru client (CU STILURI INCLUSE)
+// (Înlocuiește întreaga funcție)
+
+async function generateClientHTML(reportData) { 
+    const { client, billable, nonBillable, currentDate, clientEvolution } = reportData; 
     const monthName = currentDate.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
 
-    // --- Generate sections ---
+    // --- Funcția de creare tabel sumar (rămâne neschimbată) ---
     const createSummaryTable = (title, data, color) => {
         if (data.grandTotal === 0) return '';
         
@@ -314,7 +322,7 @@ async function generateClientHTML(reportData) { // <-- Add async
     const combinedPresent = billable.presentTotal + nonBillable.presentTotal;
     const combinedAbsent = billable.absentTotal + nonBillable.absentTotal;
 
-    // --- Generate NEW sections ---
+    // --- Generare secțiuni noi (rămân neschimbate) ---
     let evolutionChartHTML = '';
     try {
         const chartImageBase64 = await generateChartImage(clientEvolution);
@@ -335,7 +343,7 @@ async function generateClientHTML(reportData) { // <-- Add async
     const programHistoryHTML = generateProgramHistoryHTML(clientEvolution.programHistory);
 
 
-    // --- Build Final HTML (using team member report style as base) ---
+    // --- Construiește HTML-ul final ---
     return `
         <!DOCTYPE html>
         <html>
@@ -359,13 +367,55 @@ async function generateClientHTML(reportData) { // <-- Add async
                 .summary-box h3 { margin: 0 0 15px 0; }
                 .summary-box table { box-shadow: none; }
                 .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12px; }
-                /* Specific for program history */
-                .program-history-score { display: inline-flex; align-items: center; justify-content: center; font-weight: 600; width: 28px; height: 28px; border-radius: 0.25rem; border: 2px solid; }
-                .program-history-score[data-score="0"] { color: #ef4444; border-color: #ef4444; }
-                .program-history-score[data-score="-"] { color: #f59e0b; border-color: #f59e0b; }
-                .program-history-score[data-score="P"] { color: #3b82f6; border-color: #3b82f6; }
-                .program-history-score[data-score="+"] { color: #10b981; border-color: #10b981; }
                 .program-history-empty { color: #6b7280; text-align: center; padding: 2rem; }
+                
+                /* --- ÎNCEPUT STILURI SCORURI (BLOCUL ADĂUGAT) --- */
+                .program-score-display { display: flex; gap: 0.5rem; justify-content: flex-start; padding: 4px 0; }
+                .program-score-buttons { gap: 0.75rem; display: flex; flex-wrap: wrap; }
+                
+                .score-btn {
+                  position: relative;
+                  width: 44px; 
+                  height: 44px;
+                  padding: 0;
+                  font-size: 1.5rem;
+                  font-weight: 700;
+                  color: white;
+                  background-color: #D1D5DB; /* Culoare de bază (gri) */
+                  border: none;
+                  border-radius: 0.5rem;
+                }
+                
+                .score-btn[data-score="0"] { background-color: #ef4444; } /* Roșu */
+                .score-btn[data-score="-"] { background-color: #f59e0b; } /* Portocaliu */
+                .score-btn[data-score="P"] { background-color: #3b82f6; } /* Albastru */
+                .score-btn[data-score="+"] { background-color: #10b981; } /* Verde */
+
+                .score-badge {
+                  position: absolute;
+                  top: -8px;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  background-color: white;
+                  color: #1F2937; /* --text-primary */
+                  border: 1px solid #D1D5DB; /* --border-color */
+                  border-radius: 0.375rem;
+                  padding: 0.1rem 0.5rem;
+                  font-size: 0.8rem;
+                  font-weight: 700;
+                  min-width: 24px;
+                  text-align: center;
+                }
+
+                .score-label {
+                  display: block;
+                  margin-top: 2px;
+                  text-align:center; 
+                }
+                
+                .note-program-no-score { font-weight: 600; color: #6b7280; }
+                /* --- SFÂRȘIT STILURI SCORURI --- */
+
             </style>
         </head>
         <body>
@@ -417,7 +467,6 @@ async function generateClientHTML(reportData) { // <-- Add async
         </html>
     `;
 }
-
 
 // --- LOGICA INTERNĂ DE GENERARE RAPORT ECHIPĂ ---
 
@@ -486,6 +535,9 @@ function processEventsForTeamReport(events) {
     const sortedMonths = Object.keys(monthlyData).sort();
     return { monthlyData, clientTotals, sortedMonths, grandTotal: totalHours };
 }
+
+// În: js/reportService.js
+// ROL: Generează raportul HTML pentru terapeut (CU STILURI INCLUSE)
 
 function generateTeamMemberHTML(reportData) {
     const { member, billable, nonBillable } = reportData;
@@ -570,6 +622,18 @@ function generateTeamMemberHTML(reportData) {
                 .summary-box h3 { margin: 0 0 15px 0; }
                 .summary-box table { box-shadow: none; }
                 .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12px; }
+
+                /* --- ÎNCEPUT STILURI SCORURI --- */
+                .program-score-display { display: flex; gap: 0.5rem; justify-content: flex-start; padding: 4px 0; }
+                .score-item { position: relative; width: 36px; height: 36px; font-size: 1.25rem; font-weight: 700; color: white; border-radius: 0.375rem; display: flex; align-items: center; justify-content: center; }
+                .score-item.score-0 { background-color: #ef4444; }
+                .score-item.score-minus { background-color: #f59e0b; }
+                .score-item.score-P { background-color: #3b82f6; }
+                .score-item.score-plus { background-color: #10b981; }
+                .score-item .score-badge { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); background-color: white; color: #1f2937; border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0 0.375rem; font-size: 0.75rem; font-weight: 700; min-width: 20px; text-align: center; }
+                .score-item .score-label { margin-top: 1px; text-align:center; }
+                .note-program-no-score { font-weight: 600; color: #6b7280; }
+                /* --- SFÂRȘIT STILURI SCORURI --- */
             </style>
         </head>
         <body>
@@ -804,7 +868,7 @@ function generateProgramHistoryHTML(programHistory) {
             .score-item.score-P { background-color: #3b82f6; }
             .score-item.score-plus { background-color: #10b981; }
             .score-item .score-badge { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); background-color: white; color: #1f2937; border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0 0.375rem; font-size: 0.75rem; font-weight: 700; min-width: 20px; text-align: center; }
-            .score-item .score-label { margin-top: 1px; }
+            .score-item .score-label { margin-top: 1px; text-align:center; }
             .note-program-no-score { font-weight: 600; color: #6b7280; }
         </style>
     `;
