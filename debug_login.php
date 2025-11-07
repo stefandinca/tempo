@@ -22,10 +22,10 @@ if ($_GET['action'] === 'login') {
     
     if ($user) {
         error_log("User found in database");
-        error_log("Stored hash: " . $user['password_hash']);
-        error_log("Hash length: " . strlen($user['password_hash']));
+        error_log("Stored hash: " . $user['password']);
+        error_log("Hash length: " . strlen($user['password']));
         
-        $verify_result = password_verify($password, $user['password_hash']);
+        $verify_result = password_verify($password, $user['password']);
         error_log("Password verify result: " . ($verify_result ? "TRUE" : "FALSE"));
         
         if ($verify_result) {
