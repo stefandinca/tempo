@@ -461,18 +461,44 @@ export const calendarState = {
      * @param {string} clientId - ID-ul clientului
      */
     deleteClient: (clientId) => {
+        // --- CORECȚIE BUG EVENIMENTE ORFANE ---
+        
+        // 1. Șterge clientul din lista principală
         state.clients = state.clients.filter(c => c.id !== clientId);
-        // Elimină referința din evenimente
-        state.events.forEach(event => {
+
+        // 2. Modifică/Filtrează evenimentele
+        state.events = state.events.map(event => {
+            // Elimină referința din câmpul vechi (dacă există)
             if (event.clientId === clientId) {
                 delete event.clientId;
             }
+            
+            // Elimină referința din câmpul nou (array)
             if (event.clientIds && event.clientIds.includes(clientId)) {
                 event.clientIds = event.clientIds.filter(id => id !== clientId);
             }
+            return event;
+        }).filter(event => {
+            // 3. FILTRU NOU: Șterge evenimentul dacă nu mai are clienți
+            
+            // Păstrează evenimentele care nu sunt de tip 'terapie' (ex: pauză, ședință)
+            // chiar dacă nu au client
+            if (event.type !== 'therapy' && event.type !== 'group-therapy' && event.type !== 'evaluare' && event.type !== 'psihoterapie' && event.type !== 'dezvoltare-personala') {
+                return true; 
+            }
+            
+            // Verifică ambele câmpuri (vechi și nou)
+            const hasOldClient = event.clientId;
+            const hasNewClients = event.clientIds && event.clientIds.length > 0;
+            
+            // Păstrează evenimentul doar dacă MAI ARE cel puțin un client
+            return hasOldClient || hasNewClients;
         });
         
-        // (CORECTAT) Șterge și datele de evoluție și facturare, verificând ambele formate
+        // --- SFÂRȘIT CORECȚIE ---
+
+        
+        // Șterge și datele de evoluție și facturare, verificând ambele formate
         const legacyClientId = `client_${clientId}`;
 
         if (state.evolutionData[clientId]) {

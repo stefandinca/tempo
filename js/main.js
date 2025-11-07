@@ -86,7 +86,7 @@ const dom = {
     mobileMenuToggles: document.querySelectorAll('.mobile-menu-toggle'),
     mobileMenuBackdrop: $('mobileMenuBackdrop'),
     sidebar: document.querySelector('.sidebar'),
-    refreshBtns: document.querySelectorAll('.btn-refresh-data'),
+    
 
     
     
@@ -1202,8 +1202,9 @@ async function init() {
     initThemeToggle();
     initFullscreenToggle();
 
-    if (dom.refreshBtns.length > 0) {
-        dom.refreshBtns.forEach(btn => {
+    const refreshButtons = document.querySelectorAll('.btn-refresh-data');
+    if (refreshButtons.length > 0) {
+        refreshButtons.forEach(btn => {
             btn.addEventListener('click', forceRefreshData);
         });
     }

@@ -1338,6 +1338,9 @@ function formatAgeInYearsMonths(totalMonths) {
 /**
  * Salvează datele evaluării Portage.
  */
+/**
+ * Salvează datele evaluării Portage.
+ */
 async function savePortageEvaluation() {
     const { evolutionData } = calendarState.getState();
     const birthDate = $('childBirthDateInput').value;
@@ -1368,15 +1371,27 @@ async function savePortageEvaluation() {
         }
     });
 
-    const clientEvals = evolutionData[currentClientId]?.evaluations || {};
+    // --- START CORECȚIE BUG SUPRASCRIERE ---
+    // Ne asigurăm că întreaga structură de date există ÎNAINTE de a crea referința
+    
+    // 1. Asigură-te că obiectul clientului există în evolutionData
+    if (!evolutionData[currentClientId]) {
+        evolutionData[currentClientId] = { name: client.name, evaluations: {}, programHistory: [] };
+    }
+    // 2. Asigură-te că sub-obiectul `evaluations` există
+    if (!evolutionData[currentClientId].evaluations) {
+        evolutionData[currentClientId].evaluations = {};
+    }
+
+    // 3. Acum `clientEvals` este o referință SIGURĂ la obiectul din state care trebuie modificat
+    const clientEvals = evolutionData[currentClientId].evaluations;
     
     // Calculează vârsta de dezvoltare și salvează scorul
     for (const domain in domainScores) {
         const items = portrigeData[domain].filter(item => item.months <= ageMonths);
         let developmentalAge = 0;
         if (items.length > 0) {
-            const checkedCount = domainScores[domain].checked;
-            // Găsește ultimul item bifat
+            // (logica de calculare a vârstei rămâne neschimbată)
             const checkedItems = domainItems[domain].filter(cb => cb.checked).map(cb => cb.closest('.portage-item'));
             if(checkedItems.length > 0) {
                 const lastCheckedItem = checkedItems[checkedItems.length-1];
@@ -1385,16 +1400,20 @@ async function savePortageEvaluation() {
         }
         
         const key = `Portrige - ${domain}`; // Cheia pentru grafic
-        if (!clientEvals[key]) clientEvals[key] = {};
-        clientEvals[key][evalDate] = developmentalAge; // Salvează vârsta de dezvoltare (în luni)
+        
+        // 4. Asigură-te că domeniul (ex: "Portrige - Limbaj") există
+        if (!clientEvals[key]) {
+            clientEvals[key] = {};
+        }
+        
+        // 5. Adaugă/Actualizează data evaluării FĂRĂ a suprascrie întregul domeniu
+        clientEvals[key][evalDate] = developmentalAge;
     }
     
-    // Actualizează starea locală
-    if (!evolutionData[currentClientId]) {
-        evolutionData[currentClientId] = { name: client.name, evaluations: {}, programHistory: [] };
-    }
-    evolutionData[currentClientId].evaluations = clientEvals;
+    // `evolutionData` a fost deja modificat prin referință
     calendarState.setEvolutionData(evolutionData);
+    
+    // --- SFÂRȘIT CORECȚIE BUG SUPRASCRIERE ---
     
     // Salvează pe server
     try {
@@ -1405,16 +1424,8 @@ async function savePortageEvaluation() {
             window.logActivity("Evaluare salvată", client.name, 'evaluation', currentClientId);
         }
         
-        // Nu rerandăm graficele (Portage), dar actualizăm lista de rapoarte
-        // și închidem tab-ul de evaluare.
-        
-        // ***** START CORECȚIE *****
-        // Linia de mai jos era cea greșită. Am șters-o.
-        // const client = calendarState.getClientById(currentClientId); 
-        
         // Folosim variabila 'client' deja definită la începutul funcției.
         renderEvaluationReportsList(evolutionData[currentClientId], client);
-        // ***** SFÂRȘIT CORECȚIE *****
         
         activateTab('tabGrafice');
 
