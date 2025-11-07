@@ -161,6 +161,7 @@ try {
                     $event['clientIds'] = $event['clientIds'] ? explode(',', $event['clientIds']) : [];
                     $event['programIds'] = $event['programIds'] ? explode(',', $event['programIds']) : [];
                     $event['repeating'] = $event['repeating'] ? array_map('intval', json_decode($event['repeating'])) : [];                    // Convertim 'isPublic' și 'isBillable' înapoi în boolean pentru JS
+                    $event['attendance'] = $event['attendance'] ? json_decode($event['attendance'], true) : new stdClass();
                     $event['isPublic'] = (bool)$event['isPublic'];
                     $event['isBillable'] = (bool)$event['isBillable'];
 
@@ -217,7 +218,7 @@ try {
                     }
 
                     // 4. Inserează events și joncțiunile
-                    $stmt_evt = $pdo->prepare("INSERT INTO events (id, name, details, type, date, startTime, duration, isPublic, isBillable, repeating_json, comments) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    $stmt_evt = $pdo->prepare("INSERT INTO events (id, name, details, type, date, startTime, duration, isPublic, isBillable, repeating_json, comments, attendance) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     $stmt_evt_team = $pdo->prepare("INSERT INTO event_team_members (event_id, team_member_id) VALUES (?, ?)");
                     $stmt_evt_client = $pdo->prepare("INSERT INTO event_clients (event_id, client_id) VALUES (?, ?)");
                     $stmt_evt_prog = $pdo->prepare("INSERT INTO event_programs (event_id, program_id) VALUES (?, ?)");
@@ -235,7 +236,8 @@ try {
                             $e['date'], $startTime, $e['duration'] ?? null,
                             isset($e['isPublic']) ? (int)$e['isPublic'] : 0, 
                             isset($e['isBillable']) ? (int)$e['isBillable'] : 1, 
-                            json_encode($e['repeating'] ?? []), $e['comments'] ?? null
+                            json_encode($e['repeating'] ?? []), $e['comments'] ?? null,
+                            json_encode($e['attendance'] ?? new stdClass())
                         ]);
                         
                         foreach ($e['teamMemberIds'] ?? [] as $id) { $stmt_evt_team->execute([$e['id'], $id]); }

@@ -198,6 +198,9 @@ function generatePaymentSummary(clientId, monthKey, totalDue) {
 /**
  * Calculează orele facturabile pentru un client într-o lună specificată.
  */
+/**
+ * Calculează orele facturabile pentru un client într-o lună specificată.
+ */
 function calculateClientHoursForMonth(clientId, year, month, allEvents) {
     const monthEvents = allEvents.filter(event => {
         const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
@@ -210,9 +213,16 @@ function calculateClientHoursForMonth(clientId, year, month, allEvents) {
     let billableMinutes = 0;
     
     monthEvents.forEach(event => {
-        // Este facturabil ȘI clientul a fost prezent
+        
+        // === CORECȚIE: ACEASTĂ LINIE LIPSEA ===
+        // Definește 'attendance' pentru clientul curent în cadrul evenimentului
         const attendance = (event.attendance && event.attendance[clientId]) || 'present';
-        if (event.isBillable !== false && attendance === 'present' && event.duration) {
+        // === SFÂRȘIT CORECȚIE ===
+
+        // Este facturabil ȘI clientul a fost prezent sau absent (dar nu absent motivat)
+        const isBillableAttendance = (attendance === 'present' || attendance === 'absent');
+        
+        if (event.isBillable !== false && isBillableAttendance && event.duration) {
           billableMinutes += (Number(event.duration) || 0);
         }
     });

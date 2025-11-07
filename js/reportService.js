@@ -529,29 +529,57 @@ function processEventsForTeamReport(events) {
         const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
         
         if (clientIds.length === 0) {
+            // Evenimente administrative (fără client)
             const eventLabel = getEventTypeLabel(event.type) || event.name;
             if (!monthlyData[monthKey].clients[eventLabel]) monthlyData[monthKey].clients[eventLabel] = 0;
             monthlyData[monthKey].clients[eventLabel] += hours;
             if (!clientTotals[eventLabel]) clientTotals[eventLabel] = 0;
             clientTotals[eventLabel] += hours;
+            
+            // Se adaugă la totalul lunii și la totalul general
+            monthlyData[monthKey].total += hours;
+            totalHours += hours;
+
         } else {
+            // Evenimente cu clienți
+            let eventAddedToTotal = false; // Flag pentru a adăuga durata evenimentului o singură dată
+
             clientIds.forEach(clientId => {
-                const client = calendarState.getClientById(clientId);
-                const clientName = client ? client.name : 'Client necunoscut';
-                if (!monthlyData[monthKey].clients[clientName]) monthlyData[monthKey].clients[clientName] = 0;
-                monthlyData[monthKey].clients[clientName] += hours;
-                if (!clientTotals[clientName]) clientTotals[clientName] = 0;
-                clientTotals[clientName] += hours;
+                // === ÎNCEPUT MODIFICARE ===
+                // Verifică prezența pentru FIECARE client
+                const attendance = (event.attendance && event.attendance[clientId]) || 'present';
+                
+                // Adaugă la totalul clientului DOAR dacă nu este 'absent-motivated'
+                if (attendance !== 'absent-motivated') {
+                    const client = calendarState.getClientById(clientId);
+                    const clientName = client ? client.name : 'Client necunoscut';
+                    
+                    if (!monthlyData[monthKey].clients[clientName]) monthlyData[monthKey].clients[clientName] = 0;
+                    // (Notă: Aici se adaugă orele complete ale evenimentului per client,
+                    // presupunând că așa este dorit pentru rapoartele de grup)
+                    monthlyData[monthKey].clients[clientName] += hours;
+
+                    if (!clientTotals[clientName]) clientTotals[clientName] = 0;
+                    clientTotals[clientName] += hours;
+
+                    // Marchează că acest eveniment a fost facturabil
+                    eventAddedToTotal = true;
+                }
+                // === SFÂRȘIT MODIFICARE ===
             });
+            
+            // Adaugă la totalul general al lunii DOAR dacă cel puțin un client
+            // a avut prezență facturabilă (prezent sau absent)
+            if (eventAddedToTotal) {
+                monthlyData[monthKey].total += hours;
+                totalHours += hours;
+            }
         }
-        monthlyData[monthKey].total += hours;
-        totalHours += hours;
     });
 
     const sortedMonths = Object.keys(monthlyData).sort();
     return { monthlyData, clientTotals, sortedMonths, grandTotal: totalHours };
 }
-
 // În: js/reportService.js
 // ROL: Generează raportul HTML pentru terapeut (CU STILURI INCLUSE)
 
@@ -945,6 +973,7 @@ function getEventTypeLabel(type) {
     const types = {
         'therapy': 'Terapie',
         'group-therapy': 'Terapie de grup',
+        'logopedie':'Logopedie',
         'coordination': 'Coordonare',
         'day-off': 'Zi libera',
         'pauza-masa': 'Pauza de masa',
