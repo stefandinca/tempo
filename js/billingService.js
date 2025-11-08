@@ -2,21 +2,19 @@
  * js/billingService.js
  *
  * Gestionează logica pentru noua secțiune de Facturare.
- * UPDATED: Now uses pricing from event_types table
+ * Calculează orele, totalurile și gestionează încasările.
  */
 
 import { calendarState } from './calendarState.js';
 import * as api from './apiService.js';
 import { showCustomAlert, showCustomConfirm } from './uiService.js';
-import { getEventTypes, getBasePrice } from './settingsService.js';
 
 // --- Constante ---
-const DEFAULT_RATE = 100; // Fallback rate if pricing data isn't loaded
+const BILLING_RATE_PER_HOUR = 100;
 const $ = (id) => document.getElementById(id);
 
 // --- Stare locală ---
-let currentBillingDate = new Date();
-let eventTypes = [];
+let currentBillingDate = new Date(); // Începe cu luna curentă
 
 // --- Elemente DOM ---
 const dom = {
@@ -41,63 +39,17 @@ const dom = {
 };
 
 /**
- * Load event types pricing
- */
-async function loadEventTypesPricing() {
-    try {
-        eventTypes = await api.loadEventTypes();
-        console.log('Event types pricing loaded:', eventTypes);
-    } catch (err) {
-        console.error('Failed to load event types pricing:', err);
-        // Try to get from settingsService if already loaded
-        eventTypes = getEventTypes();
-        if (eventTypes.length === 0) {
-            // Use defaults
-            eventTypes = [
-                { id: 'therapy', basePrice: 100 },
-                { id: 'group-therapy', basePrice: 80 },
-                { id: 'coordination', basePrice: 50 },
-                { id: 'pauza-masa', basePrice: 0 },
-                { id: 'sedinta', basePrice: 0 },
-                { id: 'day-off', basePrice: 0 }
-            ];
-        }
-    }
-}
-
-/**
- * Get price per hour for an event type
- */
-function getPricePerHour(eventType) {
-    // Try to get from loaded event types
-    const type = eventTypes.find(et => et.id === eventType);
-    if (type) {
-        return type.basePrice || 0;
-    }
-    
-    // Try to get from settingsService
-    try {
-        return getBasePrice(eventType);
-    } catch {
-        // Fallback to default
-        return DEFAULT_RATE;
-    }
-}
-
-/**
  * Inițializează ascultătorii de evenimente pentru secțiunea de facturare.
+ * Chemată din main.js.
  */
-export async function init() {
-    if (!dom.section) return;
-
-    // Load event types pricing
-    await loadEventTypesPricing();
+export function init() {
+    if (!dom.section) return; // Nu inițializa dacă secțiunea nu există
 
     dom.prevBtn.addEventListener('click', () => navigateBillingMonth(-1));
     dom.nextBtn.addEventListener('click', () => navigateBillingMonth(1));
     dom.billingSearchBar.addEventListener('input', () => renderBillingView());
 
-    // Payment modal listeners
+    // Ascultători pentru modalul de plată
     dom.closePaymentModalBtn.addEventListener('click', closePaymentModal);
     dom.cancelPaymentBtn.addEventListener('click', closePaymentModal);
     dom.paymentModal.addEventListener('click', (e) => {
@@ -105,7 +57,7 @@ export async function init() {
     });
     dom.paymentForm.addEventListener('submit', handleSavePayment);
 
-    // Delegated event listener for actions
+    // Ascultător principal pentru acțiunile din listă (delegare evenimente)
     dom.clientList.addEventListener('click', (e) => {
         const actionBtn = e.target.closest('[data-action]');
         if (!actionBtn) return;
@@ -124,6 +76,7 @@ export async function init() {
     });
 }
 
+
 /**
  * Randează întreaga vizualizare de facturare pentru luna selectată.
  */
@@ -133,18 +86,24 @@ export function renderBillingView() {
     const month = currentBillingDate.getMonth();
     const monthKey = `${year}-${String(month + 1).padStart(2, '0')}`;
 
+    // Actualizează eticheta lunii
     dom.currentMonthLabel.textContent = currentBillingDate.toLocaleString('ro-RO', {
         month: 'long',
         year: 'numeric'
     });
     
-    dom.clientList.innerHTML = '';
+    dom.clientList.innerHTML = ''; // Curăță lista
 
+    // Obține termenul de căutare
     const searchTerm = dom.billingSearchBar.value.toLowerCase();
     
+    // Filtrează clienții
     const filteredClients = clients.filter(client => {
+        // 1. Filtrează după nume
         const nameMatch = client.name.toLowerCase().includes(searchTerm);
+        // 2. Nu afișa clienți "speciali" (ex: Pauza, Sedinta)
         const isSpecial = ['Pauza de masa', 'Sedinta', 'Concediu'].includes(client.name);
+        
         return nameMatch && !isSpecial;
     });
 
@@ -159,7 +118,7 @@ export function renderBillingView() {
 
     filteredClients.forEach(client => {
         const hoursData = calculateClientHoursForMonth(client.id, year, month, events);
-        const totalDue = hoursData.totalAmount;
+        const totalDue = hoursData.billableHours * BILLING_RATE_PER_HOUR;
         
         const card = document.createElement('div');
         card.className = 'billing-card';
@@ -172,16 +131,16 @@ export function renderBillingView() {
                 <span class="client-hours">${hoursData.billableHours.toFixed(1)} ore</span>
             </div>
             <div class="billing-body">
-                ${generatePaymentSummary(client.id, monthKey, totalDue, hoursData)}
+                ${generatePaymentSummary(client.id, monthKey, totalDue)}
             </div>
             <div class="billing-actions">
                 <button class="btn btn-primary btn-sm" data-action="add-payment">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-cash-coin" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M11 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8m5-4a5 5 0 1 1-10 0 5 5 0 0 1 10 0"/>
-                        <path d="M9.438 11.944c.047.596.518 1.06 1.363 1.116v.44h.375v-.443c.875-.061 1.386-.529 1.386-1.207 0-.618-.39-.936-1.09-1.1l-.296-.07v-1.2c.376.043.614.248.671.532h.658c-.047-.575-.54-1.024-1.329-1.073V8.5h-.375v.45c-.747.073-1.255.522-1.255 1.158 0 .562.378.92 1.007 1.066l.248.061v1.272c-.384-.058-.639-.27-.696-.563h-.668zm1.36-1.354c-.369-.085-.569-.26-.569-.522 0-.294.216-.514.572-.578v1.1zm.432.746c.449.104.655.272.655.569 0 .339-.257.571-.709.614v-1.195z"/>
-                        <path d="M1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.083q.088-.517.258-1H3a2 2 0 0 0-2-2V3a2 2 0 0 0 2-2h10a2 2 0 0 0 2 2v3.528c.38.34.717.728 1 1.154V1a1 1 0 0 0-1-1z"/>
-                        <path d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 6 6 0 0 1 3.13-1.567"/>
-                    </svg>
+  <path fill-rule="evenodd" d="M11 15a4 4 0 1 0 0-8 4 4 0 0 0 0 8m5-4a5 5 0 1 1-10 0 5 5 0 0 1 10 0"/>
+  <path d="M9.438 11.944c.047.596.518 1.06 1.363 1.116v.44h.375v-.443c.875-.061 1.386-.529 1.386-1.207 0-.618-.39-.936-1.09-1.1l-.296-.07v-1.2c.376.043.614.248.671.532h.658c-.047-.575-.54-1.024-1.329-1.073V8.5h-.375v.45c-.747.073-1.255.522-1.255 1.158 0 .562.378.92 1.007 1.066l.248.061v1.272c-.384-.058-.639-.27-.696-.563h-.668zm1.36-1.354c-.369-.085-.569-.26-.569-.522 0-.294.216-.514.572-.578v1.1zm.432.746c.449.104.655.272.655.569 0 .339-.257.571-.709.614v-1.195z"/>
+  <path d="M1 0a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h4.083q.088-.517.258-1H3a2 2 0 0 0-2-2V3a2 2 0 0 0 2-2h10a2 2 0 0 0 2 2v3.528c.38.34.717.728 1 1.154V1a1 1 0 0 0-1-1z"/>
+  <path d="M9.998 5.083 10 5a2 2 0 1 0-3.132 1.65 6 6 0 0 1 3.13-1.567"/>
+</svg>
                     Adaugă Încasare
                 </button>
             </div>
@@ -191,32 +150,14 @@ export function renderBillingView() {
 }
 
 /**
- * Generează HTML pentru rezumatul financiar cu breakdown pe tip eveniment
+ * Generează HTML pentru rezumatul financiar (Total, Achitat, Restant) și lista plăților.
  */
-function generatePaymentSummary(clientId, monthKey, totalDue, hoursData) {
+function generatePaymentSummary(clientId, monthKey, totalDue) {
     const { billingsData } = calendarState.getState();
     const payments = billingsData[clientId]?.[monthKey] || [];
     
     const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
     const balance = totalDue - totalPaid;
-
-    // Generate breakdown by event type
-    let breakdownHtml = '';
-    if (hoursData.hoursByType && Object.keys(hoursData.hoursByType).length > 0) {
-        breakdownHtml = '<div class="billing-breakdown"><h5 style="margin: 0.5rem 0; font-size: 0.875rem; color: #666;">Detalii pe tip de serviciu:</h5><ul style="margin: 0; padding-left: 1.25rem; font-size: 0.875rem;">';
-        
-        for (const [type, hours] of Object.entries(hoursData.hoursByType)) {
-            const pricePerHour = getPricePerHour(type);
-            const amount = hours * pricePerHour;
-            const typeName = getEventTypeLabel(type);
-            
-            if (hours > 0) {
-                breakdownHtml += `<li>${typeName}: ${hours.toFixed(1)}h × ${pricePerHour.toFixed(0)} RON/h = ${amount.toFixed(2)} RON</li>`;
-            }
-        }
-        
-        breakdownHtml += '</ul></div>';
-    }
 
     let paymentsHtml = '<p class="no-payments">Nicio încasare înregistrată.</p>';
     if (payments.length > 0) {
@@ -247,7 +188,6 @@ function generatePaymentSummary(clientId, monthKey, totalDue, hoursData) {
                 <span class="value">${balance.toFixed(2)} RON</span>
             </div>
         </div>
-        ${breakdownHtml}
         <div class="payments-list">
             <h4>Istoric Încasări</h4>
             ${paymentsHtml}
@@ -256,7 +196,10 @@ function generatePaymentSummary(clientId, monthKey, totalDue, hoursData) {
 }
 
 /**
- * Calculează orele facturabile și totalul pentru un client
+ * Calculează orele facturabile pentru un client într-o lună specificată.
+ */
+/**
+ * Calculează orele facturabile pentru un client într-o lună specificată.
  */
 function calculateClientHoursForMonth(clientId, year, month, allEvents) {
     const monthEvents = allEvents.filter(event => {
@@ -268,57 +211,42 @@ function calculateClientHoursForMonth(clientId, year, month, allEvents) {
     });
 
     let billableMinutes = 0;
-    let totalAmount = 0;
-    const hoursByType = {};
     
     monthEvents.forEach(event => {
+        
+        // === CORECȚIE: ACEASTĂ LINIE LIPSEA ===
+        // Definește 'attendance' pentru clientul curent în cadrul evenimentului
         const attendance = (event.attendance && event.attendance[clientId]) || 'present';
-        if (event.isBillable !== false && attendance === 'present' && event.duration) {
-            const minutes = Number(event.duration) || 0;
-            const hours = minutes / 60;
-            const eventType = event.type || 'therapy';
-            const pricePerHour = getPricePerHour(eventType);
-            
-            billableMinutes += minutes;
-            totalAmount += hours * pricePerHour;
-            
-            if (!hoursByType[eventType]) {
-                hoursByType[eventType] = 0;
-            }
-            hoursByType[eventType] += hours;
+        // === SFÂRȘIT CORECȚIE ===
+
+        // Este facturabil ȘI clientul a fost prezent sau absent (dar nu absent motivat)
+        const isBillableAttendance = (attendance === 'present' || attendance === 'absent');
+        
+        if (event.isBillable !== false && isBillableAttendance && event.duration) {
+          billableMinutes += (Number(event.duration) || 0);
         }
     });
     
     return {
-        billableHours: billableMinutes / 60,
-        totalAmount: totalAmount,
-        hoursByType: hoursByType
+        billableHours: billableMinutes / 60
     };
 }
 
-function getEventTypeLabel(type) {
-    const labels = {
-        'therapy': 'Terapie individuală',
-        'group-therapy': 'Terapie de grup',
-        'coordination': 'Coordonare',
-        'pauza-masa': 'Pauză de masă',
-        'sedinta': 'Ședință',
-        'day-off': 'Zi liberă'
-    };
-    return labels[type] || type;
-}
+// --- Navigare Lunară ---
 
 function navigateBillingMonth(direction) {
     currentBillingDate.setMonth(currentBillingDate.getMonth() + direction);
     renderBillingView();
 }
 
+// --- Management Plăți ---
+
 function openPaymentModal(clientId, monthKey) {
     dom.paymentModalTitle.textContent = `Adaugă Încasare (${monthKey})`;
     dom.paymentForm.reset();
     dom.paymentClientId.value = clientId;
     dom.paymentMonthKey.value = monthKey;
-    dom.paymentDate.valueAsDate = new Date();
+    dom.paymentDate.valueAsDate = new Date(); // Setează data la ziua de azi
     dom.paymentModal.style.display = 'flex';
     dom.paymentAmount.focus();
 }
@@ -343,6 +271,7 @@ async function handleSavePayment(e) {
 
     const { billingsData } = calendarState.getState();
 
+    // Asigură că structura există
     if (!billingsData[clientId]) {
         billingsData[clientId] = {};
     }
@@ -350,6 +279,7 @@ async function handleSavePayment(e) {
         billingsData[clientId][monthKey] = [];
     }
 
+    // Adaugă noua plată
     billingsData[clientId][monthKey].push({
         id: `pay_${Date.now()}`,
         date: date,
@@ -357,12 +287,14 @@ async function handleSavePayment(e) {
         notes: notes
     });
 
+    // Sortează plățile după dată
     billingsData[clientId][monthKey].sort((a, b) => new Date(a.date) - new Date(b.date));
 
+    // Salvează și rerandează
     try {
         await api.saveBillingsData(billingsData);
-        calendarState.setBillingsData(billingsData);
-        renderBillingView();
+        calendarState.setBillingsData(billingsData); // Actualizează starea
+        renderBillingView(); // Rerandează lista de facturare
         closePaymentModal();
     } catch (err) {
         console.error('Eroare la salvarea încasării:', err);
@@ -378,8 +310,10 @@ async function handleDeletePayment(clientId, monthKey, paymentId) {
 
     if (!billingsData[clientId] || !billingsData[clientId][monthKey]) return;
 
+    // Filtrează plata
     billingsData[clientId][monthKey] = billingsData[clientId][monthKey].filter(p => p.id !== paymentId);
 
+    // Salvează și rerandează
     try {
         await api.saveBillingsData(billingsData);
         calendarState.setBillingsData(billingsData);
