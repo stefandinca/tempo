@@ -300,7 +300,7 @@ function renderProgramsList() {
                 </svg>
             </div>
         </div>
-        <div id="programsListContainer" class="hidden space-y-3">
+        <div id="programsListContainer" class=" space-y-3">
             ${filtered.length === 0 ? 
                 '<div class="text-center py-8 text-gray-500">Nu există programe.</div>' :
                 filtered.map(prog => createProgramCard(prog)).join('')
