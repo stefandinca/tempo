@@ -167,3 +167,11 @@ export async function saveBillingsData(data) {
     };
     return apiFetch('billings', options);
 }
+
+/**
+ * Încarcă tipurile de evenimente din baza de date.
+ * Apel GET la api.php?path=event_types
+ */
+export async function loadEventTypes() {
+    return apiFetch('event_types');
+}

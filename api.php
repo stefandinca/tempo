@@ -259,6 +259,31 @@ try {
             break;
 
         // ==========================================================
+        // CAZUL 'event_types' - Încarcă tipurile de evenimente din DB
+        // ==========================================================
+        case 'event_types':
+            if ($method === 'GET') {
+                try {
+                    $stmt = $pdo->query("SELECT id, label, isBillable, requiresTime FROM event_types ORDER BY id");
+                    $eventTypes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    
+                    // Convertim valorile boolean pentru JavaScript
+                    foreach ($eventTypes as &$type) {
+                        $type['isBillable'] = (bool)$type['isBillable'];
+                        $type['requiresTime'] = (bool)$type['requiresTime'];
+                    }
+                    
+                    sendResponse($eventTypes);
+                } catch (Exception $e) {
+                    debugLog("Eroare la încărcarea tipurilor de evenimente: " . $e->getMessage());
+                    sendError('Failed to load event types: ' . $e->getMessage());
+                }
+            } else {
+                sendError('Unsupported method for event_types', 405);
+            }
+            break;
+
+        // ==========================================================
         // CAZUL 'evolution'
         // ==========================================================
         case 'evolution':

@@ -1082,12 +1082,16 @@ export function updateEventTitle() {
 export function updateEventTypeDependencies(eventType) {
     const startTimeField = $('startTime');
     const durationField = $('duration');
+    const eventTypeSelect = $('eventType');
     
-    const isRequired = !(eventType === 'day-off');
+    // Obține opțiunea selectată și atributele sale
+    const selectedOption = eventTypeSelect ? eventTypeSelect.selectedOptions[0] : null;
+    const requiresTime = selectedOption ? (selectedOption.dataset.requiresTime === 'true') : true;
+    const isBillableByDefault = selectedOption ? (selectedOption.dataset.isBillable === 'true') : true;
 
     [startTimeField, durationField].forEach(field => {
         if(field) {
-            if (isRequired) {
+            if (requiresTime) {
                 field.setAttribute('required', 'required');
                 field.style.opacity = '1';
             } else {
@@ -1099,7 +1103,7 @@ export function updateEventTypeDependencies(eventType) {
     
     const isBillableCheckbox = $('isBillable');
     if (isBillableCheckbox) {
-        isBillableCheckbox.checked = !(eventType === 'pauza-masa' || eventType === 'sedinta' || eventType === 'day-off');
+        isBillableCheckbox.checked = isBillableByDefault;
     }
 }
 
@@ -1134,19 +1138,8 @@ function calculateEndTime(startTime, durationMinutes) {
 }
 
 function getEventTypeLabel(type) {
-    const types = {
-        'therapy': 'Terapie',
-        'group-therapy': 'Terapie de grup',
-        'logopedie': 'Logopedie',
-        'coordination': 'Coordonare',
-        'day-off': 'Zi libera',
-        'pauza-masa': 'Pauza de masa',
-        'sedinta': 'Sedinta',
-        'evaluare':'Evaluare',
-        'psihoterapie':'Psihoterapie',
-        'dezvoltare-personala':'Dezvoltare personala'
-    };
-    return types[type] || type;
+    // Folosește funcția din calendarState pentru a obține label-ul
+    return calendarState.getEventTypeLabel(type);
 }
 
 function getRoleLabel(role) {

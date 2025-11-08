@@ -122,6 +122,29 @@ function generateClientId(fullName, birthDate) {
     return `${firstName}${dateSuffix}`;
 }
 
+/**
+ * Populează dropdown-ul de tipuri de evenimente cu date din baza de date
+ * @param {Array} eventTypes - Array de obiecte cu id, label, isBillable, requiresTime
+ */
+function populateEventTypeDropdown(eventTypes) {
+    const eventTypeSelect = dom.eventTypeSelect;
+    if (!eventTypeSelect) return;
+    
+    // Curăță opțiunile existente
+    eventTypeSelect.innerHTML = '';
+    
+    // Adaugă opțiunile din baza de date
+    eventTypes.forEach(type => {
+        const option = document.createElement('option');
+        option.value = type.id;
+        option.textContent = type.label;
+        // Stochează proprietățile suplimentare ca atribute data pentru a le putea accesa mai târziu
+        option.dataset.isBillable = type.isBillable;
+        option.dataset.requiresTime = type.requiresTime;
+        eventTypeSelect.appendChild(option);
+    });
+}
+
 // --- Navigare Principală (Tab-uri) ---
 
 /**
@@ -401,11 +424,19 @@ console.log('Types:', repeatingDays.map(d => typeof d));
 console.log('Values:', repeatingDays);
 console.log('===========================');
 
-    if (eventType === 'day-off' || eventType === 'pauza-masa' || eventType === 'sedinta') {
+    // Obține proprietățile tipului de eveniment din dropdown
+    const eventTypeSelect = dom.eventTypeSelect;
+    const selectedOption = eventTypeSelect ? eventTypeSelect.selectedOptions[0] : null;
+    const requiresTime = selectedOption ? (selectedOption.dataset.requiresTime === 'true') : true;
+
+    // Dacă tipul de eveniment nu necesită timp, folosește valori implicite
+    if (!requiresTime) {
         if (!startTime) startTime = '08:00';
         if (!duration || isNaN(duration)) duration = 60;
     }
-    if ((eventType !== 'day-off') && (!startTime || isNaN(duration))) {
+    
+    // Validare: dacă tipul necesită timp, verifică că sunt completate
+    if (requiresTime && (!startTime || isNaN(duration))) {
          ui.showCustomAlert('Te rog completează ora de început și durata.', 'Validare');
         return;
     }
@@ -1173,6 +1204,12 @@ async function init() {
         // calendarState.initializeData(data); // Deja inițializat mai sus
         const programsData = await api.loadPrograms();
         calendarState.setPrograms(programsData.programs);
+        
+        // Încărcare tipuri de evenimente
+        const eventTypes = await api.loadEventTypes();
+        calendarState.setEventTypes(eventTypes); // Salvează în state
+        populateEventTypeDropdown(eventTypes); // Populează dropdown-ul
+        
         const evolutionData = await api.loadEvolutionData();
         calendarState.setEvolutionData(evolutionData);
 
