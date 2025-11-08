@@ -279,3 +279,231 @@
 .score-btn[data-score="-"] { background-color: #f59e0b; } /* Portocaliu */
 .score-btn[data-score="P"] { background-color: #3b82f6; } /* Albastru */
 .score-btn[data-score="+"] { background-color: #10b981; } /* Verde */
+
+/* Add this CSS to your dashboard-styles.css or tailwind-custom.css */
+
+/* ========================================
+   SETTINGS SECTION STYLES
+   ======================================== */
+
+/* Settings Tabs */
+.settings-tabs {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 0;
+}
+
+.settings-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--text-secondary);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: -2px;
+}
+
+.settings-tab-btn:hover {
+    color: var(--text-primary);
+    background: var(--bg-secondary);
+}
+
+.settings-tab-btn.active {
+    color: var(--accent-primary);
+    border-bottom-color: var(--accent-primary);
+    background: transparent;
+}
+
+.settings-tab-btn svg {
+    flex-shrink: 0;
+}
+
+/* Settings Panels */
+.settings-panel {
+    display: none;
+}
+
+.settings-panel.active {
+    display: block;
+}
+
+/* Event Types Table */
+#eventTypesTableBody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s ease;
+}
+
+#eventTypesTableBody tr:hover {
+    background-color: var(--bg-secondary);
+}
+
+#eventTypesTableBody tr:last-child {
+    border-bottom: none;
+}
+
+#eventTypesTableBody td {
+    padding: 1rem;
+}
+
+/* Event Type Label */
+.event-type-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.event-type-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 0.5rem;
+    background: var(--bg-secondary);
+    color: var(--accent-primary);
+    flex-shrink: 0;
+}
+
+/* Toggle Switch Styles */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: var(--accent-primary);
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+.toggle-switch input:disabled + .toggle-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Price Input Field */
+.price-input-wrapper {
+    position: relative;
+    max-width: 180px;
+    margin-left: auto;
+}
+
+.price-input {
+    width: 100%;
+    padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+    border: 2px solid var(--border-color);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-align: right;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    transition: all 0.2s ease;
+}
+
+.price-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.price-input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--bg-secondary);
+}
+
+.price-currency {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    pointer-events: none;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .settings-tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .settings-tab-btn {
+        flex-shrink: 0;
+        padding: 0.625rem 1rem;
+        font-size: 0.875rem;
+    }
+    
+    #eventTypesTableBody td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .event-type-icon {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .price-input-wrapper {
+        max-width: 140px;
+    }
+    
+    .price-input {
+        font-size: 0.875rem;
+        padding: 0.375rem 2rem 0.375rem 0.5rem;
+    }
+}
+
+/* Dark mode specific adjustments */
+[data-theme="dark"] .toggle-slider {
+    background-color: #4b5563;
+}
+
+[data-theme="dark"] .toggle-switch input:checked + .toggle-slider {
+    background-color: var(--accent-primary);
+}
