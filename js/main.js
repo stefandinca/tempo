@@ -488,31 +488,27 @@ console.log('===========================');
 
     } else {
         // This is a simple edit OR a new event
-        if (editingEventId) {
-            // Simple edit (of a non-recurring or newly detached event)
-            const updatedEvent = { ...existingEvent, ...eventBase, id: editingEventId };
-            // Dacă evenimentul existent *nu* era recurent, dar acum *este* (utilizatorul a adăugat recurență la un eveniment singular)
-            if ((!existingEvent.repeating || existingEvent.repeating.length === 0) && eventBase.repeating.length > 0) {
-                // Tratează-l ca pe o creare de noi evenimente recurente, dar șterge-l pe cel vechi
-                calendarState.deleteEvent(editingEventId); // Șterge originalul
-                const newEvents = createRecurringEvents(eventBase); // Creează seria
-                calendarState.saveEvent(newEvents);
-            } else {
-                // Editare simplă
-                calendarState.saveEvent(updatedEvent);
+        const defaultAttendance = {};
+            if (clientIds.length > 0) {
+                clientIds.forEach(clientId => {
+                    defaultAttendance[clientId] = 'present';
+                });
             }
-        } else {
-            // New event
+            
             if (eventBase.repeating.length > 0) {
                 // New recurring event
-                const newEvents = createRecurringEvents(eventBase);
+                // Pass defaultAttendance to the create function
+                const newEvents = createRecurringEvents(eventBase, defaultAttendance); 
                 calendarState.saveEvent(newEvents);
             } else {
                 // New single event
-                const newEvent = { ...eventBase, id: generateEventId() };
+                const newEvent = { 
+                    ...eventBase, 
+                    id: generateEventId(),
+                    attendance: defaultAttendance // Add the new attendance object
+                };
                 calendarState.saveEvent(newEvent);
             }
-        }
     }
     // --- END NEW RECURRENCE EDIT LOGIC ---
     
@@ -861,7 +857,12 @@ function setupAdminListeners() {
 
 // --- Funcții Helper ---
 
-function createRecurringEvents(eventBase) {
+/**
+ * Helper function to create recurring events
+ * @param {object} eventBase - The base event data from the form
+ * @param {object} defaultAttendance - The pre-built attendance object
+ */
+function createRecurringEvents(eventBase, defaultAttendance = {}) { // 1. Accept new parameter
     const events = [];
     const parts = eventBase.date.split('-');
     const startDate = new Date(parts[0], parts[1] - 1, parts[2]);
@@ -879,7 +880,13 @@ function createRecurringEvents(eventBase) {
             const day = String(currentDate.getDate()).padStart(2, '0');
             const dateStr = `${year}-${month}-${day}`;
             
-            events.push({ ...eventBase, id: generateEventId(), date: dateStr });
+            // 2. Add attendance to each new event
+            events.push({ 
+                ...eventBase, 
+                id: generateEventId(), 
+                date: dateStr,
+                attendance: defaultAttendance // Add default attendance
+            });
         }
         currentDate.setDate(currentDate.getDate() + 1);
     }

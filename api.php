@@ -161,7 +161,20 @@ try {
                     $event['clientIds'] = $event['clientIds'] ? explode(',', $event['clientIds']) : [];
                     $event['programIds'] = $event['programIds'] ? explode(',', $event['programIds']) : [];
                     $event['repeating'] = $event['repeating'] ? array_map('intval', json_decode($event['repeating'])) : [];                    // Convertim 'isPublic' și 'isBillable' înapoi în boolean pentru JS
-                    $event['attendance'] = $event['attendance'] ? json_decode($event['attendance'], true) : new stdClass();
+                    // --- START FIX ---
+                    // Robustly decode attendance, ensuring it's always an object
+                    $attendanceData = $event['attendance'] ? json_decode($event['attendance'], true) : null;
+                    if (is_array($attendanceData)) {
+                        // This converts PHP associative arrays ({"a":1}) AND
+                        // empty arrays ([]) into objects.
+                        $event['attendance'] = (object)$attendanceData;
+                    } elseif (is_object($attendanceData)) {
+                        $event['attendance'] = $attendanceData;
+                    } else {
+                        // Default to an empty object if null or invalid
+                        $event['attendance'] = new stdClass();
+                    }
+                    // --- END FIX ---
                     $event['isPublic'] = (bool)$event['isPublic'];
                     $event['isBillable'] = (bool)$event['isBillable'];
 

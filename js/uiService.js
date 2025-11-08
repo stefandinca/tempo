@@ -493,7 +493,13 @@ function addAttendanceListeners(eventId, canModify = true) {
             const clientId = toggle.dataset.clientId;
             
             const event = calendarState.getEventById(eventId);
-            if (!event.attendance) event.attendance = {};
+            // --- START FIX ---
+            // If attendance is missing OR is an array [] (from the bug), 
+            // force it to be an object before setting properties.
+            if (!event.attendance || Array.isArray(event.attendance)) {
+                event.attendance = {};
+            }
+            // --- END FIX ---
             event.attendance[clientId] = status;
             
             calendarState.saveEvent(event);
