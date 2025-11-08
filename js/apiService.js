@@ -215,3 +215,40 @@ export async function deleteEventType(id) {
     };
     return apiFetch(`event_types&id=${id}`, options);
 }
+
+/**
+ * Creează un program nou.
+ * @param {object} program - Obiectul cu datele programului {id, title, description}
+ */
+export async function createProgram(program) {
+    const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(program)
+    };
+    return apiFetch('programs', options);
+}
+
+/**
+ * Actualizează un program existent.
+ * @param {object} program - Obiectul cu datele programului {id, title, description}
+ */
+export async function updateProgram(program) {
+    const options = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(program)
+    };
+    return apiFetch('programs', options);
+}
+
+/**
+ * Șterge un program.
+ * @param {string} id - ID-ul programului
+ */
+export async function deleteProgram(id) {
+    const options = {
+        method: 'DELETE'
+    };
+    return apiFetch(`programs&id=${id}`, options);
+}

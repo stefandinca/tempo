@@ -339,8 +339,8 @@ try {
                     }
                     
                     // Validate ID format (lowercase, numbers, hyphens only)
-                    if (!preg_match('/^[a-z0-9\-]+$/', $id)) {
-                        sendError('ID must contain only lowercase letters, numbers, and hyphens', 400);
+                    if (!preg_match('/^[a-z0-9\]+$/', $id)) {
+                        sendError('ID must contain only lowercase letters, numbers', 400);
                     }
                     
                     // FIX 3: Add base_price to the INSERT query
@@ -428,6 +428,127 @@ try {
             }
             break; // <-- Make sure to copy down to the break;
 
+        // ==========================================================
+        // CAZUL 'programs'
+        // ==========================================================
+        
+        case 'programs':
+    if ($method === 'GET') {
+        // Already handled - returns programs from database
+        $programs = $pdo->query("SELECT * FROM programs ORDER BY title")->fetchAll();
+        sendResponse(['programs' => $programs]);
+        
+    } elseif ($method === 'POST') {
+        // Create new program
+        try {
+            if ($input === null) {
+                sendError('Invalid JSON data', 400);
+            }
+            
+            $id = $input['id'] ?? null;
+            $title = $input['title'] ?? null;
+            $description = $input['description'] ?? '';
+            
+            if (!$id || !$title) {
+                sendError('ID și titlul sunt obligatorii', 400);
+            }
+            
+            // Validate ID format
+            if (!preg_match('/^prog_[a-z0-9_]+$/', $id)) {
+                sendError('ID-ul trebuie să înceapă cu "prog_" și să conțină doar litere mici, cifre și underscore', 400);
+            }
+            
+            $stmt = $pdo->prepare("INSERT INTO programs (id, title, description) VALUES (?, ?, ?)");
+            $stmt->execute([$id, $title, $description]);
+            
+            debugLog("Program creat: $id - $title");
+            sendResponse(['success' => true, 'message' => 'Program creat cu succes', 'id' => $id]);
+            
+        } catch (PDOException $e) {
+            if ($e->getCode() == 23000) {
+                sendError('Un program cu acest ID există deja', 409);
+            } else {
+                debugLog("Eroare la crearea programului: " . $e->getMessage());
+                sendError('Nu s-a putut crea programul: ' . $e->getMessage());
+            }
+        }
+        
+    } elseif ($method === 'PUT') {
+        // Update program
+        try {
+            if ($input === null) {
+                sendError('Invalid JSON data', 400);
+            }
+            
+            $id = $input['id'] ?? null;
+            $title = $input['title'] ?? null;
+            $description = $input['description'] ?? '';
+            
+            if (!$id || !$title) {
+                sendError('ID și titlul sunt obligatorii', 400);
+            }
+            
+            $stmt = $pdo->prepare("UPDATE programs SET title = ?, description = ? WHERE id = ?");
+            $stmt->execute([$title, $description, $id]);
+            
+            if ($stmt->rowCount() === 0) {
+                sendError('Programul nu a fost găsit', 404);
+            }
+            
+            debugLog("Program actualizat: $id - $title");
+            sendResponse(['success' => true, 'message' => 'Program actualizat cu succes']);
+            
+        } catch (Exception $e) {
+            debugLog("Eroare la actualizarea programului: " . $e->getMessage());
+            sendError('Nu s-a putut actualiza programul: ' . $e->getMessage());
+        }
+        
+    } elseif ($method === 'DELETE') {
+        // Delete program
+        try {
+            $id = $_GET['id'] ?? null;
+            
+            if (!$id) {
+                sendError('ID-ul este obligatoriu', 400);
+            }
+            
+            // Check if any events use this program
+            $checkStmt = $pdo->prepare("SELECT COUNT(*) as count FROM event_programs WHERE program_id = ?");
+            $checkStmt->execute([$id]);
+            $result = $checkStmt->fetch();
+            
+            if ($result['count'] > 0) {
+                sendError("Nu poți șterge acest program. Există {$result['count']} evenimente care îl folosesc.", 409);
+            }
+            
+            // Check if any program history uses this program
+            $checkHistoryStmt = $pdo->prepare("SELECT COUNT(*) as count FROM program_history WHERE program_id = ?");
+            $checkHistoryStmt->execute([$id]);
+            $historyResult = $checkHistoryStmt->fetch();
+            
+            if ($historyResult['count'] > 0) {
+                sendError("Nu poți șterge acest program. Există {$historyResult['count']} înregistrări în istoricul programelor.", 409);
+            }
+            
+            $stmt = $pdo->prepare("DELETE FROM programs WHERE id = ?");
+            $stmt->execute([$id]);
+            
+            if ($stmt->rowCount() === 0) {
+                sendError('Programul nu a fost găsit', 404);
+            }
+            
+            debugLog("Program șters: $id");
+            sendResponse(['success' => true, 'message' => 'Program șters cu succes']);
+            
+        } catch (Exception $e) {
+            debugLog("Eroare la ștergerea programului: " . $e->getMessage());
+            sendError('Nu s-a putut șterge programul: ' . $e->getMessage());
+        }
+    } else {
+        sendError('Metodă nepermisă pentru programs', 405);
+    }
+    break;
+        
         // ==========================================================
         // CAZUL 'evolution'
         // ==========================================================

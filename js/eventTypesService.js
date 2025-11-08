@@ -68,6 +68,29 @@ export function renderList() {
         type.label.toLowerCase().includes(searchTerm) ||
         type.id.toLowerCase().includes(searchTerm)
     );
+
+    // Add event delegation for program cards
+setTimeout(() => {
+    const programsContainer = document.getElementById('programsListContainer');
+    if (programsContainer) {
+        programsContainer.addEventListener('click', (e) => {
+            const editBtn = e.target.closest('[data-action="edit-program"]');
+            const deleteBtn = e.target.closest('[data-action="delete-program"]');
+            
+            if (editBtn) {
+                const programId = editBtn.dataset.id;
+                const { programs } = calendarState.getState();
+                const program = programs.find(p => p.id === programId);
+                if (program) openProgramModal(program);
+            }
+            
+            if (deleteBtn) {
+                const programId = deleteBtn.dataset.id;
+                handleDeleteProgram(programId);
+            }
+        });
+    }
+}, 100);
     
     // Clear list
     dom.list.innerHTML = '';
@@ -132,6 +155,122 @@ export function renderList() {
     dom.list.appendChild(programsSection);
 }
 
+
+/**
+ * Deschide modalul pentru adăugare/editare program
+ */
+function openProgramModal(program = null) {
+    // Reuse the event type modal for programs
+    if (program) {
+        // Edit mode
+        dom.modalTitle.textContent = 'Editează Program';
+        dom.originalId.value = program.id;
+        dom.idField.value = program.id;
+        dom.idField.disabled = true;
+        dom.labelField.value = program.title;
+        dom.priceField.closest('.form-group').style.display = 'none'; // Hide price field
+        dom.isBillableField.closest('.form-group').style.display = 'none'; // Hide billable field
+        dom.requiresTimeField.closest('.form-group').style.display = 'none'; // Hide requires time field
+        
+        // Use the price field for description (hack, but works)
+        dom.priceField.type = 'text';
+        dom.priceField.value = program.description || '';
+        const priceLabel = dom.priceField.closest('.form-group').querySelector('label');
+        if (priceLabel) priceLabel.textContent = 'Descriere';
+        dom.priceField.closest('.form-group').style.display = 'block';
+        
+        dom.deleteBtn.style.display = 'inline-flex';
+        dom.deleteBtn.dataset.type = 'program'; // Mark as program delete
+    } else {
+        // Add mode
+        dom.modalTitle.textContent = 'Adaugă Program';
+        dom.form.reset();
+        dom.originalId.value = '';
+        dom.idField.disabled = false;
+        dom.idField.placeholder = 'ex: prog_limbaj_expresiv';
+        dom.labelField.placeholder = 'ex: Limbaj Expresiv';
+        dom.priceField.type = 'text';
+        dom.priceField.value = '';
+        const priceLabel = dom.priceField.closest('.form-group').querySelector('label');
+        if (priceLabel) priceLabel.textContent = 'Descriere';
+        dom.priceField.placeholder = 'Descriere opțională a programului';
+        dom.priceField.closest('.form-group').style.display = 'block';
+        dom.isBillableField.closest('.form-group').style.display = 'none';
+        dom.requiresTimeField.closest('.form-group').style.display = 'none';
+        dom.deleteBtn.style.display = 'none';
+    }
+    
+    dom.modal.style.display = 'flex';
+    dom.idField.focus();
+}
+
+/**
+ * Salvează programul (create sau update)
+ */
+async function handleSaveProgram(programData) {
+    const isEdit = !!dom.originalId.value;
+    
+    try {
+        if (isEdit) {
+            await api.updateProgram(programData);
+            showCustomAlert('Programul a fost actualizat cu succes!', 'Succes');
+        } else {
+            await api.createProgram(programData);
+            showCustomAlert('Programul a fost creat cu succes!', 'Succes');
+        }
+        
+        await reloadPrograms();
+        closeModal();
+        
+    } catch (error) {
+        console.error('Eroare la salvarea programului:', error);
+        showCustomAlert(error.message || 'Nu s-a putut salva programul.', 'Eroare');
+    }
+}
+
+/**
+ * Șterge programul
+ */
+async function handleDeleteProgram(id) {
+    const { programs } = calendarState.getState();
+    const program = programs.find(p => p.id === id);
+    
+    const confirmed = await showCustomConfirm(
+        `Sigur vrei să ștergi programul "${program.title}"?\n\nAceastă acțiune este permanentă și nu poate fi anulată.`,
+        'Confirmare Ștergere'
+    );
+    
+    if (!confirmed) return;
+    
+    try {
+        await api.deleteProgram(id);
+        showCustomAlert('Programul a fost șters cu succes!', 'Succes');
+        
+        await reloadPrograms();
+        closeModal();
+        
+    } catch (error) {
+        console.error('Eroare la ștergerea programului:', error);
+        showCustomAlert(error.message || 'Nu s-a putut șterge programul.', 'Eroare');
+    }
+}
+
+/**
+ * Reîncarcă programele și actualizează UI
+ */
+async function reloadPrograms() {
+    try {
+        const programsData = await api.loadPrograms();
+        calendarState.setPrograms(programsData.programs);
+        renderList();
+    } catch (error) {
+        console.error('Eroare la reîncărcarea programelor:', error);
+    }
+}
+
+/**
+ * Randează lista de programe (collapsible)
+ */
 /**
  * Randează lista de programe (collapsible)
  */
@@ -164,12 +303,7 @@ function renderProgramsList() {
         <div id="programsListContainer" class="hidden space-y-3">
             ${filtered.length === 0 ? 
                 '<div class="text-center py-8 text-gray-500">Nu există programe.</div>' :
-                filtered.map(prog => `
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
-                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">${prog.title}</h3>
-                        ${prog.description ? `<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${prog.description}</p>` : ''}
-                    </div>
-                `).join('')
+                filtered.map(prog => createProgramCard(prog)).join('')
             }
         </div>
     `;
@@ -192,7 +326,7 @@ function renderProgramsList() {
         if (addProgramBtn) {
             addProgramBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
-                showCustomAlert('Funcționalitatea de adăugare programe va fi implementată în viitor.', 'În dezvoltare');
+                openProgramModal();
             });
         }
     }, 0);
@@ -200,6 +334,31 @@ function renderProgramsList() {
     return programsSection;
 }
 
+/**
+ * Creează un card pentru un program
+ */
+function createProgramCard(program) {
+    return `
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">${program.title}</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">ID: <code class="bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">${program.id}</code></p>
+                    ${program.description ? `<p class="text-sm text-gray-600 dark:text-gray-300 mt-2">${program.description}</p>` : ''}
+                </div>
+                
+                <div class="flex gap-2 ml-4">
+                    <button class="btn-icon hover:bg-gray-100 dark:hover:bg-gray-700" data-action="edit-program" data-id="${program.id}" title="Editează">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                    </button>
+                    <button class="btn-icon hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400" data-action="delete-program" data-id="${program.id}" title="Șterge">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
 /**
  * Creează un card pentru un tip de eveniment.
  */
@@ -282,32 +441,51 @@ function closeModal() {
 async function handleSave(e) {
     e.preventDefault();
     
-    const eventType = {
-        id: dom.idField.value.trim().toLowerCase(),
-        label: dom.labelField.value.trim(),
-        isBillable: dom.isBillableField.checked,
-        requiresTime: dom.requiresTimeField.checked,
-        base_price: parseFloat(dom.priceField.value) || 0
-    };
+    // Check if we're editing a program (based on hidden fields)
+    const isProgram = dom.isBillableField.closest('.form-group').style.display === 'none';
     
-    const isEdit = !!dom.originalId.value;
-    
-    try {
-        if (isEdit) {
-            await api.updateEventType(eventType);
-            showCustomAlert('Tipul de eveniment a fost actualizat cu succes!', 'Succes');
-        } else {
-            await api.createEventType(eventType);
-            showCustomAlert('Tipul de eveniment a fost creat cu succes!', 'Succes');
+    if (isProgram) {
+        const programData = {
+            id: dom.idField.value.trim().toLowerCase(),
+            title: dom.labelField.value.trim(),
+            description: dom.priceField.value.trim() // Using price field for description
+        };
+        
+        // Validate ID format for programs
+        if (!programData.id.startsWith('prog_')) {
+            showCustomAlert('ID-ul programului trebuie să înceapă cu "prog_"', 'Eroare');
+            return;
         }
         
-        // Reîncarcă tipurile și actualizează UI
-        await reloadEventTypes();
-        closeModal();
+        await handleSaveProgram(programData);
+    } else {
+        // Original event type save logic
+        const eventType = {
+            id: dom.idField.value.trim().toLowerCase(),
+            label: dom.labelField.value.trim(),
+            isBillable: dom.isBillableField.checked,
+            requiresTime: dom.requiresTimeField.checked,
+            base_price: parseFloat(dom.priceField.value) || 0
+        };
         
-    } catch (error) {
-        console.error('Eroare la salvarea tipului:', error);
-        showCustomAlert(error.message || 'Nu s-a putut salva tipul de eveniment.', 'Eroare');
+        const isEdit = !!dom.originalId.value;
+        
+        try {
+            if (isEdit) {
+                await api.updateEventType(eventType);
+                showCustomAlert('Tipul de eveniment a fost actualizat cu succes!', 'Succes');
+            } else {
+                await api.createEventType(eventType);
+                showCustomAlert('Tipul de eveniment a fost creat cu succes!', 'Succes');
+            }
+            
+            await reloadEventTypes();
+            closeModal();
+            
+        } catch (error) {
+            console.error('Eroare la salvarea tipului:', error);
+            showCustomAlert(error.message || 'Nu s-a putut salva tipul de eveniment.', 'Eroare');
+        }
     }
 }
 
@@ -318,6 +496,13 @@ async function handleDelete() {
     const id = dom.originalId.value;
     if (!id) return;
     
+    // Check if deleting a program
+    if (dom.deleteBtn.dataset.type === 'program') {
+        await handleDeleteProgram(id);
+        return;
+    }
+    
+    // Original event type delete logic
     const { eventTypes } = calendarState.getState();
     const type = eventTypes.find(t => t.id === id);
     
@@ -332,7 +517,6 @@ async function handleDelete() {
         await api.deleteEventType(id);
         showCustomAlert('Tipul de eveniment a fost șters cu succes!', 'Succes');
         
-        // Reîncarcă tipurile și actualizează UI
         await reloadEventTypes();
         closeModal();
         
