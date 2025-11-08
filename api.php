@@ -205,9 +205,36 @@ try {
                 try {
                     $pdo->beginTransaction();
 
-                    // 1. Șterge datele vechi (cu TRUNCATE pentru a reseta și auto-increment, dar necesită permisiuni)
-                    // Folosim DELETE pentru compatibilitate mai largă cu cheile străine
+                    // 1. Șterge datele vechi
                     $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
+
+                    // --- START MODIFICATION ---
+                    // Logica de ștergere a istoricului
+                    // Colectează toate ID-urile evenimentelor care vor fi salvate
+                    $newEventIds = [];
+                    if (isset($input['events']) && is_array($input['events'])) {
+                        foreach ($input['events'] as $e) {
+                            if (isset($e['id'])) {
+                                $newEventIds[] = $e['id'];
+                            }
+                        }
+                    }
+
+                    if (count($newEventIds) > 0) {
+                        // Creează placeholdere (?) pentru clauza IN
+                        $placeholders = rtrim(str_repeat('?,', count($newEventIds)), ',');
+                        // Șterge din program_history DOAR intrările ale căror event_id NU SUNT în noua listă de evenimente
+                        $stmt_delete_history = $pdo->prepare("DELETE FROM program_history WHERE event_id IS NOT NULL AND event_id NOT IN ($placeholders)");
+                        $stmt_delete_history->execute($newEventIds);
+                        debugLog("Curățat " . $stmt_delete_history->rowCount() . " înregistrări vechi din program_history.");
+                    } else {
+                        // Dacă nu se trimit evenimente, șterge tot istoricul asociat evenimentelor
+                        $pdo->exec("DELETE FROM program_history WHERE event_id IS NOT NULL");
+                        debugLog("Niciun eveniment primit. Se șterge tot istoricul programelor asociat evenimentelor.");
+                    }
+                    // --- END MODIFICATION ---
+
+                    // Continuă cu ștergerea normală a datelor
                     $pdo->exec("DELETE FROM event_team_members;");
                     $pdo->exec("DELETE FROM event_clients;");
                     $pdo->exec("DELETE FROM event_programs;");
