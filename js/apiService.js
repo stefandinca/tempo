@@ -175,3 +175,43 @@ export async function saveBillingsData(data) {
 export async function loadEventTypes() {
     return apiFetch('event_types');
 }
+
+/**
+ * Creează un tip nou de eveniment.
+ * Apel POST la api.php?path=event_types
+ * @param {object} eventType - Obiectul cu datele tipului {id, label, isBillable, requiresTime}
+ */
+export async function createEventType(eventType) {
+    const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventType)
+    };
+    return apiFetch('event_types', options);
+}
+
+/**
+ * Actualizează un tip de eveniment existent.
+ * Apel PUT la api.php?path=event_types
+ * @param {object} eventType - Obiectul cu datele tipului {id, label, isBillable, requiresTime}
+ */
+export async function updateEventType(eventType) {
+    const options = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(eventType)
+    };
+    return apiFetch('event_types', options);
+}
+
+/**
+ * Șterge un tip de eveniment.
+ * Apel DELETE la api.php?path=event_types&id=...
+ * @param {string} id - ID-ul tipului de eveniment
+ */
+export async function deleteEventType(id) {
+    const options = {
+        method: 'DELETE'
+    };
+    return apiFetch(`event_types&id=${id}`, options);
+}

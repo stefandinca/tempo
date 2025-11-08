@@ -12,6 +12,7 @@ import * as view from './calendarView.js';
 import * as reportService from './reportService.js';
 import * as evolutionService from './evolutionService.js';
 import * as billing from './billingService.js';
+import * as eventTypesService from './eventTypesService.js';
 
 // --- Variabile DOM Globale ---
 const $ = (id) => document.getElementById(id);
@@ -29,6 +30,7 @@ const dom = {
     teamSection: $('teamSection'),
     dashboardSection: $('dashboardSection'),
     billingSection: $('billingSection'),
+    eventTypesSection: $('eventTypesSection'),
     
     // Calendar
     currentPeriod: $('currentPeriod'),
@@ -144,6 +146,9 @@ function populateEventTypeDropdown(eventTypes) {
         eventTypeSelect.appendChild(option);
     });
 }
+
+// Make it globally accessible for eventTypesService
+window.populateEventTypeDropdown = populateEventTypeDropdown;
 
 // --- Navigare Principală (Tab-uri) ---
 
@@ -1188,6 +1193,17 @@ async function init() {
         if (dom.billingSection) {
             dom.billingSection.style.display = 'none';
         }
+        
+        // Ascunde link-ul de Tipuri Evenimente din sidebar
+        const eventTypesLink = document.querySelector('.menu-item[data-view="eventTypes"]');
+        if (eventTypesLink) {
+            eventTypesLink.style.display = 'none';
+        }
+        
+        // Ascunde fizic secțiunea de Tipuri Evenimente
+        if (dom.eventTypesSection) {
+            dom.eventTypesSection.style.display = 'none';
+        }
     }
         
     } catch (error) {
@@ -1353,6 +1369,7 @@ async function init() {
     // Inițializează serviciul de facturare
     if (auth.isAdmin()) {
         billing.init();
+        eventTypesService.init(); // Initialize event types management
     }
     // --- Randare Inițială ---
     populateClientFilterDropdown(); // Populează dropdown-ul de clienți

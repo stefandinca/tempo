@@ -259,12 +259,12 @@ try {
             break;
 
         // ==========================================================
-        // CAZUL 'event_types' - Încarcă tipurile de evenimente din DB
+        // CAZUL 'event_types' - Gestionează tipurile de evenimente din DB
         // ==========================================================
         case 'event_types':
             if ($method === 'GET') {
                 try {
-                    $stmt = $pdo->query("SELECT id, label, isBillable, requiresTime FROM event_types ORDER BY id");
+                    $stmt = $pdo->query("SELECT id, label, isBillable, requiresTime FROM event_types ORDER BY label");
                     $eventTypes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     
                     // Convertim valorile boolean pentru JavaScript
@@ -277,6 +277,104 @@ try {
                 } catch (Exception $e) {
                     debugLog("Eroare la încărcarea tipurilor de evenimente: " . $e->getMessage());
                     sendError('Failed to load event types: ' . $e->getMessage());
+                }
+            } elseif ($method === 'POST') {
+                // Create new event type
+                try {
+                    if ($input === null) {
+                        sendError('Invalid JSON data', 400);
+                    }
+                    
+                    $id = $input['id'] ?? null;
+                    $label = $input['label'] ?? null;
+                    $isBillable = isset($input['isBillable']) ? (int)$input['isBillable'] : 1;
+                    $requiresTime = isset($input['requiresTime']) ? (int)$input['requiresTime'] : 1;
+                    
+                    if (!$id || !$label) {
+                        sendError('ID and label are required', 400);
+                    }
+                    
+                    // Validate ID format (lowercase, numbers, hyphens only)
+                    if (!preg_match('/^[a-z0-9\-]+$/', $id)) {
+                        sendError('ID must contain only lowercase letters, numbers, and hyphens', 400);
+                    }
+                    
+                    $stmt = $pdo->prepare("INSERT INTO event_types (id, label, isBillable, requiresTime) VALUES (?, ?, ?, ?)");
+                    $stmt->execute([$id, $label, $isBillable, $requiresTime]);
+                    
+                    debugLog("Tip eveniment creat: $id - $label");
+                    sendResponse(['success' => true, 'message' => 'Event type created successfully', 'id' => $id]);
+                    
+                } catch (PDOException $e) {
+                    if ($e->getCode() == 23000) { // Duplicate entry
+                        sendError('Un tip de eveniment cu acest ID există deja', 409);
+                    } else {
+                        debugLog("Eroare la crearea tipului: " . $e->getMessage());
+                        sendError('Failed to create event type: ' . $e->getMessage());
+                    }
+                }
+            } elseif ($method === 'PUT') {
+                // Update existing event type
+                try {
+                    if ($input === null) {
+                        sendError('Invalid JSON data', 400);
+                    }
+                    
+                    $id = $input['id'] ?? null;
+                    $label = $input['label'] ?? null;
+                    $isBillable = isset($input['isBillable']) ? (int)$input['isBillable'] : 1;
+                    $requiresTime = isset($input['requiresTime']) ? (int)$input['requiresTime'] : 1;
+                    
+                    if (!$id || !$label) {
+                        sendError('ID and label are required', 400);
+                    }
+                    
+                    $stmt = $pdo->prepare("UPDATE event_types SET label = ?, isBillable = ?, requiresTime = ? WHERE id = ?");
+                    $affected = $stmt->execute([$label, $isBillable, $requiresTime, $id]);
+                    
+                    if ($stmt->rowCount() === 0) {
+                        sendError('Event type not found', 404);
+                    }
+                    
+                    debugLog("Tip eveniment actualizat: $id - $label");
+                    sendResponse(['success' => true, 'message' => 'Event type updated successfully']);
+                    
+                } catch (Exception $e) {
+                    debugLog("Eroare la actualizarea tipului: " . $e->getMessage());
+                    sendError('Failed to update event type: ' . $e->getMessage());
+                }
+            } elseif ($method === 'DELETE') {
+                // Delete event type
+                try {
+                    // Get ID from query string for DELETE
+                    $id = $_GET['id'] ?? null;
+                    
+                    if (!$id) {
+                        sendError('ID is required', 400);
+                    }
+                    
+                    // Check if any events use this type
+                    $checkStmt = $pdo->prepare("SELECT COUNT(*) as count FROM events WHERE type = ?");
+                    $checkStmt->execute([$id]);
+                    $result = $checkStmt->fetch();
+                    
+                    if ($result['count'] > 0) {
+                        sendError("Nu poți șterge acest tip. Există {$result['count']} evenimente care îl folosesc.", 409);
+                    }
+                    
+                    $stmt = $pdo->prepare("DELETE FROM event_types WHERE id = ?");
+                    $stmt->execute([$id]);
+                    
+                    if ($stmt->rowCount() === 0) {
+                        sendError('Event type not found', 404);
+                    }
+                    
+                    debugLog("Tip eveniment șters: $id");
+                    sendResponse(['success' => true, 'message' => 'Event type deleted successfully']);
+                    
+                } catch (Exception $e) {
+                    debugLog("Eroare la ștergerea tipului: " . $e->getMessage());
+                    sendError('Failed to delete event type: ' . $e->getMessage());
                 }
             } else {
                 sendError('Unsupported method for event_types', 405);

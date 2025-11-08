@@ -67,6 +67,12 @@
                         <span class="hidden md:inline">Facturare</span>
                     </a>
                 </li>
+                <li class="menu-item" data-view="eventTypes">
+                    <a href="#" class="flex items-center gap-3 px-3 py-2 md:px-4 md:py-3 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors whitespace-nowrap">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span class="hidden md:inline">Servicii</span>
+                    </a>
+                </li>
             </ul>
 
             
@@ -514,6 +520,82 @@
         </form>
     </div>
 </div>
+
+    <!-- Event Types Section -->
+    <section id="eventTypesSection" class="main-section">
+        <header class="section-header">
+            <div class="header-title-group">
+                <button class="mobile-menu-toggle btn-icon md:hidden">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+                <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Tipuri Evenimente</h1>
+            </div>
+            <div class="header-actions">
+                <button id="addEventTypeBtn" class="btn btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m-7-7h14"/></svg>
+                    <span>Adaugă Tip Nou</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="section-content-grid" style="grid-template-columns: 1fr; overflow-y: auto;">
+            <div class="section-col-list" style="height: auto;">
+                <input type="search" id="eventTypeSearchBar" class="form-input" placeholder="Caută tip după nume..." style="margin-bottom: 1.5rem;">
+                <div id="eventTypesList" class="space-y-4">
+                    <!-- Event types will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Event Type Modal -->
+    <div id="eventTypeModal" class="modal-backdrop modal-small">
+        <div class="modal-content">
+            <form id="eventTypeForm">
+                <div class="modal-header">
+                    <h2 id="eventTypeModalTitle" class="modal-title">Adaugă Tip Eveniment</h2>
+                    <button id="closeEventTypeModal" type="button" class="btn-icon btn-close" title="Închide">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="eventTypeOriginalId">
+                    
+                    <div class="form-group">
+                        <label for="eventTypeId">ID Tip <span class="text-red-500">*</span></label>
+                        <input type="text" id="eventTypeId" class="form-input" required pattern="[a-z0-9\-]+" placeholder="ex: terapie-speciala" title="Doar litere mici, cifre și liniuță">
+                        <small class="text-gray-500">Doar litere mici, cifre și liniuță (-). Nu se poate schimba după creare.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eventTypeLabel">Denumire <span class="text-red-500">*</span></label>
+                        <input type="text" id="eventTypeLabel" class="form-input" required placeholder="ex: Terapie Specială">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="eventTypeIsBillable" class="form-checkbox" checked>
+                            <span>Eveniment facturabil</span>
+                        </label>
+                        <small class="text-gray-500 block mt-1">Dacă este bifat, evenimentele de acest tip vor fi facturabile implicit.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="eventTypeRequiresTime" class="form-checkbox" checked>
+                            <span>Necesită oră și durată</span>
+                        </label>
+                        <small class="text-gray-500 block mt-1">Dacă este bifat, va fi obligatoriu să specifici ora și durata la crearea evenimentelor.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="cancelEventTypeBtn" type="button" class="btn btn-secondary">Anulează</button>
+                    <button id="deleteEventTypeBtn" type="button" class="btn btn-danger" style="display: none;">Șterge</button>
+                    <button type="submit" class="btn btn-primary">Salvează</button>
+                </div>
+            </form>
+        </div>
+    </div>
             
         </main>
     </div>
