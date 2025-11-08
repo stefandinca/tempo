@@ -98,7 +98,7 @@ setTimeout(() => {
     // Add Servicii section with collapse
     const serviciiSection = document.createElement('div');
     serviciiSection.innerHTML = `
-        <div class="flex items-center justify-between mb-4 cursor-pointer" id="serviciiHeader">
+        <div class="flex items-center justify-between mb-4 cursor-pointer bg-blue-100 py-4 px-6 rounded-lg" id="serviciiHeader">
             <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Lista Servicii</h2>
             <div class="flex items-center gap-2">
                 <button id="addServiceBtn" class="btn btn-primary flex items-center gap-2 px-3 py-2 text-sm" onclick="event.stopPropagation()">
@@ -288,8 +288,8 @@ function renderProgramsList() {
     const programsSection = document.createElement('div');
     programsSection.className = 'mt-8';
     programsSection.innerHTML = `
-        <div class="flex items-center justify-between mb-4 cursor-pointer" id="programsHeader">
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Programe</h2>
+        <div class="flex items-center justify-between mb-4 cursor-pointer bg-blue-100 py-4 px-6 rounded-lg" id="programsHeader">
+            <h2 class="text-xl font-semibold text-gray-900 ">Programe</h2>
             <div class="flex items-center gap-2">
                 <button id="addProgramBtn" class="btn btn-primary flex items-center gap-2 px-3 py-2 text-sm" onclick="event.stopPropagation()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m-7-7h14"/></svg>
