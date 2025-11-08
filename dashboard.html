@@ -541,6 +541,8 @@
         <div class="section-content-grid" style="grid-template-columns: 1fr; overflow-y: auto;">
             <div class="section-col-list" style="height: auto;">
                 <input type="search" id="eventTypeSearchBar" class="form-input" placeholder="Caută tip după nume..." style="margin-bottom: 1.5rem;">
+                
+                
                 <div id="eventTypesList" class="space-y-4">
                     <!-- Event types will be rendered here -->
                 </div>
@@ -570,6 +572,12 @@
                     <div class="form-group">
                         <label for="eventTypeLabel">Denumire <span class="text-red-500">*</span></label>
                         <input type="text" id="eventTypeLabel" class="form-input" required placeholder="ex: Terapie Specială">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eventTypePrice">Preț de Bază (RON)</label>
+                        <input type="number" id="eventTypePrice" class="form-input" placeholder="ex: 100" min="0" step="1">
+                        <small class="text-gray-500">Setați 0 dacă prețul este variabil sau nu se aplică.</small>
                     </div>
 
                     <div class="form-group">

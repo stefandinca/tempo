@@ -264,13 +264,15 @@ try {
         case 'event_types':
             if ($method === 'GET') {
                 try {
-                    $stmt = $pdo->query("SELECT id, label, isBillable, requiresTime FROM event_types ORDER BY label");
+                    // FIX 1: Add base_price to the SELECT query
+                    $stmt = $pdo->query("SELECT id, label, isBillable, requiresTime, base_price FROM event_types ORDER BY label");
                     $eventTypes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     
-                    // Convertim valorile boolean pentru JavaScript
+                    // Convertim valorile boolean/float pentru JavaScript
                     foreach ($eventTypes as &$type) {
                         $type['isBillable'] = (bool)$type['isBillable'];
                         $type['requiresTime'] = (bool)$type['requiresTime'];
+                        $type['base_price'] = (float)($type['base_price'] ?? 0); // <-- FIX 2: Process the price
                     }
                     
                     sendResponse($eventTypes);
@@ -278,6 +280,7 @@ try {
                     debugLog("Eroare la încărcarea tipurilor de evenimente: " . $e->getMessage());
                     sendError('Failed to load event types: ' . $e->getMessage());
                 }
+
             } elseif ($method === 'POST') {
                 // Create new event type
                 try {
@@ -289,6 +292,7 @@ try {
                     $label = $input['label'] ?? null;
                     $isBillable = isset($input['isBillable']) ? (int)$input['isBillable'] : 1;
                     $requiresTime = isset($input['requiresTime']) ? (int)$input['requiresTime'] : 1;
+                    $base_price = $input['base_price'] ?? 0; // <-- ADD: Get base_price
                     
                     if (!$id || !$label) {
                         sendError('ID and label are required', 400);
@@ -299,10 +303,11 @@ try {
                         sendError('ID must contain only lowercase letters, numbers, and hyphens', 400);
                     }
                     
-                    $stmt = $pdo->prepare("INSERT INTO event_types (id, label, isBillable, requiresTime) VALUES (?, ?, ?, ?)");
-                    $stmt->execute([$id, $label, $isBillable, $requiresTime]);
+                    // FIX 3: Add base_price to the INSERT query
+                    $stmt = $pdo->prepare("INSERT INTO event_types (id, label, isBillable, requiresTime, base_price) VALUES (?, ?, ?, ?, ?)");
+                    $stmt->execute([$id, $label, $isBillable, $requiresTime, $base_price]);
                     
-                    debugLog("Tip eveniment creat: $id - $label");
+                    debugLog("Tip eveniment creat: $id - $label - Pret: $base_price");
                     sendResponse(['success' => true, 'message' => 'Event type created successfully', 'id' => $id]);
                     
                 } catch (PDOException $e) {
@@ -324,19 +329,21 @@ try {
                     $label = $input['label'] ?? null;
                     $isBillable = isset($input['isBillable']) ? (int)$input['isBillable'] : 1;
                     $requiresTime = isset($input['requiresTime']) ? (int)$input['requiresTime'] : 1;
+                    $base_price = $input['base_price'] ?? 0; // <-- ADD: Get base_price
                     
                     if (!$id || !$label) {
                         sendError('ID and label are required', 400);
                     }
                     
-                    $stmt = $pdo->prepare("UPDATE event_types SET label = ?, isBillable = ?, requiresTime = ? WHERE id = ?");
-                    $affected = $stmt->execute([$label, $isBillable, $requiresTime, $id]);
+                    // FIX 4: This must be an UPDATE, not an INSERT
+                    $stmt = $pdo->prepare("UPDATE event_types SET label = ?, isBillable = ?, requiresTime = ?, base_price = ? WHERE id = ?");
+                    $affected = $stmt->execute([$label, $isBillable, $requiresTime, $base_price, $id]);
                     
                     if ($stmt->rowCount() === 0) {
                         sendError('Event type not found', 404);
                     }
                     
-                    debugLog("Tip eveniment actualizat: $id - $label");
+                    debugLog("Tip eveniment actualizat: $id - $label - Pret: $base_price");
                     sendResponse(['success' => true, 'message' => 'Event type updated successfully']);
                     
                 } catch (Exception $e) {
@@ -379,7 +386,7 @@ try {
             } else {
                 sendError('Unsupported method for event_types', 405);
             }
-            break;
+            break; // <-- Make sure to copy down to the break;
 
         // ==========================================================
         // CAZUL 'evolution'

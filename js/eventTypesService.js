@@ -29,7 +29,8 @@ const dom = {
     idField: $('eventTypeId'),
     labelField: $('eventTypeLabel'),
     isBillableField: $('eventTypeIsBillable'),
-    requiresTimeField: $('eventTypeRequiresTime')
+    requiresTimeField: $('eventTypeRequiresTime'),
+    priceField: $('eventTypePrice')
 };
 
 /**
@@ -107,6 +108,9 @@ function createEventTypeCard(type) {
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${type.requiresTime ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}">
                         ${type.requiresTime ? '⏰ Necesită timp' : '⏸️  Timp opțional'}
                     </span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                        💳 ${type.base_price || 0} RON
+                    </span>
                 </div>
             </div>
             
@@ -136,6 +140,7 @@ function openModal(type = null) {
         dom.labelField.value = type.label;
         dom.isBillableField.checked = type.isBillable;
         dom.requiresTimeField.checked = type.requiresTime;
+        dom.priceField.value = type.base_price || 0;
         dom.deleteBtn.style.display = 'inline-flex';
     } else {
         // Add mode
@@ -143,6 +148,7 @@ function openModal(type = null) {
         dom.form.reset();
         dom.originalId.value = '';
         dom.idField.disabled = false;
+        dom.priceField.value = 0;
         dom.deleteBtn.style.display = 'none';
     }
     
@@ -168,7 +174,8 @@ async function handleSave(e) {
         id: dom.idField.value.trim().toLowerCase(),
         label: dom.labelField.value.trim(),
         isBillable: dom.isBillableField.checked,
-        requiresTime: dom.requiresTimeField.checked
+        requiresTime: dom.requiresTimeField.checked,
+        base_price: parseFloat(dom.priceField.value) || 0
     };
     
     const isEdit = !!dom.originalId.value;
