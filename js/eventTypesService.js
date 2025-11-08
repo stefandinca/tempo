@@ -72,20 +72,132 @@ export function renderList() {
     // Clear list
     dom.list.innerHTML = '';
     
-    if (filtered.length === 0) {
-        dom.list.innerHTML = `
-            <div class="text-center py-8 text-gray-500">
-                ${searchTerm ? 'Niciun tip găsit pentru căutarea ta.' : 'Nu există tipuri de evenimente. Adaugă primul!'}
+    // Add Servicii section with collapse
+    const serviciiSection = document.createElement('div');
+    serviciiSection.innerHTML = `
+        <div class="flex items-center justify-between mb-4 cursor-pointer" id="serviciiHeader">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Lista Servicii</h2>
+            <div class="flex items-center gap-2">
+                <button id="addServiceBtn" class="btn btn-primary flex items-center gap-2 px-3 py-2 text-sm" onclick="event.stopPropagation()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m-7-7h14"/></svg>
+                    <span>Adaugă Serviciu</span>
+                </button>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform rotate-180" id="serviciiChevron">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
             </div>
-        `;
-        return;
-    }
+        </div>
+        <div id="serviciiListContainer" class="space-y-4">
+            ${filtered.length === 0 ? 
+                `<div class="text-center py-8 text-gray-500">
+                    ${searchTerm ? 'Niciun serviciu găsit pentru căutarea ta.' : 'Nu există servicii. Adaugă primul!'}
+                </div>` :
+                ''
+            }
+        </div>
+    `;
     
-    // Render cards
+    dom.list.appendChild(serviciiSection);
+    
+    // Add event type cards to the container
+    const serviciiContainer = document.getElementById('serviciiListContainer');
     filtered.forEach(type => {
         const card = createEventTypeCard(type);
-        dom.list.appendChild(card);
+        serviciiContainer.appendChild(card);
     });
+    
+    // Add toggle functionality for servicii header
+    const header = document.getElementById('serviciiHeader');
+    const container = document.getElementById('serviciiListContainer');
+    const chevron = document.getElementById('serviciiChevron');
+    
+    if (header && container && chevron) {
+        header.addEventListener('click', () => {
+            container.classList.toggle('hidden');
+            chevron.classList.toggle('rotate-180');
+        });
+    }
+    
+    // Add click handler for add service button
+    const addServiceBtn = document.getElementById('addServiceBtn');
+    if (addServiceBtn) {
+        addServiceBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openModal();
+        });
+    }
+    
+    // Add programs section
+    const programsSection = renderProgramsList();
+    dom.list.appendChild(programsSection);
+}
+
+/**
+ * Randează lista de programe (collapsible)
+ */
+function renderProgramsList() {
+    const { programs } = calendarState.getState();
+    const searchTerm = dom.searchBar.value.toLowerCase();
+    
+    // Filter programs
+    const filtered = programs.filter(prog => 
+        prog.title.toLowerCase().includes(searchTerm) ||
+        (prog.description && prog.description.toLowerCase().includes(searchTerm))
+    );
+    
+    // Create programs section
+    const programsSection = document.createElement('div');
+    programsSection.className = 'mt-8';
+    programsSection.innerHTML = `
+        <div class="flex items-center justify-between mb-4 cursor-pointer" id="programsHeader">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Programe</h2>
+            <div class="flex items-center gap-2">
+                <button id="addProgramBtn" class="btn btn-primary flex items-center gap-2 px-3 py-2 text-sm" onclick="event.stopPropagation()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m-7-7h14"/></svg>
+                    <span>Adaugă Program</span>
+                </button>
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform" id="programsChevron">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+        </div>
+        <div id="programsListContainer" class="hidden space-y-3">
+            ${filtered.length === 0 ? 
+                '<div class="text-center py-8 text-gray-500">Nu există programe.</div>' :
+                filtered.map(prog => `
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">${prog.title}</h3>
+                        ${prog.description ? `<p class="text-sm text-gray-500 dark:text-gray-400 mt-1">${prog.description}</p>` : ''}
+                    </div>
+                `).join('')
+            }
+        </div>
+    `;
+    
+    // Add toggle functionality
+    setTimeout(() => {
+        const header = document.getElementById('programsHeader');
+        const container = document.getElementById('programsListContainer');
+        const chevron = document.getElementById('programsChevron');
+        
+        if (header && container && chevron) {
+            header.addEventListener('click', () => {
+                container.classList.toggle('hidden');
+                chevron.classList.toggle('rotate-180');
+            });
+        }
+        
+        // Add click handler for add program button
+        const addProgramBtn = document.getElementById('addProgramBtn');
+        if (addProgramBtn) {
+            addProgramBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                showCustomAlert('Funcționalitatea de adăugare programe va fi implementată în viitor.', 'În dezvoltare');
+            });
+        }
+    }, 0);
+    
+    return programsSection;
 }
 
 /**
@@ -133,7 +245,7 @@ function createEventTypeCard(type) {
 function openModal(type = null) {
     if (type) {
         // Edit mode
-        dom.modalTitle.textContent = 'Editează Tip Eveniment';
+        dom.modalTitle.textContent = 'Editează Serviciu';
         dom.originalId.value = type.id;
         dom.idField.value = type.id;
         dom.idField.disabled = true; // ID nu se poate schimba
@@ -144,7 +256,7 @@ function openModal(type = null) {
         dom.deleteBtn.style.display = 'inline-flex';
     } else {
         // Add mode
-        dom.modalTitle.textContent = 'Adaugă Tip Eveniment';
+        dom.modalTitle.textContent = 'Adaugă Serviciu';
         dom.form.reset();
         dom.originalId.value = '';
         dom.idField.disabled = false;
