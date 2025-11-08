@@ -19,6 +19,7 @@ const state = {
     clients: [],
     events: [],
     programs: [],
+    eventTypes: [], // <-- NOU: Adăugat
     evolutionData: {},
     billingsData: {},
 
@@ -30,6 +31,7 @@ const state = {
     editingEventId: null,
     editingMemberId: null,
     editingClientId: null,
+    editingEventTypeId: null, // <-- NOU: Adăugat
     
     // Starea selecției din modalul de evenimente
     selectedClientIds: new Set(),
@@ -55,6 +57,7 @@ export const calendarState = {
         state.teamMembers = data.teamMembers || [];
         state.clients = data.clients || [];
         state.events = data.events || [];
+        state.eventTypes = data.event_types || []; // <-- NOU: Preluare din loadData
         // Setează filtrele active inițiale ca fiind toți membrii echipei
         state.activeFilters = state.teamMembers.map(m => m.id);
     },
@@ -71,6 +74,13 @@ export const calendarState = {
      */
     setPrograms: (programs) => {
         state.programs = programs || [];
+    },
+
+    /**
+     * NOU: Setează tipurile de evenimente (dacă sunt încărcate separat)
+     */
+    setEventTypes: (types) => {
+        state.eventTypes = types || [];
     },
 
     /**
@@ -135,7 +145,6 @@ export const calendarState = {
     },
     
     // --- Getters (funcții de citire a datelor) ---
-    // Aceștia vor înlocui logica de filtrare din interiorul funcțiilor de randare
     
     /**
      * Returnează evenimentele filtrate pentru o anumită dată.
@@ -205,6 +214,13 @@ export const calendarState = {
         return state.programs.find(p => String(p.id) === String(id));
     },
 
+    /**
+     * NOU: Returnează un tip de eveniment după ID.
+     */
+    getEventTypeById: (id) => {
+        return state.eventTypes.find(t => t.id === id);
+    },
+
     // --- Funcții pentru starea modalelor ---
     
     /**
@@ -246,7 +262,6 @@ export const calendarState = {
     },
     
     // --- CRUD (Create, Read, Update, Delete) pentru date ---
-    // Aceste funcții vor înlocui manipularea directă a array-urilor
     
     /**
      * Adaugă sau actualizează un eveniment (sau mai multe, pt. recurență).
@@ -301,7 +316,6 @@ export const calendarState = {
      */
     updateRecurringEvents: (originalEvent, newEventBaseData) => {
         // Define criteria to find matching recurring events
-        // Based on deleteRecurringEvents logic
         const criteria = {
             name: originalEvent.name,
             teamMemberIds: originalEvent.teamMemberIds || (originalEvent.teamMemberId ? [originalEvent.teamMemberId] : []),
@@ -310,12 +324,10 @@ export const calendarState = {
             repeating: originalEvent.repeating
         };
 
-        // Normalize criteria teamMemberIds for comparison
         const criteriaTeamIds = JSON.stringify(criteria.teamMemberIds.sort());
         const criteriaRepeating = JSON.stringify((criteria.repeating || []).map(d => parseInt(d)).sort());
 
         state.events.forEach((event, index) => {
-            // Check if this event matches the original criteria
             const eventTeamIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
             const eventRepeating = (event.repeating || []).map(d => parseInt(d));
 
@@ -327,14 +339,11 @@ export const calendarState = {
                 JSON.stringify(eventRepeating.sort()) === criteriaRepeating;
 
             if (matches) {
-                // Found a matching event in the series. Update it.
-                // Preserve the original event's ID and Date
-                // Apply all other new data from the form
                 state.events[index] = {
-                    ...event, // Preserves id, date, attendance, programScores, comments
-                    ...newEventBaseData, // Applies new name, details, type, time, duration, members, clients, programs, repeating
-                    id: event.id, // Explicitly preserve ID
-                    date: event.date // Explicitly preserve Date
+                    ...event, 
+                    ...newEventBaseData, 
+                    id: event.id, 
+                    date: event.date 
                 };
             }
         });
@@ -347,12 +356,10 @@ export const calendarState = {
     saveTeamMember: (memberData) => {
         const index = state.teamMembers.findIndex(m => m.id === memberData.id);
         if (index > -1) {
-            // Editare
             state.teamMembers[index] = { ...state.teamMembers[index], ...memberData };
         } else {
-            // Adăugare
             state.teamMembers.push(memberData);
-            state.activeFilters.push(memberData.id); // Activează filtrul by default
+            state.activeFilters.push(memberData.id); 
         }
     },
     
@@ -363,18 +370,14 @@ export const calendarState = {
     deleteTeamMember: (memberId) => {
         state.teamMembers = state.teamMembers.filter(m => m.id !== memberId);
         
-        // Elimină membrul din evenimente
         state.events = state.events.map(event => {
-            // Formatul nou
             if (event.teamMemberIds) {
                 event.teamMemberIds = event.teamMemberIds.filter(id => id !== memberId);
             }
-            // Formatul vechi
             if (event.teamMemberId === memberId) {
                 delete event.teamMemberId;
             }
             return event;
-        // La final, filtrează evenimentele care au rămas fără niciun terapeut
         }).filter(event => (event.teamMemberIds && event.teamMemberIds.length > 0) || event.teamMemberId);
         
         state.activeFilters = state.activeFilters.filter(id => id !== memberId);
@@ -385,70 +388,58 @@ export const calendarState = {
      * @param {object} clientData - Datele clientului (include ID)
      */
     saveClient: (clientData) => {
-        // Verifică dacă suntem în modul de editare (dacă state.editingClientId este setat)
         const originalId = state.editingClientId;
         const newId = clientData.id;
 
         if (originalId) {
             // --- MOD EDITARE ---
-            // Caută clientul după ID-ul original
             const index = state.clients.findIndex(c => c.id === originalId);
             
             if (index > -1) {
-                // Actualizează clientul în array-ul 'clients'
-                state.clients[index] = { ...state.clients[index], ...clientData }; // Acest pas actualizează și ID-ul dacă a fost schimbat
+                state.clients[index] = { ...state.clients[index], ...clientData }; 
 
-                // Verifică dacă ID-ul a fost schimbat
                 if (originalId !== newId) {
                     // --- ID-ul s-a schimbat, trebuie migrate datele ---
                     
-                    // 1. Migrează datele din evolutionData (evaluări)
+                    // 1. Migrează datele din evolutionData
                     const legacyOriginalId = `client_${originalId}`;
                     if (state.evolutionData[originalId]) {
                         state.evolutionData[newId] = state.evolutionData[originalId];
                         delete state.evolutionData[originalId];
                     }
-                    // Verifică și cheia veche
                     if (state.evolutionData[legacyOriginalId]) {
                         state.evolutionData[newId] = state.evolutionData[legacyOriginalId];
                         delete state.evolutionData[legacyOriginalId];
                     }
-                    
-                    // De asemenea, actualizează numele în datele de evoluție migrate
                     if (state.evolutionData[newId]) {
                         state.evolutionData[newId].name = clientData.name;
                     }
                     
-                    // 2. Migrează referințele din 'events' (istoricul programelor)
+                    // 2. Migrează referințele din 'events'
                     state.events.forEach(event => {
-                        // Câmpul vechi (dacă există)
                         if (event.clientId === originalId) {
                             event.clientId = newId;
                         }
-                        // Câmpul nou (array)
                         if (event.clientIds && event.clientIds.includes(originalId)) {
                             event.clientIds = event.clientIds.map(id => id === originalId ? newId : id);
                         }
                     });
 
-                    // 3. (MODIFICAT) Migrează datele din billingsData (plăți)
+                    // 3. Migrează datele din billingsData
                     if (state.billingsData[originalId]) {
                         state.billingsData[newId] = state.billingsData[originalId];
                         delete state.billingsData[originalId];
                     }
-                    // Verifică și cheia veche
                     if (state.billingsData[legacyOriginalId]) {
                         state.billingsData[newId] = state.billingsData[legacyOriginalId];
                         delete state.billingsData[legacyOriginalId];
                     }
                 }
             } else {
-                // Fallback: dacă clientul original nu e găsit, adaugă-l ca nou
                 state.clients.push(clientData);
             }
         } else {
             // --- MOD ADĂUGARE NOU ---
-            // Verifică să nu existe deja (deși main.js face asta, e bine să fie și aici)
             const index = state.clients.findIndex(c => c.id === newId);
             if (index === -1) { 
                 state.clients.push(clientData);
@@ -461,19 +452,14 @@ export const calendarState = {
      * @param {string} clientId - ID-ul clientului
      */
     deleteClient: (clientId) => {
-        // --- CORECȚIE BUG EVENIMENTE ORFANE ---
-        
         // 1. Șterge clientul din lista principală
         state.clients = state.clients.filter(c => c.id !== clientId);
 
         // 2. Modifică/Filtrează evenimentele
         state.events = state.events.map(event => {
-            // Elimină referința din câmpul vechi (dacă există)
             if (event.clientId === clientId) {
                 delete event.clientId;
             }
-            
-            // Elimină referința din câmpul nou (array)
             if (event.clientIds && event.clientIds.includes(clientId)) {
                 event.clientIds = event.clientIds.filter(id => id !== clientId);
             }
@@ -481,10 +467,13 @@ export const calendarState = {
         }).filter(event => {
             // 3. FILTRU NOU: Șterge evenimentul dacă nu mai are clienți
             
-            // Păstrează evenimentele care nu sunt de tip 'terapie' (ex: pauză, ședință)
-            // chiar dacă nu au client
-            if (event.type !== 'therapy' && event.type !== 'group-therapy') {
-                return true; 
+            // (MODIFICAT) Verifică tipul dinamic
+            const eventType = calendarState.getEventTypeById(event.type);
+            // Presupune că e facturabil (necesită client) dacă tipul nu e găsit
+            const requiresClient = eventType ? eventType.isBillable : true; 
+
+            if (!requiresClient) {
+                return true; // Păstrează evenimente non-facturabile (ședință, pauză)
             }
             
             // Verifică ambele câmpuri (vechi și nou)
@@ -496,31 +485,45 @@ export const calendarState = {
         });
         
         // --- SFÂRȘIT CORECȚIE ---
-
         
-        // Șterge și datele de evoluție și facturare, verificând ambele formate
+        // Șterge și datele de evoluție și facturare
         const legacyClientId = `client_${clientId}`;
+        if (state.evolutionData[clientId]) delete state.evolutionData[clientId];
+        if (state.evolutionData[legacyClientId]) delete state.evolutionData[legacyClientId];
+        if (state.billingsData[clientId]) delete state.billingsData[clientId];
+        if (state.billingsData[legacyClientId]) delete state.billingsData[legacyClientId];
+    },
 
-        if (state.evolutionData[clientId]) {
-            delete state.evolutionData[clientId];
-        }
-        if (state.evolutionData[legacyClientId]) {
-            delete state.evolutionData[legacyClientId];
-        }
-
-        if (state.billingsData[clientId]) {
-            delete state.billingsData[clientId];
-        }
-        if (state.billingsData[legacyClientId]) {
-            delete state.billingsData[legacyClientId];
+    /**
+     * NOU: Salvează un tip de eveniment.
+     * @param {object} typeData - Datele tipului (include ID)
+     */
+    saveEventType: (typeData) => {
+        const index = state.eventTypes.findIndex(t => t.id === typeData.id);
+        if (index > -1) {
+            // Editare
+            state.eventTypes[index] = { ...state.eventTypes[index], ...typeData };
+        } else {
+            // Adăugare
+            state.eventTypes.push(typeData);
         }
     },
 
     /**
-     * Setează starea de editare pentru un membru/client.
+     * NOU: Șterge un tip de eveniment.
+     * @param {string} typeId - ID-ul tipului
      */
-    setEditingId: ({ memberId, clientId }) => {
+    deleteEventType: (typeId) => {
+        state.eventTypes = state.eventTypes.filter(t => t.id !== typeId);
+        // Notă: Nu ștergem evenimentele asociate, ele vor afișa ID-ul
+    },
+
+    /**
+     * Setează starea de editare pentru un membru/client/tip.
+     */
+    setEditingId: ({ memberId, clientId, eventTypeId }) => {
         if (memberId !== undefined) state.editingMemberId = memberId;
         if (clientId !== undefined) state.editingClientId = clientId;
+        if (eventTypeId !== undefined) state.editingEventTypeId = eventTypeId; // <-- NOU
     }
 };

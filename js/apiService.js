@@ -81,7 +81,7 @@ async function apiFetch(path, options = {}) {
 // --- Metode API Publice (Exportate) ---
 
 /**
- * Încarcă datele principale (teamMembers, clients, events).
+ * Încarcă datele principale (teamMembers, clients, events, event_types).
  * Apel GET la api.php?path=data
  */
 export async function loadData() {
@@ -166,4 +166,30 @@ export async function saveBillingsData(data) {
         body: JSON.stringify(data)
     };
     return apiFetch('billings', options);
+}
+
+// --- NOU: API PENTRU TIPURI DE EVENIMENTE ---
+
+// --- NOU: API PENTRU TIPURI DE EVENIMENTE ---
+
+/**
+ * Încarcă tipurile de evenimente (din DB).
+ * Apel GET la api.php?path=event_types
+ */
+export async function loadEventTypes() {
+    return apiFetch('event_types');
+}
+
+/**
+ * Salvează tipurile de evenimente (în DB).
+ * Apel POST la api.php?path=event_types
+ * @param {Array} typesArray - Array-ul complet de tipuri de evenimente
+ */
+export async function saveEventTypes(typesArray) {
+    const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(typesArray)
+    };
+    return apiFetch('event_types', options);
 }

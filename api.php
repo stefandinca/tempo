@@ -138,7 +138,22 @@ try {
                 // 2. Obține clients
                 $data['clients'] = $pdo->query("SELECT * FROM clients")->fetchAll();
 
-                // 3. Obține events și legăturile lor (folosind GROUP_CONCAT)
+                // 3. (MODIFICAT) Obține event_types
+                // Convertim TINYINT(1) în boolean pentru JS
+                $data['event_types'] = $pdo->query("
+                    SELECT id, label, 
+                           CAST(isBillable AS UNSIGNED) as isBillable, 
+                           CAST(requiresTime AS UNSIGNED) as requiresTime 
+                    FROM event_types
+                ")->fetchAll(PDO::FETCH_ASSOC);
+
+                // Convertim valorile numerice în boolean
+                foreach ($data['event_types'] as &$type) {
+                    $type['isBillable'] = (bool)$type['isBillable'];
+                    $type['requiresTime'] = (bool)$type['requiresTime'];
+                }
+
+                // 4. Obține events și legăturile lor
                 $stmt = $pdo->query("
                     SELECT 
                         e.*,
@@ -160,21 +175,16 @@ try {
                     $event['teamMemberIds'] = $event['teamMemberIds'] ? explode(',', $event['teamMemberIds']) : [];
                     $event['clientIds'] = $event['clientIds'] ? explode(',', $event['clientIds']) : [];
                     $event['programIds'] = $event['programIds'] ? explode(',', $event['programIds']) : [];
-                    $event['repeating'] = $event['repeating'] ? array_map('intval', json_decode($event['repeating'])) : [];                    // Convertim 'isPublic' și 'isBillable' înapoi în boolean pentru JS
+                    $event['repeating'] = $event['repeating'] ? array_map('intval', json_decode($event['repeating'])) : [];
                     $event['attendance'] = $event['attendance'] ? json_decode($event['attendance'], true) : new stdClass();
                     $event['isPublic'] = (bool)$event['isPublic'];
                     $event['isBillable'] = (bool)$event['isBillable'];
-
-                    // === IMPROVED TIME FORMAT CORRECTION ===
-                    // MySQL returns TIME as hh:mm:ss, but JavaScript expects hh:mm
-                    // We MUST trim the seconds to ensure proper event positioning
+                    
                     if (!empty($event['startTime'])) {
-                        // Check if the time has seconds (length > 5 means it's hh:mm:ss format)
                         if (strlen($event['startTime']) > 5) {
                             $event['startTime'] = substr($event['startTime'], 0, 5);
                         }
                     }
-                    // === END TIME FORMAT CORRECTION ===
                 }
 
                 $data['events'] = $events;
@@ -184,6 +194,7 @@ try {
             // CAZUL 'data' (POST) - Salvează totul în DB (Metoda Truncate)
             // ==========================================================
             } elseif ($method === 'POST') {
+                // (NEMODIFICAT - salvează clients, team_members, events)
                 if ($input === null) {
                     sendError('Invalid JSON data', 400);
                 }
@@ -192,8 +203,6 @@ try {
                 try {
                     $pdo->beginTransaction();
 
-                    // 1. Șterge datele vechi (cu TRUNCATE pentru a reseta și auto-increment, dar necesită permisiuni)
-                    // Folosim DELETE pentru compatibilitate mai largă cu cheile străine
                     $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
                     $pdo->exec("DELETE FROM event_team_members;");
                     $pdo->exec("DELETE FROM event_clients;");
@@ -201,35 +210,30 @@ try {
                     $pdo->exec("DELETE FROM events;");
                     $pdo->exec("DELETE FROM clients;");
                     $pdo->exec("DELETE FROM team_members;");
+                    // NOTĂ: NU ștergem event_types aici. Se gestionează separat.
                     $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
 
-                    // 2. Inserează team_members
                     $stmt_team = $pdo->prepare("INSERT INTO team_members (id, name, color, initials, role) VALUES (?, ?, ?, ?, ?)");
                     foreach ($input['teamMembers'] as $m) {
                         $stmt_team->execute([$m['id'], $m['name'], $m['color'], $m['initials'], $m['role']]);
                     }
 
-                    // 3. Inserează clients
                     $stmt_client = $pdo->prepare("INSERT INTO clients (id, name, email, phone, birthDate, medical) VALUES (?, ?, ?, ?, ?, ?)");
                     foreach ($input['clients'] as $c) {
-                        // Asigură-te că data este null dacă e goală
                         $birthDate = !empty($c['birthDate']) ? $c['birthDate'] : null;
                         $stmt_client->execute([$c['id'], $c['name'], $c['email'], $c['phone'], $birthDate, $c['medical'] ?? '']);
                     }
 
-                    // 4. Inserează events și joncțiunile
                     $stmt_evt = $pdo->prepare("INSERT INTO events (id, name, details, type, date, startTime, duration, isPublic, isBillable, repeating_json, comments, attendance) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                     $stmt_evt_team = $pdo->prepare("INSERT INTO event_team_members (event_id, team_member_id) VALUES (?, ?)");
                     $stmt_evt_client = $pdo->prepare("INSERT INTO event_clients (event_id, client_id) VALUES (?, ?)");
                     $stmt_evt_prog = $pdo->prepare("INSERT INTO event_programs (event_id, program_id) VALUES (?, ?)");
 
                     foreach ($input['events'] as $e) {
-                        // === ENSURE TIME FORMAT IS hh:mm BEFORE SAVING ===
                         $startTime = $e['startTime'] ?? null;
                         if ($startTime && strlen($startTime) > 5) {
                             $startTime = substr($startTime, 0, 5);
                         }
-                        // === END TIME FORMAT CHECK ===
                         
                         $stmt_evt->execute([
                             $e['id'], $e['name'] ?? null, $e['details'] ?? null, $e['type'] ?? 'therapy', 
@@ -257,13 +261,69 @@ try {
                 sendError('Unsupported method', 405);
             }
             break;
+            
+       // ==========================================================
+        // CAZUL 'event_types' (ACESTA ESTE BLOCUL NECESAR)
+        // ==========================================================
+        case 'event_types':
+            if ($method === 'GET') {
+                // Obține toate tipurile de evenimente
+                $data = $pdo->query("SELECT * FROM event_types")->fetchAll();
+                
+                // Convertește valorile numerice în boolean pentru JS
+                foreach ($data as &$type) {
+                    $type['isBillable'] = (bool)$type['isBillable'];
+                    $type['requiresTime'] = (bool)$type['requiresTime'];
+                }
+                sendResponse($data);
+
+            } elseif ($method === 'POST') {
+                if ($input === null) {
+                    sendError('Invalid JSON data for event types', 400);
+                }
+                debugLog("Salvare 'event_types'. Se salvează " . count($input) . " tipuri.");
+
+                try {
+                    $pdo->beginTransaction();
+                    
+                    // Golește tabelul
+                    $pdo->exec("DELETE FROM event_types;");
+                    
+                    // Pregătește statement-ul
+                    $stmt = $pdo->prepare("INSERT INTO event_types (id, label, isBillable, requiresTime) VALUES (?, ?, ?, ?)");
+                    
+                    // Inserează datele noi
+                    foreach ($input as $type) {
+                        $stmt->execute([
+                            $type['id'],
+                            $type['label'],
+                            (int)$type['isBillable'], // Convertește boolean înapoi în int
+                            (int)$type['requiresTime']
+                        ]);
+                    }
+                    
+                    $pdo->commit();
+                    debugLog("Salvare 'event_types' reușită.");
+                    sendResponse(['success' => true, 'message' => 'Event types saved']);
+                } catch (Exception $e) {
+                    if ($pdo->inTransaction()) {
+                        $pdo->rollBack();
+                    }
+                    debugLog("EROARE DB la salvarea 'event_types': " . $e->getMessage());
+                    sendError('Failed to write event types data: ' . $e->getMessage());
+                }
+            } else {
+                 // Adaugă acest 'else' pentru a prinde alte metode (cum ar fi PUT, DELETE etc.)
+                 sendError('Unsupported method. Only GET and POST are allowed for event_types.', 405);
+            }
+            break; // Nu uita de 'break'!
 
         // ==========================================================
-        // CAZUL 'evolution'
+        // CAZUL 'evolution' (NEMODIFICAT)
         // ==========================================================
         case 'evolution':
             if ($method === 'GET') {
-                $evolutionData = new stdClass(); // Inițializează ca obiect gol
+                $evolutionData = new stdClass(); 
 
                 // 1. Portage
                 $stmt_portage = $pdo->query("SELECT * FROM portage_evaluations");
@@ -330,25 +390,19 @@ try {
                 debugLog("Salvare 'evolution'. Se primesc date pentru " . count($input) . " clienți.");
                 
                 try {
-                    // 1. Obține ID-uri valide DOAR pentru programe (necesar pentru program_history)
                     $valid_program_ids = $pdo->query("SELECT id FROM programs")->fetchAll(PDO::FETCH_COLUMN, 0);
-
                     $pdo->beginTransaction();
-                    
-                    // 2. Șterge datele vechi
                     $pdo->exec("DELETE FROM portage_evaluations;");
                     $pdo->exec("DELETE FROM program_history;");
                     $pdo->exec("DELETE FROM logopedic_evaluations;");
                     $pdo->exec("DELETE FROM monthly_themes;");
                     debugLog("Tabelele de evoluție au fost golite.");
 
-                    // 3. Pregătește statement-urile
                     $stmt_portage = $pdo->prepare("INSERT INTO portage_evaluations (client_id, domain, eval_date, score) VALUES (?, ?, ?, ?)");
                     $stmt_history = $pdo->prepare("INSERT INTO program_history (client_id, event_id, program_id, score, eval_date) VALUES (?, ?, ?, ?, ?)");
                     $stmt_logo = $pdo->prepare("INSERT INTO logopedic_evaluations (client_id, eval_date, scores_json, comments) VALUES (?, ?, ?, ?)");
                     $stmt_theme = $pdo->prepare("INSERT INTO monthly_themes (client_id, month_key, theme_text) VALUES (?, ?, ?)");
 
-                    // 4. Inserează datele noi (fără validare client_id)
                     foreach ($input as $clientId => $data) {
                         debugLog("Se procesează evoluția pentru client: $clientId");
                         
@@ -386,17 +440,15 @@ try {
             break;
 
         // ==========================================================
-        // CAZUL 'billings'
+        // CAZUL 'billings' (NEMODIFICAT)
         // ==========================================================
         case 'billings':
             if ($method === 'GET') {
                 $stmt = $pdo->query("SELECT * FROM payments ORDER BY payment_date ASC");
-                // (MODIFICAT) Inițializează ca obiect
                 $billingsData = new stdClass(); 
                 while ($row = $stmt->fetch()) {
                     $clientId = $row['client_id'];
                     $monthKey = $row['month_key'];
-                    // (MODIFICAT) Folosește sintaxa de obiect
                     if (!isset($billingsData->$clientId)) $billingsData->$clientId = new stdClass();
                     if (!isset($billingsData->$clientId->$monthKey)) $billingsData->$clientId->$monthKey = [];
                     
@@ -451,34 +503,23 @@ try {
             break;
 
         // ==========================================================
-        // CAZURILE .json (programs, portrige)
+        // CAZURILE .json (programs, portrige) - (NEMODIFICATE)
         // ==========================================================
         case 'programs':
             $programs = $pdo->query("SELECT * FROM programs")->fetchAll();
-            // Recreează formatul JSON original
             sendResponse(['programs' => $programs]);
             break;
 
         case 'portrige.json':
-            // portrige.json este static, îl citim direct din fișier ca înainte
             $file = __DIR__ . '/portrige.json';
             if (file_exists($file)) {
-                setNoCacheHeaders(); // Simplu, fără validare ETag
+                setNoCacheHeaders(); 
                 header('Content-Type: application/json; charset=utf-8');
                 readfile($file);
                 exit();
             } else {
                 sendError('JSON file not found: ' . $path, 404);
             }
-            break;
-
-        // ==========================================================
-        // ENDPOINT-URI VECHI (Dezactivate, acum gestionate de 'POST /data')
-        // ==========================================================
-        case 'events':
-        case 'clients':
-        case 'team':
-            sendError('This endpoint is deprecated. Use GET/POST on "data" endpoint.', 404);
             break;
 
         // ==========================================================
@@ -489,7 +530,6 @@ try {
     }
 
 } catch (Exception $e) {
-            // Verifică dacă tranzacția e activă înainte de rollback
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }

@@ -188,6 +188,7 @@ export function openEventModal(eventId) {
     populateTeamMemberCheckboxes();
     populateClientCheckboxes('');
     populateProgramCheckboxes('');
+    populateEventTypesDropdown();
     
     ['repeatMon', 'repeatTue', 'repeatWed', 'repeatThu', 'repeatFri'].forEach(id => {
         if ($(id)) $(id).checked = false;
@@ -1082,8 +1083,11 @@ export function updateEventTitle() {
 export function updateEventTypeDependencies(eventType) {
     const startTimeField = $('startTime');
     const durationField = $('duration');
-    
-    const isRequired = !(eventType === 'day-off');
+
+    // Obține detaliile tipului din state
+    const type = calendarState.getEventTypeById(eventType);
+    const isRequired = type ? type.requiresTime : true; // Presupune că necesită timp dacă tipul nu e găsit
+    const isBillable = type ? type.isBillable : true; // Presupune că e facturabil
 
     [startTimeField, durationField].forEach(field => {
         if(field) {
@@ -1096,10 +1100,10 @@ export function updateEventTypeDependencies(eventType) {
             }
         }
     });
-    
+
     const isBillableCheckbox = $('isBillable');
     if (isBillableCheckbox) {
-        isBillableCheckbox.checked = !(eventType === 'pauza-masa' || eventType === 'sedinta' || eventType === 'day-off');
+        isBillableCheckbox.checked = isBillable;
     }
 }
 
@@ -1134,22 +1138,105 @@ function calculateEndTime(startTime, durationMinutes) {
 }
 
 function getEventTypeLabel(type) {
-    const types = {
-        'therapy': 'Terapie',
-        'group-therapy': 'Terapie de grup',
-        'logopedie': 'Logopedie',
-        'coordination': 'Coordonare',
-        'day-off': 'Zi libera',
-        'pauza-masa': 'Pauza de masa',
-        'sedinta': 'Sedinta',
-        'evaluare':'Evaluare',
-        'psihoterapie':'Psihoterapie',
-        'dezvoltare-personala':'Dezvoltare personala'
-    };
-    return types[type] || type;
+    const eventType = calendarState.getEventTypeById(type);
+    return eventType ? eventType.label : type; // Afișează ID-ul dacă eticheta nu e găsită
 }
 
 function getRoleLabel(role) {
     const roles = { 'therapist': 'Terapeut', 'coordinator': 'Coordonator', 'admin': 'Admin' };
     return roles[role] || role;
+}
+
+/**
+ * NOU: Populează dropdown-ul de tipuri de evenimente dinamic
+ */
+function populateEventTypesDropdown() {
+    const { eventTypes } = calendarState.getState();
+    const select = $('eventType');
+    if (!select) return;
+
+    select.innerHTML = ''; // Golește opțiunile vechi
+
+    if (eventTypes.length === 0) {
+        select.innerHTML = '<option value="">Eroare: Nu sunt tipuri definite</option>';
+        return;
+    }
+
+    eventTypes.forEach(type => {
+        const option = document.createElement('option');
+        option.value = type.id;
+        option.textContent = type.label;
+        select.appendChild(option);
+    });
+}
+
+// --- NOU: Management UI pentru Tipuri de Evenimente ---
+
+export function renderEventTypesList() {
+    const { eventTypes } = calendarState.getState();
+    const container = $('eventTypesList');
+    if (!container) return;
+
+    container.innerHTML = '<h3>Tipuri de Evenimente</h3>';
+
+    if (!eventTypes || eventTypes.length === 0) {
+        container.innerHTML += '<p class="empty-list-message">Nu există tipuri de evenimente definite.</p>';
+        return;
+    }
+
+    // Reutilizăm stilurile de la .team-member-card
+    eventTypes.forEach(type => {
+        const card = document.createElement('div');
+        card.className = 'team-member-card'; // Reutilizare stil
+        card.innerHTML = `
+            <div class="team-member-card-content">
+                <div class="team-member-info">
+                    <div class="team-member-details">
+                        <div class="team-member-name">${type.label}</div>
+                        <div class="team-member-role">
+                            ID: ${type.id} | 
+                            ${type.isBillable ? 'Facturabil' : 'Nefacturabil'} | 
+                            ${type.requiresTime ? 'Necesită Timp' : 'Fără Timp'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="team-member-actions" data-type-id="${type.id}">
+                <button class="btn-icon btn-action" data-action="editeaza" title="Editează">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button class="btn-icon btn-action btn-delete" data-action="sterge" title="Șterge">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                </button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+export function resetEventTypeForm() {
+    $('eventTypeForm').reset();
+    $('eventTypeFormTitle').textContent = 'Adaugă Tip Eveniment';
+    $('eventTypeId').disabled = false; // Permite editarea ID-ului la adăugare
+    $('deleteEventTypeBtn').style.display = 'none';
+    $('eventTypeIsBillable').checked = true;
+    $('eventTypeRequiresTime').checked = true;
+    calendarState.setEditingId({ eventTypeId: null });
+}
+
+export function editEventTypeInModal(typeId) {
+    const type = calendarState.getEventTypeById(typeId);
+    if (!type) return;
+
+    calendarState.setEditingId({ eventTypeId: typeId });
+    $('eventTypeFormTitle').textContent = 'Editează Tip Eveniment';
+
+    $('eventTypeId').value = type.id;
+    $('eventTypeId').disabled = true; // ID-ul nu poate fi schimbat
+    $('eventTypeLabel').value = type.label;
+    $('eventTypeIsBillable').checked = type.isBillable;
+    $('eventTypeRequiresTime').checked = type.requiresTime;
+
+    $('deleteEventTypeBtn').style.display = 'inline-block';
+    $('eventTypeForm').scrollIntoView({ behavior: 'smooth' });
 }

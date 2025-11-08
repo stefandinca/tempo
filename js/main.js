@@ -29,6 +29,12 @@ const dom = {
     teamSection: $('teamSection'),
     dashboardSection: $('dashboardSection'),
     billingSection: $('billingSection'),
+
+    // Secțiune Echipă (Adăugare)
+        eventTypeForm: $('eventTypeForm'),
+        deleteEventTypeBtn: $('deleteEventTypeBtn'),
+        cancelEventTypeBtn: $('cancelEventTypeBtn'),
+        eventTypesList: $('eventTypesList'),
     
     // Calendar
     currentPeriod: $('currentPeriod'),
@@ -774,6 +780,74 @@ async function handleDeleteTeamMember() {
     }
 }
 
+// --- Handlers NOU: Tipuri de Evenimente ---
+
+async function handleSaveEventType(e) {
+    e.preventDefault();
+    const { editingEventTypeId } = calendarState.getState();
+
+    // Doar adminii pot modifica
+    if (!auth.isAdmin()) {
+        auth.showPermissionDenied('gestionați tipurile de evenimente');
+        return;
+    }
+
+    const formData = new FormData(e.target);
+    const typeId = formData.get('eventTypeId').toLowerCase().replace(/\s+/g, '-');
+
+    if (!typeId) {
+        ui.showCustomAlert('ID-ul este obligatoriu și nu poate conține spații.', 'ID Invalid');
+        return;
+    }
+
+    // Verifică dacă ID-ul s-a schimbat în timpul editării
+    if (editingEventTypeId && editingEventTypeId !== typeId) {
+        ui.showCustomAlert('Nu puteți schimba ID-ul unui tip de eveniment existent.', 'Editare Eșuată');
+        $('eventTypeId').value = editingEventTypeId; // Resetează ID-ul
+        return;
+    }
+
+    const typeData = {
+        id: typeId,
+        label: formData.get('eventTypeLabel'),
+        isBillable: formData.has('eventTypeIsBillable'),
+        requiresTime: formData.has('eventTypeRequiresTime')
+    };
+
+    // Salvează în starea locală
+    calendarState.saveEventType(typeData);
+
+    // Salvează pe server
+    await api.saveEventTypes(calendarState.getState().eventTypes);
+
+    window.logActivity(editingEventTypeId ? "Tip eveniment actualizat" : "Tip eveniment adăugat", typeData.label, 'generic');
+
+    ui.renderEventTypesList();
+    ui.resetEventTypeForm();
+}
+
+async function handleDeleteEventType() {
+    const { editingEventTypeId } = calendarState.getState();
+
+    if (!auth.isAdmin()) {
+        auth.showPermissionDenied('ștergeți tipurile de evenimente');
+        return;
+    }
+    if (!editingEventTypeId) return;
+
+    const confirmed = await ui.showCustomConfirm(
+        `Ești sigur că vrei să ștergi tipul "${editingEventTypeId}"? Evenimentele existente de acest tip nu vor fi șterse, dar nu vor mai putea fi editate corect.`,
+        'Șterge Tip Eveniment'
+    );
+
+    if (confirmed) {
+        calendarState.deleteEventType(editingEventTypeId);
+        await api.saveEventTypes(calendarState.getState().eventTypes);
+        ui.renderEventTypesList();
+        ui.resetEventTypeForm();
+    }
+}
+
 // --- Handlers pentru Acțiuni pe Carduri (Event Delegation) ---
 
 function setupAdminListeners() {
@@ -795,6 +869,28 @@ function setupAdminListeners() {
                 case 'sterge': 
                     calendarState.setEditingId({ clientId });
                     handleDeleteClient();
+                    break;
+            }
+        });
+
+
+    }
+
+    // NOU: Secțiunea Tipuri de Evenimente
+    if (dom.eventTypesList) {
+        dom.eventTypesList.addEventListener('click', (e) => {
+            const actionBtn = e.target.closest('.btn-action');
+            if (!actionBtn) return;
+
+            const action = actionBtn.dataset.action;
+            const typeId = actionBtn.closest('.team-member-actions').dataset.typeId; // Reutilizăm clasa
+            if (!typeId) return;
+
+            switch (action) {
+                case 'editeaza': ui.editEventTypeInModal(typeId); break;
+                case 'sterge':
+                    calendarState.setEditingId({ eventTypeId: typeId });
+                    handleDeleteEventType();
                     break;
             }
         });
@@ -824,6 +920,8 @@ function setupAdminListeners() {
 
 
 // --- Funcții Helper ---
+
+
 
 function createRecurringEvents(eventBase) {
     const events = [];
@@ -1175,6 +1273,8 @@ async function init() {
         calendarState.setPrograms(programsData.programs);
         const evolutionData = await api.loadEvolutionData();
         calendarState.setEvolutionData(evolutionData);
+        const eventTypesData = await api.loadEventTypes();
+        calendarState.setEventTypes(eventTypesData);
 
         // Încărcare date facturare
     try {
@@ -1276,6 +1376,11 @@ async function init() {
         });
     }
 
+    // Secțiunea Tipuri de Evenimente (NOU)
+    if (dom.eventTypeForm) dom.eventTypeForm.addEventListener('submit', handleSaveEventType);
+    if (dom.deleteEventTypeBtn) dom.deleteEventTypeBtn.addEventListener('click', handleDeleteEventType);
+    if (dom.cancelEventTypeBtn) dom.cancelEventTypeBtn.addEventListener('click', ui.resetEventTypeForm);
+
     // Secțiunea Client (with null checks)
     if (dom.clientForm) dom.clientForm.addEventListener('submit', handleSaveClient);
     if (dom.deleteClientBtn) dom.deleteClientBtn.addEventListener('click', handleDeleteClient);
@@ -1319,6 +1424,7 @@ async function init() {
     }
     // --- Randare Inițială ---
     populateClientFilterDropdown(); // Populează dropdown-ul de clienți
+    ui.renderEventTypesList();
     renderFilters();
     render();
     

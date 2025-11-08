@@ -17,32 +17,35 @@ const $ = (id) => document.getElementById(id);
 let currentBillingDate = new Date(); // Începe cu luna curentă
 
 // --- Elemente DOM ---
-const dom = {
-    section: $('billingSection'),
-    clientList: $('billingClientList'),
-    prevBtn: $('billingPrevMonth'),
-    nextBtn: $('billingNextMonth'),
-    currentMonthLabel: $('billingCurrentMonth'),
-    billingSearchBar: $('billingSearchBar'),
-    
-    // Modal Plată
-    paymentModal: $('paymentModal'),
-    paymentForm: $('paymentForm'),
-    closePaymentModalBtn: $('closePaymentModal'),
-    cancelPaymentBtn: $('cancelPaymentBtn'),
-    paymentClientId: $('paymentClientId'),
-    paymentMonthKey: $('paymentMonthKey'),
-    paymentDate: $('paymentDate'),
-    paymentAmount: $('paymentAmount'),
-    paymentNotes: $('paymentNotes'),
-    paymentModalTitle: $('paymentModalTitle'),
-};
+let dom = {};
 
 /**
  * Inițializează ascultătorii de evenimente pentru secțiunea de facturare.
  * Chemată din main.js.
  */
 export function init() {
+
+    dom = {
+        section: $('billingSection'),
+        clientList: $('billingClientList'),
+        prevBtn: $('billingPrevMonth'),
+        nextBtn: $('billingNextMonth'),
+        currentMonthLabel: $('billingCurrentMonth'),
+        billingSearchBar: $('billingSearchBar'),
+        
+        // Modal Plată
+        paymentModal: $('paymentModal'),
+        paymentForm: $('paymentForm'),
+        closePaymentModalBtn: $('closePaymentModal'),
+        cancelPaymentBtn: $('cancelPaymentBtn'),
+        paymentClientId: $('paymentClientId'),
+        paymentMonthKey: $('paymentMonthKey'),
+        paymentDate: $('paymentDate'),
+        paymentAmount: $('paymentAmount'),
+        paymentNotes: $('paymentNotes'),
+        paymentModalTitle: $('paymentModalTitle'),
+    };
+
     if (!dom.section) return; // Nu inițializa dacă secțiunea nu există
 
     dom.prevBtn.addEventListener('click', () => navigateBillingMonth(-1));

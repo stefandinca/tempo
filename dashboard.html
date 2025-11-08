@@ -30,7 +30,6 @@
 
     <div class="app-container flex flex-col md:flex-row h-screen overflow-hidden" id="appContainer">
         
-        <!-- Sidebar -->
         <nav class="sidebar bg-white dark:bg-gray-800 border-b md:border-r border-gray-200 dark:border-gray-700 flex md:flex-col w-full md:w-64 flex-shrink-0">
             <div class="sidebar-header flex items-center justify-center md:justify-center p-4 md:mb-8">
                 <img src="logo.png" alt="Tempo Logo" class="logo-full h-8 md:h-10">
@@ -58,7 +57,7 @@
                 <li class="menu-item" data-view="team">
                     <a href="#" class="flex items-center gap-3 px-3 py-2 md:px-4 md:py-3 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                        <span class="hidden md:inline">Echipa</span>
+                        <span class="hidden md:inline">Administrare</span>
                     </a>
                 </li>
                 <li class="menu-item" data-view="billing">
@@ -92,11 +91,9 @@
         
         <main class="main-content flex-1 flex flex-col overflow-hidden">
             
-            <!-- Dashboard Section -->
             <section id="dashboardSection" class="main-section active flex flex-col h-full">
                 <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6 flex-shrink-0">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <!--- HAMBURGER MENU-->
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div class="header-title-group">
                                 <button class="mobile-menu-toggle btn-icon md:hidden">
@@ -127,44 +124,20 @@
                 </header>
 
                 <div class="flex-1 overflow-y-auto p-4 md:p-6">
-                    <!-- Mobile-first Grid: 1 column on mobile, 2 on tablet, 3 on desktop -->
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         
-                        <!-- Programul Zilei - Full width on mobile, spans 2 cols on desktop -->
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-700 shadow-sm lg:col-span-2">
                             <div class="flex items-center gap-3 pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-gray-600 dark:text-gray-400"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
                                 <h2 class="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Programul Zilei (Dvs.)</h2>
                             </div>
                             <div id="dashboardTodaySchedule" class="space-y-0">
-                                <div class="schedule-item">
-                                    <div class="schedule-time">09:00 - 10:00</div>
-                                    <div class="schedule-details">
-                                        <div class="schedule-title">Terapie - Amalia</div>
-                                        <div class="schedule-client">cu Amalia</div>
-                                    </div>
-                                </div>
-                                <div class="schedule-item">
-                                    <div class="schedule-time">10:00 - 11:00</div>
-                                    <div class="schedule-details">
-                                        <div class="schedule-title">Terapie - Alex</div>
-                                        <div class="schedule-client">cu Alex</div>
-                                    </div>
-                                </div>
-                                <div class="schedule-item">
-                                    <div class="schedule-time">11:00 - 12:00</div>
-                                    <div class="schedule-details">
-                                        <div class="schedule-title">Terapie - Tudor</div>
-                                        <div class="schedule-client">cu Tudor</div>
-                                    </div>
-                                </div>
-                                <div class="empty-schedule hidden text-center py-8 text-gray-500 dark:text-gray-400">
+                                <div class="empty-schedule text-center py-8 text-gray-500 dark:text-gray-400">
                                     <p>Nicio sesiune programată pentru astăzi.</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Acțiuni Rapide -->
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
                             <div class="flex items-center gap-3 pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-gray-600 dark:text-gray-400"><polyline points="9 18 15 12 9 6"/></svg>
@@ -186,77 +159,37 @@
                             </div>
                         </div>
 
-                        <!-- Statistici Rapide -->
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
                             <div class="flex items-center gap-3 pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-gray-600 dark:text-gray-400"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20V16"/></svg>
                                 <h2 class="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Statistici Rapide</h2>
                             </div>
                             <div id="dashboardQuickStats" class="space-y-0">
-                                <div class="stat-item">
-                                    <span class="stat-label">Sesiuni Totale</span>
-                                    <span class="stat-value" id="statTotalSessions">120</span>
                                 </div>
-                                <div class="stat-item">
-                                    <span class="stat-label">Prezență Centru</span>
-                                    <span class="stat-value" id="statAttendance">95%</span>
-                                </div>
-                                <div class="stat-item">
-                                    <span class="stat-label">Rapoarte În Așteptare</span>
-                                    <span class="stat-value" id="statPendingReports">3</span>
-                                </div>
-                            </div>
                         </div>
 
-                        <!-- Activitate Recentă - Full width on mobile, spans 2 cols on desktop -->
                         <div class="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 border border-gray-200 dark:border-gray-700 shadow-sm lg:col-span-2">
                             <div class="flex items-center gap-3 pb-4 mb-4 border-b border-gray-200 dark:border-gray-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-gray-600 dark:text-gray-400"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                                 <h2 class="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Activitate Recentă</h2>
                             </div>
                             <div id="dashboardRecentActivity" class="space-y-0 overflow-x-auto">
-                                <div class="activity-item">
-                                    <div class="activity-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600 dark:text-gray-400"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                                    </div>
-                                    <div class="activity-text">
-                                        <strong>Evaluare salvată</strong>: Tudor
-                                    </div>
-                                    <div class="activity-time">acum 45 min</div>
-                                    <div class="activity-action">
-                                        <button class="px-3 py-1.5 text-xs md:text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors whitespace-nowrap" data-action="goToClientEvolution" data-client-id="client_1761643441294">Vezi Evoluție</button>
-                                    </div>
                                 </div>
-                                <div class="activity-item">
-                                    <div class="activity-icon">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600 dark:text-gray-400"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
-                                    </div>
-                                    <div class="activity-text">
-                                        <strong>Eveniment adăugat</strong>: Terapie - Stefan Negru
-                                    </div>
-                                    <div class="activity-time">acum 2 ore</div>
-                                    <div class="activity-action">
-                                        <button class="px-3 py-1.5 text-xs md:text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors whitespace-nowrap" data-action="goToDate" data-date="2025-11-03">Vezi Ziua</button>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
                     </div>
                 </div>
             </section>
 
-            <!-- Calendar Section (placeholder) -->
-            <section id="calendarSection" class="main-section hidden">
+            <section id="calendarSection" class="main-section flex flex-col h-full">
                 <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 md:p-6">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                        <!--- HAMBURGER MENU-->
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div class="header-title-group">
                                 <button class="mobile-menu-toggle btn-icon md:hidden">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                                 </button>
-                                <h1 id="currentPeriod" class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Panou de control</h1>
+                                <h1 id="currentPeriod" class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Calendar</h1>
                             </div>
                             
                             
@@ -267,31 +200,31 @@
                         
                         <div class="flex flex-wrap items-center gap-2">
                             <div class="flex items-center gap-1">
-                                <button id="prevBtn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <button id="prevBtn" class="btn-icon">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
                                 </button>
-                                <button id="todayBtn" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-sm">Azi</button>
-                                <button id="nextBtn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <button id="todayBtn" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-sm font-medium">Azi</button>
+                                <button id="nextBtn" class="btn-icon">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
                                 </button>
                             </div>
                             <div class="view-toggle flex gap-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
-                                <button class="view-btn active px-3 py-1.5 rounded text-sm" data-view="month">Luna</button>
-                                <button class="view-btn px-3 py-1.5 rounded text-sm" data-view="week">Saptamana</button>
+                                <button class="view-btn active px-3 py-1.5 rounded text-sm" data-view="month">Lună</button>
+                                <button class="view-btn px-3 py-1.5 rounded text-sm" data-view="week">Săptămână</button>
                                 <button class="view-btn px-3 py-1.5 rounded text-sm" data-view="day">Zi</button>
                             </div>
                             <button id="addEventBtnCalendar" class="btn btn-primary flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                                <span class="hidden sm:inline">Adauga</span>
+                                <span class="hidden sm:inline">Adaugă</span>
                             </button>
                         </div>
 
                         
                     </div>
                 </header>
-                <div class="sm:flex-col  md:flex-row  lg:flex justify-between items-center bg-white border-b border-gray-200">
-                    <div id="filters" class="filters-container p-4"></div>
-                    <div class="client-filter-container p-6 md:pr-6">
+                <div class="flex flex-col md:flex-row justify-between items-center bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 gap-4">
+                    <div id="filters" class="filters-container p-0"></div>
+                    <div class="client-filter-container flex-shrink-0">
                         <select id="calendarClientFilter" class="form-input calendar-filter-select">
                          <option value="">Toți Clienții</option>
                          </select>
@@ -299,221 +232,209 @@
                 </div>
                 
                 
-                <div id="calendarView" class="flex-1 overflow-auto p-4"></div>
+                <div id="calendarView" class="flex-1 overflow-auto p-4 md:p-6"></div>
             </section>
 
-            <section id="clientSection" class="main-section">
-        <header class="section-header">
-            <!--- HAMBURGER MENU-->
+            <section id="clientSection" class="main-section flex flex-col h-full">
+                <header class="section-header">
                         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <div class="header-title-group">
                                 <button class="mobile-menu-toggle btn-icon md:hidden">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                                 </button>
-                                <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Panou de control</h1>
+                                <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Administrare Clienți</h1>
                             </div>
-                            
-                            
                         </div>
-            <div class="header-actions">
+                    <div class="header-actions">
+                        <button id="refreshClientBtn" class="btn-icon btn-refresh-data" title="Reîmprospătează datele">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                        </button>
+                        <button id="addNewClientBtn" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            <span>Adaugă Client Nou</span>
+                        </button>
+                    </div>
+                </header>
+                
+                <div class="section-content-grid">
+                    <div class="section-col-list">
+                        <input type="search" id="clientSearchBar" class="form-input" placeholder="Caută client după nume, email...">
+                        <div id="clientsList" class="modal-list">
+                            </div>
+                    </div>
+                    <div class="section-col-form">
+                        <form id="clientForm">
+                            <h3 id="clientFormTitle" class="text-lg font-semibold mb-4">Adaugă Client Nou</h3>
+                            <div class="form-group">
+                                <label for="clientFullName">Nume Complet</label>
+                                <input type="text" id="clientFullName" name="clientFullName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientEmail">Email</label>
+                                <input type="email" id="clientEmail" name="clientEmail" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="clientPhone">Telefon</label>
+                                <input type="tel" id="clientPhone" name="clientPhone" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="clientBirthdayInput">Data Nașterii</label>
+                                <input type="date" id="clientBirthdayInput" name="clientBirthdayInput" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="clientMedical">Alergii sau medicație</label>
+                                <textarea id="clientMedical" name="clientMedical" class="form-input" rows="3" placeholder="Notițe medicale, alergii, medicație..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientId">Cod Client (ID)</label>
+                                <input type="text" id="clientId" name="clientId" class="form-input" 
+                                       placeholder="ex: andrei2102" 
+                                       pattern="[a-z0-9_]+" 
+                                       title="Folosește doar litere mici si cifre">
+                                <small style="color: var(--text-secondary); font-size: 0.75rem; display: block; margin-top: 0.25rem;">
+                                    Lasă gol pentru generare automată. Folosește format: numeddmm
+                                </small>
+                            </div>
+                            <div class="modal-footer-form flex justify-end gap-2 mt-4">
+                                <button id="deleteClientBtn" type="button" class="btn btn-danger-outline" style="display: none;">Șterge</button>
+                                <button id="cancelClientBtn" type="button" class="btn btn-secondary">Anulează</button>
+                                <button type="submit" class="btn btn-primary">Salvează Client</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
 
-                <button id="refreshDashboardBtn" class="btn-icon btn-refresh-data" title="Reîmprospătează datele">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+            <section id="teamSection" class="main-section flex flex-col h-full">
+                <header class="section-header">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div class="header-title-group">
+                                <button class="mobile-menu-toggle btn-icon md:hidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                                </button>
+                                <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Administrare Echipă</h1>
+                            </div>
+                        </div>
+                    <div class="header-actions">
+                        <button id="refreshTeamBtn" class="btn-icon btn-refresh-data" title="Reîmprospătează datele">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                        </button>
+                        <button id="addNewTeamMemberBtn" class="btn btn-primary">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            <span>Adaugă Membru Nou</span>
+                        </button>
+                    </div>
+                </header>
+
+                <div class="section-content-grid">
+                    <div class="section-col-list">
+                        <div id="teamMembersList" class="modal-list">
+                            </div>
+                        
+                        <div id="eventTypeCategoriesList" class="modal-list mt-8">
+                            </div>
+                    </div>
+                    <div class="section-col-form">
+                        <form id="teamMemberForm" class="mb-8">
+                            <h3 id="teamFormTitle" class="text-lg font-semibold mb-4">Adaugă Membru Nou</h3>
+                            <div class="form-group">
+                                <label for="memberName">Nume</label>
+                                <input type="text" id="memberName" name="memberName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="memberInitials">Inițiale (max 3)</label>
+                                <input type="text" id="memberInitials" name="memberInitials" class="form-input" required maxlength="3">
+                            </div>
+                            <div class="form-group">
+                                <label for="memberRole">Rol</label>
+                                <select id="memberRole" name="memberRole" class="form-input" required>
+                                    <option value="therapist">Terapeut</option>
+                                    <option value="coordinator">Coordonator</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="memberColor">Culoare</label>
+                                <div class="color-picker-group">
+                                    <input type="color" id="memberColor" name="memberColor" class="form-input-color" value="#4f46e5">
+                                    <input type="text" id="memberColorHex" name="memberColorHex" class="form-input" value="#4F46E5" maxlength="7">
+                                </div>
+                            </div>
+                            <div class="modal-footer-form flex justify-end gap-2 mt-4">
+                                <button id="deleteMemberBtn" type="button" class="btn btn-danger-outline" style="display: none;">Șterge</button>
+                                <button id="cancelMemberBtn" type="button" class="btn btn-secondary">Anulează</button>
+                                <button type="submit" class="btn btn-primary">Salvează Membru</button>
+                            </div>
+                        </form>
+                        
+                        <hr class="my-8 border-gray-200 dark:border-gray-700">
+                        
+                        <form id="eventTypeForm">
+                            <h3 id="eventTypeFormTitle" class="text-lg font-semibold mb-4">Adaugă Categorie Eveniment</h3>
+                            <div class="form-group">
+                                <label for="eventTypeId">ID (fără spații, ex: 'terapie', 'pauza_pranz')</label>
+                                <input type="text" id="eventTypeId" name="eventTypeId" class="form-input" required pattern="[a-z0-9_-]+" title="Doar litere mici, cifre, - și _">
+                            </div>
+                            <div class="form-group">
+                                <label for="eventTypeLabel">Etichetă (ex: 'Terapie', 'Pauză de prânz')</label>
+                                <input type="text" id="eventTypeLabel" name="eventTypeLabel" class="form-input" required>
+                            </div>
+                            <div class="form-group-checkboxes">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="eventTypeIsBillable" name="eventTypeIsBillable" checked>
+                                    <label for="eventTypeIsBillable">Facturabil (necesită client)</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="eventTypeRequiresTime" name="eventTypeRequiresTime" checked>
+                                    <label for="eventTypeRequiresTime">Necesită Oră/Durată</label>
+                                </div>
+                            </div>
+                            <div class="modal-footer-form flex justify-end gap-2 mt-4">
+                                <button id="deleteEventTypeBtn" type="button" class="btn btn-danger-outline" style="display: none;">Șterge</button>
+                                <button id="cancelEventTypeBtn" type="button" class="btn btn-secondary">Anulează</button>
+                                <button type="submit" class="btn btn-primary">Salvează Categorie</button>
+                            </div>
+                        </form>
+                        
+                    </div>
+                </div>
+            </section>
+
+
+            <section id="billingSection" class="main-section flex flex-col h-full">
+                <header class="section-header">
+                    <div class="header-title-group">
+                        <button class="mobile-menu-toggle btn-icon md:hidden">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        </button>
+                        <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Facturare</h1>
+                    </div>
+                    <div class="header-actions flex-wrap">
+                        <button id="refreshBillingBtn" class="btn-icon btn-refresh-data" title="Reîmprospătează datele">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                        </button>
+                        <div class="flex items-center gap-1">
+                            <button id="billingPrevMonth" class="btn-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
                             </button>
+                            <h2 id="billingCurrentMonth" class="px-4 py-2 rounded-lg text-lg font-semibold text-gray-900 dark:text-white"></h2>
+                            <button id="billingNextMonth" class="btn-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </header>
 
-                <button id="addNewClientBtn" class="btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                    <span>Adauga Client Nou</span>
-                </button>
-            </div>
-        </header>
-        
-        <div class="section-content-grid">
-            <div class="section-col-list">
-                <input type="search" id="clientSearchBar" class="form-input" placeholder="Cauta client dupa nume, email...">
-                <div id="clientsList" class="modal-list">
-                    </div>
-            </div>
-            <div class="section-col-form">
-                <form id="clientForm">
-                    <h3 id="clientFormTitle">Adauga Client Nou</h3>
-                    <div class="form-group">
-                        <label for="clientFullName">Nume Complet</label>
-                        <input type="text" id="clientFullName" name="clientFullName" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="clientEmail">Email</label>
-                        <input type="email" id="clientEmail" name="clientEmail" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="clientPhone">Telefon</label>
-                        <input type="tel" id="clientPhone" name="clientPhone" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="clientBirthdayInput">Data Nasterii</label>
-                        <input type="date" id="clientBirthdayInput" name="clientBirthdayInput" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="clientMedical">Alergii sau medicatie</label>
-                        <textarea id="clientMedical" name="clientMedical" class="form-input" rows="3" placeholder="Notițe medicale, alergii, medicatie curenta..."></textarea>
-                    </div>
-                    <div class="form-group">
-        <label for="clientId">Cod Client (ID)</label>
-        <input type="text" id="clientId" name="clientId" class="form-input" 
-               placeholder="ex: andrei2102" 
-               pattern="[a-z0-9_]+" 
-               title="Folosește doar litere mici si cifre">
-        <small style="color: var(--text-secondary); font-size: 0.75rem; display: block; margin-top: 0.25rem;">
-            Lasă gol pentru generare automată. Folosește format: numeddmm
-        </small>
-    </div>
-                    <div class="modal-footer-form">
-                        <button id="deleteClientBtn" type="button" class="btn btn-danger-outline">Sterge</button>
-                        <button id="cancelClientBtn" type="button" class="btn btn-secondary">Anuleaza</button>
-                        <button type="submit" class="btn btn-primary">Salveaza</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <section id="teamSection" class="main-section">
-        <header class="section-header">
-            <!--- HAMBURGER MENU-->
-                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                            <div class="header-title-group">
-                                <button class="mobile-menu-toggle btn-icon md:hidden">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                                </button>
-                                <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Panou de control</h1>
+                <div class="section-content-grid" style="grid-template-columns: 1fr; overflow-y: auto;">
+                    <div class="section-col-list" style="height: auto;">
+                        <input type="search" id="billingSearchBar" class="form-input" placeholder="Caută client după nume..." style="margin-bottom: 1.5rem;">
+                        <div id="billingClientList" class="modal-list" style="padding-right: 0;">
                             </div>
-                            
-                            
-                        </div>
-            <div class="header-actions">
-
-                <button id="refreshTeamBtn" class="btn-icon btn-refresh-data" title="Reîmprospătează datele">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                </button>
-
-                <button id="addNewTeamMemberBtn" class="btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-                    <span>Adauga Membru Nou</span>
-                </button>
-            </div>
-        </header>
-
-        <div class="section-content-grid">
-            <div class="section-col-list">
-                <div id="teamMembersList" class="modal-list">
                     </div>
-            </div>
-            <div class="section-col-form">
-                <form id="teamMemberForm">
-                    <h3 id="teamFormTitle">Adauga Membru Nou</h3>
-                    <div class="form-group">
-                        <label for="memberName">Nume</label>
-                        <input type="text" id="memberName" name="memberName" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="memberInitials">Initiale (max 3)</label>
-                        <input type="text" id="memberInitials" name="memberInitials" class="form-input" required maxlength="3">
-                    </div>
-                    <div class="form-group">
-                        <label for="memberRole">Rol</label>
-                        <select id="memberRole" name="memberRole" class="form-input" required>
-                            <option value="therapist">Terapeut</option>
-                            <option value="coordinator">Coordonator</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="memberColor">Culoare</label>
-                        <div class="color-picker-group">
-                            <input type="color" id="memberColor" name="memberColor" class="form-input-color" value="#4f46e5">
-                            <input type="text" id="memberColorHex" name="memberColorHex" class="form-input" value="#4F46E5" maxlength="7">
-                        </div>
-                    </div>
-                    <div class="modal-footer-form">
-                        <button id="deleteMemberBtn" type="button" class="btn btn-danger-outline">Sterge</button>
-                        <button id="cancelMemberBtn" type="button" class="btn btn-secondary">Anuleaza</button>
-                        <button type="submit" class="btn btn-primary">Salveaza</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </section>
-
-
-
-    <section id="billingSection" class="main-section">
-    <header class="section-header">
-        <div class="header-title-group">
-            <button class="mobile-menu-toggle btn-icon md:hidden">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-            </button>
-            <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Facturare</h1>
-        </div>
-        <div class="header-actions">
-            <button id="refreshBillingBtn" class="btn-icon btn-refresh-data" title="Reîmprospătează datele">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-            </button>
-            <div class="flex items-center gap-1">
-                <button id="billingPrevMonth" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-                </button>
-                <h2 id="billingCurrentMonth" class="px-4 py-2 rounded-lg text-lg font-semibold"></h2>
-                <button id="billingNextMonth" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <div class="section-content-grid" style="grid-template-columns: 1fr; overflow-y: auto;">
-        <div class="section-col-list" style="height: auto;">
-            <input type="search" id="billingSearchBar" class="form-input" placeholder="Caută client după nume..." style="margin-bottom: 1.5rem;">
-            <div id="billingClientList" class="modal-list" style="padding-right: 0;">
                 </div>
-        </div>
-    </div>
-</section>
+            </section>
 
-<div id="paymentModal" class="modal-backdrop modal-small">
-    <div class="modal-content">
-        <form id="paymentForm">
-            <div class="modal-header">
-                <h2 id="paymentModalTitle" class="modal-title">Adaugă Încasare</h2>
-                <button id="closePaymentModal" type="button" class="btn-icon btn-close" title="Inchide">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                </button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="paymentClientId">
-                <input type="hidden" id="paymentMonthKey">
-
-                <div class="form-group">
-                    <label for="paymentDate">Data Încasării</label>
-                    <input type="date" id="paymentDate" class="form-input" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="paymentAmount">Sumă (RON)</label>
-                    <input type="number" id="paymentAmount" class="form-input" required min="1" step="1">
-                </div>
-
-                <div class="form-group">
-                    <label for="paymentNotes">Notițe (Opțional)</label>
-                    <input type="text" id="paymentNotes" class="form-input" placeholder="ex: chitanța nr. 123">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button id="cancelPaymentBtn" type="button" class="btn btn-secondary">Anulează</button>
-                <button type="submit" class="btn btn-primary">Salvează Încasarea</button>
-            </div>
-        </form>
-    </div>
-</div>
+            
             
         </main>
     </div>
@@ -532,16 +453,16 @@
                 
                 <div class="event-details-section">
                     <h3>Comentarii (Private)</h3>
-                    <textarea id="eventComments" class="form-input" placeholder="Adauga notite private despre eveniment..."></textarea>
+                    <textarea id="eventComments" class="form-input" placeholder="Adaugă notițe private despre eveniment..."></textarea>
                 </div>
             </div>
             <div class="modal-footer justify-between">
                 <div>
-                    <button id="deleteEventFromDetails" class="btn btn-danger-outline">Sterge</button>
+                    <button id="deleteEventFromDetailsBtn" class="btn btn-danger-outline">Șterge</button>
                 </div>
                 <div>
-                    <button id="closeEventDetails" class="btn btn-secondary">Inchide</button>
-                    <button id="editEventFromDetails" class="btn btn-primary">Editeaza</button>
+                    <button id="closeEventDetails" class="btn btn-secondary">Închide</button>
+                    <button id="editEventFromDetailsBtn" class="btn btn-primary">Editează</button>
                 </div>
             </div>
         </div>
@@ -551,13 +472,13 @@
         <div class="modal-content modal-xl">
             <form id="eventForm">
                 <div class="modal-header">
-                    <h2 id="modalTitle" class="modal-title">Adauga/Editeaza Eveniment</h2>
+                    <h2 id="modalTitle" class="modal-title">Adaugă/Editează Eveniment</h2>
                     <button id="closeModal" type="button" class="btn-icon btn-close" title="Inchide">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                     </button>
                 </div>
                 
-                <div class="modal-body modal-grid">
+                <div class="modal-body modal-grid" style="grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr);">
                     
                     <div class="modal-col">
                         <h3>Detalii Eveniment</h3>
@@ -568,24 +489,14 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="eventDetails">Detalii Eveniment (Optionale)</label>
+                            <label for="eventDetails">Detalii Eveniment (Opționale)</label>
                             <textarea id="eventDetails" name="eventDetails" class="form-input" rows="3"></textarea>
                         </div>
                         
                         <div class="form-group">
                             <label for="eventType">Tip Eveniment</label>
                             <select id="eventType" name="eventType" class="form-input" required>
-                                <option value="therapy">Terapie</option>
-                                <option value="group-therapy">Terapie de grup</option>
-                                <option value="logopedie">Logopedie</option>
-                                <option value="coordination">Coordonare</option>
-                                <option value="evaluare">Evaluare</option>
-                                <option value="psihoterapie">Psihoterapie</option>
-                                <option value="dezvoltare-personala">Dezvoltare personala</option>
-                                <option value="pauza-masa">Pauza de masa</option>
-                                <option value="sedinta">Sedinta</option>
-                                <option value="day-off">Zi libera</option>
-                            </select>
+                                </select>
                         </div>
                         
                         <div class="form-grid-2">
@@ -594,7 +505,7 @@
                                 <input type="date" id="eventDate" name="eventDate" class="form-input" required>
                             </div>
                             <div class="form-group">
-                                <label for="startTime">Ora Inceput</label>
+                                <label for="startTime">Ora Început</label>
                                 <select id="startTime" name="startTime" class="form-input" required>
                                     <option value="08:00">08:00</option>
                                     <option value="08:30">08:30</option>
@@ -630,7 +541,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label>Recurenta (in aceasta luna)</label>
+                            <label>Recurență (în această lună)</label>
                             <div class="repeating-days">
                                 <input type="checkbox" id="repeatMon" name="repeatMon" value="1"><label for="repeatMon">L</label>
                                 <input type="checkbox" id="repeatTue" name="repeatTue" value="2"><label for="repeatTue">M</label>
@@ -643,7 +554,7 @@
                         <div class="form-group-checkboxes">
                             <div class="checkbox-item">
                                 <input type="checkbox" id="isPublic" name="isPublic">
-                                <label for="isPublic">Eveniment public (vizibil in calendarul public)</label>
+                                <label for="isPublic">Eveniment public (vizibil în calendarul public)</label>
                             </div>
                             <div class="checkbox-item">
                                 <input type="checkbox" id="isBillable" name="isBillable" checked>
@@ -653,26 +564,26 @@
                     </div>
                     
                     <div class="modal-col">
-                        <h3>Clienti</h3>
+                        <h3>Clienți</h3>
                         <div class="form-group">
-                            <input type="search" id="clientSearch" class="form-input" placeholder="Cauta client...">
+                            <input type="search" id="clientSearch" class="form-input" placeholder="Caută client...">
                         </div>
                         <div id="clientCheckboxes" class="checkbox-list">
                             </div>
-                        <button type="button" id="addNewClientBtnInModal" class="btn btn-secondary btn-full-width">Adauga Client Nou</button>
+                        <button type="button" id="addNewClientBtnInModal" class="btn btn-secondary btn-full-width mt-4">Adaugă Client Nou</button>
                         
                         <h3 style="margin-top: 1.5rem;">Programe</h3>
                         <div class="form-group">
-                            <input type="search" id="programSearch" class="form-input" placeholder="Cauta program...">
+                            <input type="search" id="programSearch" class="form-input" placeholder="Caută program...">
                         </div>
                         <div id="programCheckboxes" class="checkbox-list program-list">
                             </div>
                     </div>
                     
                     <div class="modal-col">
-                        <h3>Echipa (Terapeuti)</h3>
+                        <h3>Echipa (Terapeuți)</h3>
                         <div class="form-group">
-                            <label>Selecteaza membrii echipei</label>
+                            <label>Selectează membrii echipei</label>
                         </div>
                         <div id="teamMemberCheckboxes" class="checkbox-list">
                             </div>
@@ -682,32 +593,29 @@
                 
                 <div class="modal-footer justify-between">
                     <div>
-                        <button id="deleteBtn" type="button" class="btn btn-danger-outline">Sterge Eveniment</button>
+                        <button id="deleteBtn" type="button" class="btn btn-danger-outline" style="display: none;">Șterge Eveniment</button>
                     </div>
                     <div>
-                        <button id="cancelBtn" type="button" class="btn btn-secondary">Anuleaza</button>
-                        <button type="submit" class="btn btn-primary">Salveaza Eveniment</button>
+                        <button id="cancelBtn" type="button" class="btn btn-secondary">Anulează</button>
+                        <button type="submit" class="btn btn-primary">Salvează Eveniment</button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
     
-    
-    
-    
     <div id="evolutionModal" class="modal-backdrop">
         <div class="modal-content modal-xl">
             <div class="modal-header">
-                <h2 id="evolutionTitle" class="modal-title">Evolutie Client</h2>
+                <h2 id="evolutionTitle" class="modal-title">Evoluție Client</h2>
                 <button id="closeEvolutionModal" class="btn-icon btn-close" title="Inchide">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
             <div class="modal-body">
                 <div class="tabs">
-                    <button class="tab-button active" data-tab="tabGrafice">Grafice Evolutie</button>
-                    <button class="tab-button" data-tab="tabEvaluare">Adauga Evaluare</button>
+                    <button class="tab-button active" data-tab="tabGrafice">Grafice Evoluție</button>
+                    <button class="tab-button" data-tab="tabEvaluare">Adaugă Evaluare</button>
                     <button class="tab-button" data-tab="tabPrograme">Istoric Programe</button>
                     <button class="tab-button" data-tab="tabNotite">Notițe Private</button>
                     <button class="tab-button" data-tab="tabTemaLunara">Temă Lunară</button>
@@ -732,8 +640,7 @@
                     <div class="monthly-theme-history">
                         <h3>Istoric Teme Lunare</h3>
                         <div id="monthlyThemeHistoryContainer">
-                            <!-- Monthly themes will be rendered here -->
-                        </div>
+                            </div>
                     </div>
                 </div>
                 
@@ -744,24 +651,7 @@
                     <div id="evolutionSummary">
                         </div>
                     <div id="evolutionEditor" style="display:none;">
-                        <table class="form-table">
-                            <thead>
-                                <tr>
-                                    <th>Test</th>
-                                    <th>1m</th>
-                                    <th>3m</th>
-                                    <th>6m</th>
-                                    <th>9m</th>
-                                    <th>12m</th>
-                                </tr>
-                            </thead>
-                            <tbody id="evolutionEditRows"></tbody>
-                        </table>
-                        <div class="modal-footer">
-                            <button id="cancelEvolutionEdit" class="btn btn-secondary">Anuleaza</button>
-                            <button id="saveEvolutionBtn" class="btn btn-primary">Salveaza Scoruri</button>
                         </div>
-                    </div>
                 </div>
 
                 <div id="tabPrograme" class="tab-content">
@@ -778,15 +668,15 @@
                     <form id="addEvaluationForm">
                         <div class="form-grid-3">
                             <div class="form-group">
-                                <label for="childBirthDateInput">Data Nasterii Client</label>
+                                <label for="childBirthDateInput">Data Nașterii Client</label>
                                 <input type="date" id="childBirthDateInput" class="form-input">
                             </div>
                             <div class="form-group">
-                                <label for="evaluationDateInput">Data Evaluarii</label>
+                                <label for="evaluationDateInput">Data Evaluării</label>
                                 <input type="date" id="evaluationDateInput" class="form-input">
                             </div>
                             <div class="form-group">
-                                <label>Varsta Curenta</label>
+                                <label>Vârsta Curentă</label>
                                 <div id="childAgeDisplay" class="form-input-static">–</div>
                             </div>
                         </div>
@@ -805,7 +695,6 @@
                         </div>
 
                         <div id="logopedicaFormContainer" style="display: none;">
-                            
                             <div class="logopedica-table-container">
                                 <table class="logopedica-table">
                                     <thead>
@@ -1337,9 +1226,9 @@
                             </div>
                         </div>
                         
-                        <div class="modal-footer">
-                            <button id="cancelEvaluationBtn" type="button" class="btn btn-secondary">Anuleaza</button>
-                            <button id="saveEvaluationBtn" type="button" class="btn btn-primary">Salveaza Evaluarea</button>
+                        <div classD="modal-footer" style="padding: 1.5rem 0 0 0;">
+                            <button id="cancelEvaluationBtn" type="button" class="btn btn-secondary">Anulează</button>
+                            <button id="saveEvaluationBtn" type="button" class="btn btn-primary">Salvează Evaluarea</button>
                         </div>
                     </form>
                 </div>
@@ -1347,6 +1236,42 @@
             </div>
         </div>
     </div>
+
+    <div id="paymentModal" class="modal-backdrop modal-small">
+    <div class="modal-content">
+        <form id="paymentForm">
+            <div class="modal-header">
+                <h2 id="paymentModalTitle" class="modal-title">Adaugă Încasare</h2>
+                <button id="closePaymentModal" type="button" class="btn-icon btn-close" title="Inchide">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="paymentClientId">
+                <input type="hidden" id="paymentMonthKey">
+
+                <div class="form-group">
+                    <label for="paymentDate">Data Încasării</label>
+                    <input type="date" id="paymentDate" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentAmount">Sumă (RON)</label>
+                    <input type="number" id="paymentAmount" class="form-input" required min="1" step="1">
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentNotes">Notițe (Opțional)</label>
+                    <input type="text" id="paymentNotes" class="form-input" placeholder="ex: chitanța nr. 123">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelPaymentBtn" type="button" class="btn btn-secondary">Anulează</button>
+                <button type="submit" class="btn btn-primary">Salvează Încasarea</button>
+            </div>
+        </form>
+    </div>
+</div>
     
     <div id="alertModal" class="modal-backdrop modal-small">
         <div class="modal-content">
@@ -1368,17 +1293,17 @@
     <div id="confirmModal" class="modal-backdrop modal-small">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="confirmModalTitle" class="modal-title">Confirma actiunea</h2>
+                <h2 id="confirmModalTitle" class="modal-title">Confirmă acțiunea</h2>
                 <button id="closeConfirmModal" class="btn-icon btn-close" title="Inchide">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
             <div class="modal-body">
-                <p id="confirmModalMessage">Esti sigur?</p>
+                <p id="confirmModalMessage">Ești sigur?</p>
             </div>
             <div class="modal-footer">
-                <button id="confirmModalCancel" class="btn btn-secondary">Anuleaza</button>
-                <button id="confirmModalOk" class="btn btn-danger">Confirma</button>
+                <button id="confirmModalCancel" class="btn btn-secondary">Anulează</button>
+                <button id="confirmModalOk" class="btn btn-danger">Confirmă</button>
             </div>
         </div>
     </div>
@@ -1386,18 +1311,18 @@
     <div id="recurringDeleteModal" class="modal-backdrop modal-small">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="recurringDeleteModalTitle" class="modal-title">Stergere Eveniment Recurent</h2>
+                <h2 id="recurringDeleteModalTitle" class="modal-title">Ștergere Eveniment Recurent</h2>
                 <button id="closeRecurringDeleteModal" class="btn-icon btn-close" title="Inchide">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
             <div class="modal-body">
-                <p id="recurringDeleteModalMessage">Acesta este un eveniment recurent. Ce doresti sa stergi?</p>
+                <p id="recurringDeleteModalMessage">Acesta este un eveniment recurent. Ce dorești să ștergi?</p>
             </div>
             <div class="modal-footer column-footer">
                 <button id="recurringDeleteSingle" class="btn btn-primary">Doar acest eveniment</button>
-                <button id="recurringDeleteAll" class="btn btn-danger-outline">Toate evenimentele (din aceasta luna)</button>
-                <button id="recurringDeleteCancel" class="btn btn-secondary">Anuleaza</button>
+                <button id="recurringDeleteAll" class="btn btn-danger-outline">Toate evenimentele (din această lună)</button>
+                <button id="recurringDeleteCancel" class="btn btn-secondary">Anulează</button>
             </div>
         </div>
     </div>
@@ -1420,9 +1345,7 @@
             </div>
         </div>
     </div>
-
-    <!-- (All modal HTML code from original dashboard.html should be included here) -->
-
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
