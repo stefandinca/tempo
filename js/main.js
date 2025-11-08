@@ -885,7 +885,11 @@ function createRecurringEvents(eventBase, defaultAttendance = {}) { // 1. Accept
                 ...eventBase, 
                 id: generateEventId(), 
                 date: dateStr,
-                attendance: defaultAttendance // Add default attendance
+                // --- BUG FIX HERE ---
+                // Original was: attendance: defaultAttendance
+                // This creates a new copy for each event
+                attendance: { ...defaultAttendance } 
+                // --- END BUG FIX ---
             });
         }
         currentDate.setDate(currentDate.getDate() + 1);

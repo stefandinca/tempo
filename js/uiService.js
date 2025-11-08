@@ -493,14 +493,24 @@ function addAttendanceListeners(eventId, canModify = true) {
             const clientId = toggle.dataset.clientId;
             
             const event = calendarState.getEventById(eventId);
-            // --- START FIX ---
-            // If attendance is missing OR is an array [] (from the bug), 
-            // force it to be an object before setting properties.
-            if (!event.attendance || Array.isArray(event.attendance)) {
-                event.attendance = {};
-            }
-            // --- END FIX ---
-            event.attendance[clientId] = status;
+            
+            // --- START BUG FIX ---
+            // 1. Get the current attendance object (or an empty one)
+            //    Make sure to handle the old array bug as well.
+            const currentAttendance = (event.attendance && !Array.isArray(event.attendance)) 
+                ? event.attendance 
+                : {};
+
+            // 2. Create a NEW object by copying the old one
+            const newAttendance = { ...currentAttendance };
+            
+            // 3. Modify the NEW object
+            newAttendance[clientId] = status;
+            
+            // 4. Assign the NEW object back to the event
+            // This breaks the shared reference.
+            event.attendance = newAttendance;
+            // --- END BUG FIX ---
             
             calendarState.saveEvent(event);
             await api.saveData(calendarState.getState());
