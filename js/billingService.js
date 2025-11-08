@@ -231,7 +231,7 @@ function calculateClientHoursForMonth(clientId, year, month, allEvents) {
             // 2. Calculează totalul de plată (pentru calcul)
             const eventType = eventTypes.find(t => t.id === event.type); // <-- NEW
             if (eventType && eventType.base_price > 0) { // <-- NEW
-                totalDue += eventType.base_price; // <-- NEW
+                totalDue += (eventType.base_price * (Number(event.duration) / 60));
             }
             // Dacă nu se găsește tipul sau prețul e 0, se adaugă 0, ceea ce e corect.
         }
