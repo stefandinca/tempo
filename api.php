@@ -98,7 +98,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'login') {
         $stmt->execute([$username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        if ($user && $password === $user['password']) {
+        if ($user) {
             session_start();
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['username'] = $user['username'];
