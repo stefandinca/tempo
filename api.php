@@ -61,7 +61,12 @@ function sendResponse($data, $statusCode = 200) {
  * Send error response
  */
 function sendError($message, $statusCode = 500) {
-    debugLog("EROARE TRIMISĂ CLIENTULUI: " . $message); // Loghează eroarea
+    try {
+        debugLog("EROARE TRIMISĂ CLIENTULUI: " . $message); // Încearcă să logheze eroarea
+    } catch (Exception $logError) {
+        // Nu face nimic dacă logarea eșuează, pentru a nu opri trimiterea răspunsului
+        error_log("CRITICAL: debugLog function failed: " . $logError->getMessage());
+    }
     sendResponse(['error' => $message], $statusCode);
 }
 
@@ -118,6 +123,34 @@ if (isset($_GET['action']) && $_GET['action'] === 'login') {
     } catch (Exception $e) {
         debugLog("Login error: " . $e->getMessage());
         sendError('Login error: ' . $e->getMessage(), 500);
+    }
+}
+
+// Handle demo registration action
+if (isset($_GET['action']) && $_GET['action'] === 'register_demo') {
+    try {
+        $name = $_POST['name'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $phone = $_POST['phone'] ?? '';
+        $organization = $_POST['organization'] ?? '';
+
+        if (empty($name) || empty($email)) {
+            sendResponse(['success' => false, 'message' => 'Numele și email-ul sunt obligatorii.'], 400);
+        }
+        
+        // Asigură-te că $pdo există
+        if (!isset($pdo)) {
+             sendError('Database connection object is not available.', 500);
+        }
+
+        $stmt = $pdo->prepare("INSERT INTO demo_users (name, email, phone, organization) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$name, $email, $phone, $organization]);
+        
+        sendResponse(['success' => true]);
+        
+    } catch (Exception $e) {
+        debugLog("Demo registration error: " . $e->getMessage());
+        sendError('Registration error: ' . $e->getMessage(), 500);
     }
 }
 
