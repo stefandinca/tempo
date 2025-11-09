@@ -12,7 +12,6 @@ import * as view from './calendarView.js';
 import * as reportService from './reportService.js';
 import * as evolutionService from './evolutionService.js';
 import * as billing from './billingService.js';
-import * as eventTypesService from './eventTypesService.js';
 
 // --- Variabile DOM Globale ---
 const $ = (id) => document.getElementById(id);
@@ -30,7 +29,6 @@ const dom = {
     teamSection: $('teamSection'),
     dashboardSection: $('dashboardSection'),
     billingSection: $('billingSection'),
-    eventTypesSection: $('eventTypesSection'),
     
     // Calendar
     currentPeriod: $('currentPeriod'),
@@ -123,32 +121,6 @@ function generateClientId(fullName, birthDate) {
     
     return `${firstName}${dateSuffix}`;
 }
-
-/**
- * Populează dropdown-ul de tipuri de evenimente cu date din baza de date
- * @param {Array} eventTypes - Array de obiecte cu id, label, isBillable, requiresTime
- */
-function populateEventTypeDropdown(eventTypes) {
-    const eventTypeSelect = dom.eventTypeSelect;
-    if (!eventTypeSelect) return;
-    
-    // Curăță opțiunile existente
-    eventTypeSelect.innerHTML = '';
-    
-    // Adaugă opțiunile din baza de date
-    eventTypes.forEach(type => {
-        const option = document.createElement('option');
-        option.value = type.id;
-        option.textContent = type.label;
-        // Stochează proprietățile suplimentare ca atribute data pentru a le putea accesa mai târziu
-        option.dataset.isBillable = type.isBillable;
-        option.dataset.requiresTime = type.requiresTime;
-        eventTypeSelect.appendChild(option);
-    });
-}
-
-// Make it globally accessible for eventTypesService
-window.populateEventTypeDropdown = populateEventTypeDropdown;
 
 // --- Navigare Principală (Tab-uri) ---
 
@@ -429,19 +401,11 @@ console.log('Types:', repeatingDays.map(d => typeof d));
 console.log('Values:', repeatingDays);
 console.log('===========================');
 
-    // Obține proprietățile tipului de eveniment din dropdown
-    const eventTypeSelect = dom.eventTypeSelect;
-    const selectedOption = eventTypeSelect ? eventTypeSelect.selectedOptions[0] : null;
-    const requiresTime = selectedOption ? (selectedOption.dataset.requiresTime === 'true') : true;
-
-    // Dacă tipul de eveniment nu necesită timp, folosește valori implicite
-    if (!requiresTime) {
+    if (eventType === 'day-off' || eventType === 'pauza-masa' || eventType === 'sedinta') {
         if (!startTime) startTime = '08:00';
         if (!duration || isNaN(duration)) duration = 60;
     }
-    
-    // Validare: dacă tipul necesită timp, verifică că sunt completate
-    if (requiresTime && (!startTime || isNaN(duration))) {
+    if ((eventType !== 'day-off') && (!startTime || isNaN(duration))) {
          ui.showCustomAlert('Te rog completează ora de început și durata.', 'Validare');
         return;
     }
@@ -488,27 +452,31 @@ console.log('===========================');
 
     } else {
         // This is a simple edit OR a new event
-        const defaultAttendance = {};
-            if (clientIds.length > 0) {
-                clientIds.forEach(clientId => {
-                    defaultAttendance[clientId] = 'present';
-                });
+        if (editingEventId) {
+            // Simple edit (of a non-recurring or newly detached event)
+            const updatedEvent = { ...existingEvent, ...eventBase, id: editingEventId };
+            // Dacă evenimentul existent *nu* era recurent, dar acum *este* (utilizatorul a adăugat recurență la un eveniment singular)
+            if ((!existingEvent.repeating || existingEvent.repeating.length === 0) && eventBase.repeating.length > 0) {
+                // Tratează-l ca pe o creare de noi evenimente recurente, dar șterge-l pe cel vechi
+                calendarState.deleteEvent(editingEventId); // Șterge originalul
+                const newEvents = createRecurringEvents(eventBase); // Creează seria
+                calendarState.saveEvent(newEvents);
+            } else {
+                // Editare simplă
+                calendarState.saveEvent(updatedEvent);
             }
-            
+        } else {
+            // New event
             if (eventBase.repeating.length > 0) {
                 // New recurring event
-                // Pass defaultAttendance to the create function
-                const newEvents = createRecurringEvents(eventBase, defaultAttendance); 
+                const newEvents = createRecurringEvents(eventBase);
                 calendarState.saveEvent(newEvents);
             } else {
                 // New single event
-                const newEvent = { 
-                    ...eventBase, 
-                    id: generateEventId(),
-                    attendance: defaultAttendance // Add the new attendance object
-                };
+                const newEvent = { ...eventBase, id: generateEventId() };
                 calendarState.saveEvent(newEvent);
             }
+        }
     }
     // --- END NEW RECURRENCE EDIT LOGIC ---
     
@@ -857,12 +825,7 @@ function setupAdminListeners() {
 
 // --- Funcții Helper ---
 
-/**
- * Helper function to create recurring events
- * @param {object} eventBase - The base event data from the form
- * @param {object} defaultAttendance - The pre-built attendance object
- */
-function createRecurringEvents(eventBase, defaultAttendance = {}) { // 1. Accept new parameter
+function createRecurringEvents(eventBase) {
     const events = [];
     const parts = eventBase.date.split('-');
     const startDate = new Date(parts[0], parts[1] - 1, parts[2]);
@@ -880,17 +843,7 @@ function createRecurringEvents(eventBase, defaultAttendance = {}) { // 1. Accept
             const day = String(currentDate.getDate()).padStart(2, '0');
             const dateStr = `${year}-${month}-${day}`;
             
-            // 2. Add attendance to each new event
-            events.push({ 
-                ...eventBase, 
-                id: generateEventId(), 
-                date: dateStr,
-                // --- BUG FIX HERE ---
-                // Original was: attendance: defaultAttendance
-                // This creates a new copy for each event
-                attendance: { ...defaultAttendance } 
-                // --- END BUG FIX ---
-            });
+            events.push({ ...eventBase, id: generateEventId(), date: dateStr });
         }
         currentDate.setDate(currentDate.getDate() + 1);
     }
@@ -1204,17 +1157,6 @@ async function init() {
         if (dom.billingSection) {
             dom.billingSection.style.display = 'none';
         }
-        
-        // Ascunde link-ul de Tipuri Evenimente din sidebar
-        const eventTypesLink = document.querySelector('.menu-item[data-view="eventTypes"]');
-        if (eventTypesLink) {
-            eventTypesLink.style.display = 'none';
-        }
-        
-        // Ascunde fizic secțiunea de Tipuri Evenimente
-        if (dom.eventTypesSection) {
-            dom.eventTypesSection.style.display = 'none';
-        }
     }
         
     } catch (error) {
@@ -1231,12 +1173,6 @@ async function init() {
         // calendarState.initializeData(data); // Deja inițializat mai sus
         const programsData = await api.loadPrograms();
         calendarState.setPrograms(programsData.programs);
-        
-        // Încărcare tipuri de evenimente
-        const eventTypes = await api.loadEventTypes();
-        calendarState.setEventTypes(eventTypes); // Salvează în state
-        populateEventTypeDropdown(eventTypes); // Populează dropdown-ul
-        
         const evolutionData = await api.loadEvolutionData();
         calendarState.setEvolutionData(evolutionData);
 
@@ -1380,7 +1316,6 @@ async function init() {
     // Inițializează serviciul de facturare
     if (auth.isAdmin()) {
         billing.init();
-        eventTypesService.init(); // Initialize event types management
     }
     // --- Randare Inițială ---
     populateClientFilterDropdown(); // Populează dropdown-ul de clienți

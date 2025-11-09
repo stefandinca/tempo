@@ -493,24 +493,8 @@ function addAttendanceListeners(eventId, canModify = true) {
             const clientId = toggle.dataset.clientId;
             
             const event = calendarState.getEventById(eventId);
-            
-            // --- START BUG FIX ---
-            // 1. Get the current attendance object (or an empty one)
-            //    Make sure to handle the old array bug as well.
-            const currentAttendance = (event.attendance && !Array.isArray(event.attendance)) 
-                ? event.attendance 
-                : {};
-
-            // 2. Create a NEW object by copying the old one
-            const newAttendance = { ...currentAttendance };
-            
-            // 3. Modify the NEW object
-            newAttendance[clientId] = status;
-            
-            // 4. Assign the NEW object back to the event
-            // This breaks the shared reference.
-            event.attendance = newAttendance;
-            // --- END BUG FIX ---
+            if (!event.attendance) event.attendance = {};
+            event.attendance[clientId] = status;
             
             calendarState.saveEvent(event);
             await api.saveData(calendarState.getState());
@@ -1098,16 +1082,12 @@ export function updateEventTitle() {
 export function updateEventTypeDependencies(eventType) {
     const startTimeField = $('startTime');
     const durationField = $('duration');
-    const eventTypeSelect = $('eventType');
     
-    // Obține opțiunea selectată și atributele sale
-    const selectedOption = eventTypeSelect ? eventTypeSelect.selectedOptions[0] : null;
-    const requiresTime = selectedOption ? (selectedOption.dataset.requiresTime === 'true') : true;
-    const isBillableByDefault = selectedOption ? (selectedOption.dataset.isBillable === 'true') : true;
+    const isRequired = !(eventType === 'day-off');
 
     [startTimeField, durationField].forEach(field => {
         if(field) {
-            if (requiresTime) {
+            if (isRequired) {
                 field.setAttribute('required', 'required');
                 field.style.opacity = '1';
             } else {
@@ -1119,7 +1099,7 @@ export function updateEventTypeDependencies(eventType) {
     
     const isBillableCheckbox = $('isBillable');
     if (isBillableCheckbox) {
-        isBillableCheckbox.checked = isBillableByDefault;
+        isBillableCheckbox.checked = !(eventType === 'pauza-masa' || eventType === 'sedinta' || eventType === 'day-off');
     }
 }
 
@@ -1154,8 +1134,19 @@ function calculateEndTime(startTime, durationMinutes) {
 }
 
 function getEventTypeLabel(type) {
-    // Folosește funcția din calendarState pentru a obține label-ul
-    return calendarState.getEventTypeLabel(type);
+    const types = {
+        'therapy': 'Terapie',
+        'group-therapy': 'Terapie de grup',
+        'logopedie': 'Logopedie',
+        'coordination': 'Coordonare',
+        'day-off': 'Zi libera',
+        'pauza-masa': 'Pauza de masa',
+        'sedinta': 'Sedinta',
+        'evaluare':'Evaluare',
+        'psihoterapie':'Psihoterapie',
+        'dezvoltare-personala':'Dezvoltare personala'
+    };
+    return types[type] || type;
 }
 
 function getRoleLabel(role) {

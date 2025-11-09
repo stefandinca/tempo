@@ -10,7 +10,7 @@ import * as api from './apiService.js';
 import { showCustomAlert, showCustomConfirm } from './uiService.js';
 
 // --- Constante ---
-
+const BILLING_RATE_PER_HOUR = 100;
 const $ = (id) => document.getElementById(id);
 
 // --- Stare locală ---
@@ -118,7 +118,7 @@ export function renderBillingView() {
 
     filteredClients.forEach(client => {
         const hoursData = calculateClientHoursForMonth(client.id, year, month, events);
-        const totalDue = hoursData.totalDue;
+        const totalDue = hoursData.billableHours * BILLING_RATE_PER_HOUR;
         
         const card = document.createElement('div');
         card.className = 'billing-card';
@@ -195,15 +195,13 @@ function generatePaymentSummary(clientId, monthKey, totalDue) {
     `;
 }
 
-
-
 /**
- * Calculează orele facturabile ȘI totalul de plată pentru un client într-o lună specificată.
+ * Calculează orele facturabile pentru un client într-o lună specificată.
+ */
+/**
+ * Calculează orele facturabile pentru un client într-o lună specificată.
  */
 function calculateClientHoursForMonth(clientId, year, month, allEvents) {
-    // Get eventTypes from state
-    const { eventTypes } = calendarState.getState(); // <-- NEW
-
     const monthEvents = allEvents.filter(event => {
         const clientIds = event.clientIds || (event.clientId ? [event.clientId] : []);
         if (!clientIds.includes(clientId)) return false;
@@ -213,33 +211,24 @@ function calculateClientHoursForMonth(clientId, year, month, allEvents) {
     });
 
     let billableMinutes = 0;
-    let totalDue = 0; // <-- NEW
-
+    
     monthEvents.forEach(event => {
         
+        // === CORECȚIE: ACEASTĂ LINIE LIPSEA ===
+        // Definește 'attendance' pentru clientul curent în cadrul evenimentului
         const attendance = (event.attendance && event.attendance[clientId]) || 'present';
+        // === SFÂRȘIT CORECȚIE ===
+
         // Este facturabil ȘI clientul a fost prezent sau absent (dar nu absent motivat)
         const isBillableAttendance = (attendance === 'present' || attendance === 'absent');
         
-        if (event.isBillable !== false && isBillableAttendance) {
-            
-            // 1. Calculează orele (pentru afișare)
-            if (event.duration) {
-              billableMinutes += (Number(event.duration) || 0);
-            }
-
-            // 2. Calculează totalul de plată (pentru calcul)
-            const eventType = eventTypes.find(t => t.id === event.type); // <-- NEW
-            if (eventType && eventType.base_price > 0) { // <-- NEW
-                totalDue += (eventType.base_price * (Number(event.duration) / 60));
-            }
-            // Dacă nu se găsește tipul sau prețul e 0, se adaugă 0, ceea ce e corect.
+        if (event.isBillable !== false && isBillableAttendance && event.duration) {
+          billableMinutes += (Number(event.duration) || 0);
         }
     });
     
     return {
-        billableHours: billableMinutes / 60,
-        totalDue: totalDue // <-- NEW
+        billableHours: billableMinutes / 60
     };
 }
 

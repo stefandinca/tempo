@@ -33,8 +33,8 @@
         <!-- Sidebar -->
         <nav class="sidebar bg-white dark:bg-gray-800 border-b md:border-r border-gray-200 dark:border-gray-700 flex md:flex-col w-full md:w-64 flex-shrink-0">
             <div class="sidebar-header flex items-center justify-center md:justify-center p-4 md:mb-8">
-                <img src="logo.png" alt="Tempo Logo" class="logo-full h-8 md:h-10">
-                <img src="logo.png" alt="Tempo Logo" class="logo-small h-8 hidden">
+                <img src="placeholder-logo.png" alt="Tempo Logo" class="logo-full h-8 md:h-10">
+                <img src="placeholder-logo.png" alt="Tempo Logo" class="logo-small h-8 hidden">
             </div>
             <ul class="sidebar-menu flex-col flex-1 overflow-y-auto p-2 md:p-4">
                 <li class="menu-item active" data-view="dashboard">
@@ -65,12 +65,6 @@
                     <a href="#" class="flex items-center gap-3 px-3 py-2 md:px-4 md:py-3 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors whitespace-nowrap">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H7"/></svg>
                         <span class="hidden md:inline">Facturare</span>
-                    </a>
-                </li>
-                <li class="menu-item" data-view="eventTypes">
-                    <a href="#" class="flex items-center gap-3 px-3 py-2 md:px-4 md:py-3 rounded-lg text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors whitespace-nowrap">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
-                        <span class="hidden md:inline">Servicii</span>
                     </a>
                 </li>
             </ul>
@@ -142,29 +136,29 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-gray-600 dark:text-gray-400"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
                                 <h2 class="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Programul Zilei (Dvs.)</h2>
                             </div>
-                            <div id="dashboardTodaySchedule" class="space-y-0 max-h-[450px] overflow-y-auto pr-2">
-                                <div class="flex gap-4 py-3.5 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-                                    <div class="text-sm md:text-base font-semibold text-primary flex-shrink-0 w-24">09:00 - 10:00</div>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="font-semibold text-gray-900 dark:text-white overflow-hidden text-ellipsis whitespace-nowrap">Terapie - Amalia</div>
-                                        <div class="text-sm text-gray-600 dark:text-gray-400">cu Amalia</div>
+                            <div id="dashboardTodaySchedule" class="space-y-0">
+                                <div class="schedule-item">
+                                    <div class="schedule-time">09:00 - 10:00</div>
+                                    <div class="schedule-details">
+                                        <div class="schedule-title">Terapie - Amalia</div>
+                                        <div class="schedule-client">cu Amalia</div>
                                     </div>
                                 </div>
-                                <div class="flex gap-4 py-3.5 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-                                    <div class="text-sm md:text-base font-semibold text-primary flex-shrink-0 w-24">10:00 - 11:00</div>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="font-semibold text-gray-900 dark:text-white overflow-hidden text-ellipsis whitespace-nowrap">Terapie - Alex</div>
-                                        <div class="text-sm text-gray-600 dark:text-gray-400">cu Alex</div>
+                                <div class="schedule-item">
+                                    <div class="schedule-time">10:00 - 11:00</div>
+                                    <div class="schedule-details">
+                                        <div class="schedule-title">Terapie - Alex</div>
+                                        <div class="schedule-client">cu Alex</div>
                                     </div>
                                 </div>
-                                <div class="flex gap-4 py-3.5 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-                                    <div class="text-sm md:text-base font-semibold text-primary flex-shrink-0 w-24">11:00 - 12:00</div>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="font-semibold text-gray-900 dark:text-white overflow-hidden text-ellipsis whitespace-nowrap">Terapie - Tudor</div>
-                                        <div class="text-sm text-gray-600 dark:text-gray-400">cu Tudor</div>
+                                <div class="schedule-item">
+                                    <div class="schedule-time">11:00 - 12:00</div>
+                                    <div class="schedule-details">
+                                        <div class="schedule-title">Terapie - Tudor</div>
+                                        <div class="schedule-client">cu Tudor</div>
                                     </div>
                                 </div>
-                                <div class="text-center py-8 text-gray-500 dark:text-gray-400 hidden text-center py-8 text-gray-500 dark:text-gray-400">
+                                <div class="empty-schedule hidden text-center py-8 text-gray-500 dark:text-gray-400">
                                     <p>Nicio sesiune programată pentru astăzi.</p>
                                 </div>
                             </div>
@@ -199,17 +193,17 @@
                                 <h2 class="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Statistici Rapide</h2>
                             </div>
                             <div id="dashboardQuickStats" class="space-y-0">
-                                <div class="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Sesiuni Totale</span>
-                                    <span class="text-2xl md:text-3xl font-bold text-primary" id="statTotalSessions">120</span>
+                                <div class="stat-item">
+                                    <span class="stat-label">Sesiuni Totale</span>
+                                    <span class="stat-value" id="statTotalSessions">120</span>
                                 </div>
-                                <div class="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Prezență Centru</span>
-                                    <span class="text-2xl md:text-3xl font-bold text-primary" id="statAttendance">95%</span>
+                                <div class="stat-item">
+                                    <span class="stat-label">Prezență Centru</span>
+                                    <span class="stat-value" id="statAttendance">95%</span>
                                 </div>
-                                <div class="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-                                    <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Rapoarte În Așteptare</span>
-                                    <span class="text-2xl md:text-3xl font-bold text-primary" id="statPendingReports">3</span>
+                                <div class="stat-item">
+                                    <span class="stat-label">Rapoarte În Așteptare</span>
+                                    <span class="stat-value" id="statPendingReports">3</span>
                                 </div>
                             </div>
                         </div>
@@ -220,28 +214,28 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="text-gray-600 dark:text-gray-400"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                                 <h2 class="text-lg md:text-xl font-semibold text-gray-900 dark:text-white">Activitate Recentă</h2>
                             </div>
-                            <div id="dashboardRecentActivity" class="max-h-[200px] overflow-y-auto pr-2" class="space-y-0 overflow-x-auto">
-                                <div class="grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 md:gap-4 py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-                                    <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                            <div id="dashboardRecentActivity" class="space-y-0 overflow-x-auto">
+                                <div class="activity-item">
+                                    <div class="activity-icon">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600 dark:text-gray-400"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                     </div>
-                                    <div class="text-sm text-gray-700 dark:text-gray-300 overflow-hidden text-ellipsis whitespace-nowrap">
+                                    <div class="activity-text">
                                         <strong>Evaluare salvată</strong>: Tudor
                                     </div>
-                                    <div class="text-xs md:text-sm text-gray-500 dark:text-gray-400 flex-shrink-0 whitespace-nowrap">acum 45 min</div>
-                                    <div class="flex-shrink-0">
+                                    <div class="activity-time">acum 45 min</div>
+                                    <div class="activity-action">
                                         <button class="px-3 py-1.5 text-xs md:text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors whitespace-nowrap" data-action="goToClientEvolution" data-client-id="client_1761643441294">Vezi Evoluție</button>
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 md:gap-4 py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-                                    <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
+                                <div class="activity-item">
+                                    <div class="activity-icon">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-600 dark:text-gray-400"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg>
                                     </div>
-                                    <div class="text-sm text-gray-700 dark:text-gray-300 overflow-hidden text-ellipsis whitespace-nowrap">
+                                    <div class="activity-text">
                                         <strong>Eveniment adăugat</strong>: Terapie - Stefan Negru
                                     </div>
-                                    <div class="text-xs md:text-sm text-gray-500 dark:text-gray-400 flex-shrink-0 whitespace-nowrap">acum 2 ore</div>
-                                    <div class="flex-shrink-0">
+                                    <div class="activity-time">acum 2 ore</div>
+                                    <div class="activity-action">
                                         <button class="px-3 py-1.5 text-xs md:text-sm bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors whitespace-nowrap" data-action="goToDate" data-date="2025-11-03">Vezi Ziua</button>
                                     </div>
                                 </div>
@@ -520,90 +514,6 @@
         </form>
     </div>
 </div>
-
-    <!-- Event Types Section -->
-    <section id="eventTypesSection" class="main-section">
-        <header class="section-header">
-            <div class="header-title-group">
-                <button class="mobile-menu-toggle btn-icon md:hidden">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                </button>
-                <h1 class="text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">Servicii</h1>
-            </div>
-            <div class="header-actions">
-                <button id="addEventTypeBtn" class="btn btn-primary">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m-7-7h14"/></svg>
-                    
-                </button>
-            </div>
-        </header>
-
-        <div class="section-content-grid" style="grid-template-columns: 1fr; overflow-y: auto;">
-            <div class="section-col-list" style="height: auto; overflow: visible;">
-                <input type="search" id="eventTypeSearchBar" class="form-input" placeholder="Caută după nume..." style="margin-bottom: 1.5rem;">
-                
-                
-                <div id="eventTypesList" class="space-y-4">
-                    <!-- Event types will be rendered here -->
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Event Type Modal -->
-    <div id="eventTypeModal" class="modal-backdrop modal-small">
-        <div class="modal-content">
-            <form id="eventTypeForm">
-                <div class="modal-header">
-                    <h2 id="eventTypeModalTitle" class="modal-title">Adaugă Tip Eveniment</h2>
-                    <button id="closeEventTypeModal" type="button" class="btn-icon btn-close" title="Închide">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="eventTypeOriginalId">
-                    
-                    <div class="form-group">
-                        <label for="eventTypeId">ID Tip <span class="text-red-500">*</span></label>
-                        <input type="text" id="eventTypeId" class="form-input" required pattern="[a-z0-9\]+" placeholder="ex: terapie-speciala" title="Doar litere mici, cifre și liniuță">
-                        <small class="text-gray-500">Doar litere mici, cifre și liniuță (-). Nu se poate schimba după creare.</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="eventTypeLabel">Denumire <span class="text-red-500">*</span></label>
-                        <input type="text" id="eventTypeLabel" class="form-input" required placeholder="ex: Terapie Specială">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="eventTypePrice">Preț de Bază (RON)</label>
-                        <input type="number" id="eventTypePrice" class="form-input" placeholder="ex: 100" min="0" step="1">
-                        <small class="text-gray-500">Setați 0 dacă prețul este variabil sau nu se aplică.</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" id="eventTypeIsBillable" class="form-checkbox" checked>
-                            <span>Eveniment facturabil</span>
-                        </label>
-                        <small class="text-gray-500 block mt-1">Dacă este bifat, evenimentele de acest tip vor fi facturabile implicit.</small>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" id="eventTypeRequiresTime" class="form-checkbox" checked>
-                            <span>Necesită oră și durată</span>
-                        </label>
-                        <small class="text-gray-500 block mt-1">Dacă este bifat, va fi obligatoriu să specifici ora și durata la crearea evenimentelor.</small>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="cancelEventTypeBtn" type="button" class="btn btn-secondary">Anulează</button>
-                    <button id="deleteEventTypeBtn" type="button" class="btn btn-danger" style="display: none;">Șterge</button>
-                    <button type="submit" class="btn btn-primary">Salvează</button>
-                </div>
-            </form>
-        </div>
-    </div>
             
         </main>
     </div>
@@ -665,7 +575,16 @@
                         <div class="form-group">
                             <label for="eventType">Tip Eveniment</label>
                             <select id="eventType" name="eventType" class="form-input" required>
-                                <option value="">Se încarcă...</option>
+                                <option value="therapy">Terapie</option>
+                                <option value="group-therapy">Terapie de grup</option>
+                                <option value="logopedie">Logopedie</option>
+                                <option value="coordination">Coordonare</option>
+                                <option value="evaluare">Evaluare</option>
+                                <option value="psihoterapie">Psihoterapie</option>
+                                <option value="dezvoltare-personala">Dezvoltare personala</option>
+                                <option value="pauza-masa">Pauza de masa</option>
+                                <option value="sedinta">Sedinta</option>
+                                <option value="day-off">Zi libera</option>
                             </select>
                         </div>
                         
@@ -1568,13 +1487,13 @@
                 }
 
                 html += `
-                <div class="grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 md:gap-4 py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-                    <div class="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">${icon}</div>
-                    <div class="text-sm text-gray-700 dark:text-gray-300 overflow-hidden text-ellipsis whitespace-nowrap">
+                <div class="activity-item">
+                    <div class="activity-icon">${icon}</div>
+                    <div class="activity-text">
                         <strong>${entry.action}</strong>: ${entry.details}
                     </div>
-                    <div class="text-xs md:text-sm text-gray-500 dark:text-gray-400 flex-shrink-0 whitespace-nowrap">${formatTimeAgo(entry.timestamp)}</div>
-                    <div class="flex-shrink-0">${actionButton}</div>
+                    <div class="activity-time">${formatTimeAgo(entry.timestamp)}</div>
+                    <div class="activity-action">${actionButton}</div>
                 </div>
                 `;
             });

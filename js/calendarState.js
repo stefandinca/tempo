@@ -21,7 +21,6 @@ const state = {
     programs: [],
     evolutionData: {},
     billingsData: {},
-    eventTypes: [], // Tipuri de evenimente din baza de date
 
     // Starea filtrelor
     activeFilters: [], // O listă de ID-uri ale membrilor echipei
@@ -72,23 +71,6 @@ export const calendarState = {
      */
     setPrograms: (programs) => {
         state.programs = programs || [];
-    },
-
-    /**
-     * Setează tipurile de evenimente încărcate.
-     */
-    setEventTypes: (eventTypes) => {
-        state.eventTypes = eventTypes || [];
-    },
-
-    /**
-     * Obține label-ul pentru un tip de eveniment pe baza ID-ului.
-     * @param {string} typeId - ID-ul tipului de eveniment
-     * @returns {string} - Label-ul tipului sau ID-ul dacă nu se găsește
-     */
-    getEventTypeLabel: (typeId) => {
-        const eventType = state.eventTypes.find(t => t.id === typeId);
-        return eventType ? eventType.label : typeId;
     },
 
     /**

@@ -94,7 +94,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'login') {
             sendResponse(['success' => false, 'message' => 'Username and password required'], 400);
         }
         
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
         $stmt->execute([$username]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
         
@@ -161,20 +161,7 @@ try {
                     $event['clientIds'] = $event['clientIds'] ? explode(',', $event['clientIds']) : [];
                     $event['programIds'] = $event['programIds'] ? explode(',', $event['programIds']) : [];
                     $event['repeating'] = $event['repeating'] ? array_map('intval', json_decode($event['repeating'])) : [];                    // Convertim 'isPublic' și 'isBillable' înapoi în boolean pentru JS
-                    // --- START FIX ---
-                    // Robustly decode attendance, ensuring it's always an object
-                    $attendanceData = $event['attendance'] ? json_decode($event['attendance'], true) : null;
-                    if (is_array($attendanceData)) {
-                        // This converts PHP associative arrays ({"a":1}) AND
-                        // empty arrays ([]) into objects.
-                        $event['attendance'] = (object)$attendanceData;
-                    } elseif (is_object($attendanceData)) {
-                        $event['attendance'] = $attendanceData;
-                    } else {
-                        // Default to an empty object if null or invalid
-                        $event['attendance'] = new stdClass();
-                    }
-                    // --- END FIX ---
+                    $event['attendance'] = $event['attendance'] ? json_decode($event['attendance'], true) : new stdClass();
                     $event['isPublic'] = (bool)$event['isPublic'];
                     $event['isBillable'] = (bool)$event['isBillable'];
 
@@ -205,36 +192,9 @@ try {
                 try {
                     $pdo->beginTransaction();
 
-                    // 1. Șterge datele vechi
+                    // 1. Șterge datele vechi (cu TRUNCATE pentru a reseta și auto-increment, dar necesită permisiuni)
+                    // Folosim DELETE pentru compatibilitate mai largă cu cheile străine
                     $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
-
-                    // --- START MODIFICATION ---
-                    // Logica de ștergere a istoricului
-                    // Colectează toate ID-urile evenimentelor care vor fi salvate
-                    $newEventIds = [];
-                    if (isset($input['events']) && is_array($input['events'])) {
-                        foreach ($input['events'] as $e) {
-                            if (isset($e['id'])) {
-                                $newEventIds[] = $e['id'];
-                            }
-                        }
-                    }
-
-                    if (count($newEventIds) > 0) {
-                        // Creează placeholdere (?) pentru clauza IN
-                        $placeholders = rtrim(str_repeat('?,', count($newEventIds)), ',');
-                        // Șterge din program_history DOAR intrările ale căror event_id NU SUNT în noua listă de evenimente
-                        $stmt_delete_history = $pdo->prepare("DELETE FROM program_history WHERE event_id IS NOT NULL AND event_id NOT IN ($placeholders)");
-                        $stmt_delete_history->execute($newEventIds);
-                        debugLog("Curățat " . $stmt_delete_history->rowCount() . " înregistrări vechi din program_history.");
-                    } else {
-                        // Dacă nu se trimit evenimente, șterge tot istoricul asociat evenimentelor
-                        $pdo->exec("DELETE FROM program_history WHERE event_id IS NOT NULL");
-                        debugLog("Niciun eveniment primit. Se șterge tot istoricul programelor asociat evenimentelor.");
-                    }
-                    // --- END MODIFICATION ---
-
-                    // Continuă cu ștergerea normală a datelor
                     $pdo->exec("DELETE FROM event_team_members;");
                     $pdo->exec("DELETE FROM event_clients;");
                     $pdo->exec("DELETE FROM event_programs;");
@@ -298,257 +258,6 @@ try {
             }
             break;
 
-        // ==========================================================
-        // CAZUL 'event_types' - Gestionează tipurile de evenimente din DB
-        // ==========================================================
-        case 'event_types':
-            if ($method === 'GET') {
-                try {
-                    // FIX 1: Add base_price to the SELECT query
-                    $stmt = $pdo->query("SELECT id, label, isBillable, requiresTime, base_price FROM event_types ORDER BY label");
-                    $eventTypes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-                    
-                    // Convertim valorile boolean/float pentru JavaScript
-                    foreach ($eventTypes as &$type) {
-                        $type['isBillable'] = (bool)$type['isBillable'];
-                        $type['requiresTime'] = (bool)$type['requiresTime'];
-                        $type['base_price'] = (float)($type['base_price'] ?? 0); // <-- FIX 2: Process the price
-                    }
-                    
-                    sendResponse($eventTypes);
-                } catch (Exception $e) {
-                    debugLog("Eroare la încărcarea tipurilor de evenimente: " . $e->getMessage());
-                    sendError('Failed to load event types: ' . $e->getMessage());
-                }
-
-            } elseif ($method === 'POST') {
-                // Create new event type
-                try {
-                    if ($input === null) {
-                        sendError('Invalid JSON data', 400);
-                    }
-                    
-                    $id = $input['id'] ?? null;
-                    $label = $input['label'] ?? null;
-                    $isBillable = isset($input['isBillable']) ? (int)$input['isBillable'] : 1;
-                    $requiresTime = isset($input['requiresTime']) ? (int)$input['requiresTime'] : 1;
-                    $base_price = $input['base_price'] ?? 0; // <-- ADD: Get base_price
-                    
-                    if (!$id || !$label) {
-                        sendError('ID and label are required', 400);
-                    }
-                    
-                    // Validate ID format (lowercase, numbers, hyphens only)
-                    if (!preg_match('/^[a-z0-9\]+$/', $id)) {
-                        sendError('ID must contain only lowercase letters, numbers', 400);
-                    }
-                    
-                    // FIX 3: Add base_price to the INSERT query
-                    $stmt = $pdo->prepare("INSERT INTO event_types (id, label, isBillable, requiresTime, base_price) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->execute([$id, $label, $isBillable, $requiresTime, $base_price]);
-                    
-                    debugLog("Tip eveniment creat: $id - $label - Pret: $base_price");
-                    sendResponse(['success' => true, 'message' => 'Event type created successfully', 'id' => $id]);
-                    
-                } catch (PDOException $e) {
-                    if ($e->getCode() == 23000) { // Duplicate entry
-                        sendError('Un tip de eveniment cu acest ID există deja', 409);
-                    } else {
-                        debugLog("Eroare la crearea tipului: " . $e->getMessage());
-                        sendError('Failed to create event type: ' . $e->getMessage());
-                    }
-                }
-            } elseif ($method === 'PUT') {
-                // Update existing event type
-                try {
-                    if ($input === null) {
-                        sendError('Invalid JSON data', 400);
-                    }
-                    
-                    $id = $input['id'] ?? null;
-                    $label = $input['label'] ?? null;
-                    $isBillable = isset($input['isBillable']) ? (int)$input['isBillable'] : 1;
-                    $requiresTime = isset($input['requiresTime']) ? (int)$input['requiresTime'] : 1;
-                    $base_price = $input['base_price'] ?? 0; // <-- ADD: Get base_price
-                    
-                    if (!$id || !$label) {
-                        sendError('ID and label are required', 400);
-                    }
-                    
-                    // FIX 4: This must be an UPDATE, not an INSERT
-                    $stmt = $pdo->prepare("UPDATE event_types SET label = ?, isBillable = ?, requiresTime = ?, base_price = ? WHERE id = ?");
-                    $affected = $stmt->execute([$label, $isBillable, $requiresTime, $base_price, $id]);
-                    
-                    if ($stmt->rowCount() === 0) {
-                        sendError('Event type not found', 404);
-                    }
-                    
-                    debugLog("Tip eveniment actualizat: $id - $label - Pret: $base_price");
-                    sendResponse(['success' => true, 'message' => 'Event type updated successfully']);
-                    
-                } catch (Exception $e) {
-                    debugLog("Eroare la actualizarea tipului: " . $e->getMessage());
-                    sendError('Failed to update event type: ' . $e->getMessage());
-                }
-            } elseif ($method === 'DELETE') {
-                // Delete event type
-                try {
-                    // Get ID from query string for DELETE
-                    $id = $_GET['id'] ?? null;
-                    
-                    if (!$id) {
-                        sendError('ID is required', 400);
-                    }
-                    
-                    // Check if any events use this type
-                    $checkStmt = $pdo->prepare("SELECT COUNT(*) as count FROM events WHERE type = ?");
-                    $checkStmt->execute([$id]);
-                    $result = $checkStmt->fetch();
-                    
-                    if ($result['count'] > 0) {
-                        sendError("Nu poți șterge acest tip. Există {$result['count']} evenimente care îl folosesc.", 409);
-                    }
-                    
-                    $stmt = $pdo->prepare("DELETE FROM event_types WHERE id = ?");
-                    $stmt->execute([$id]);
-                    
-                    if ($stmt->rowCount() === 0) {
-                        sendError('Event type not found', 404);
-                    }
-                    
-                    debugLog("Tip eveniment șters: $id");
-                    sendResponse(['success' => true, 'message' => 'Event type deleted successfully']);
-                    
-                } catch (Exception $e) {
-                    debugLog("Eroare la ștergerea tipului: " . $e->getMessage());
-                    sendError('Failed to delete event type: ' . $e->getMessage());
-                }
-            } else {
-                sendError('Unsupported method for event_types', 405);
-            }
-            break; // <-- Make sure to copy down to the break;
-
-        // ==========================================================
-        // CAZUL 'programs'
-        // ==========================================================
-        
-        case 'programs':
-    if ($method === 'GET') {
-        // Already handled - returns programs from database
-        $programs = $pdo->query("SELECT * FROM programs ORDER BY title")->fetchAll();
-        sendResponse(['programs' => $programs]);
-        
-    } elseif ($method === 'POST') {
-        // Create new program
-        try {
-            if ($input === null) {
-                sendError('Invalid JSON data', 400);
-            }
-            
-            $id = $input['id'] ?? null;
-            $title = $input['title'] ?? null;
-            $description = $input['description'] ?? '';
-            
-            if (!$id || !$title) {
-                sendError('ID și titlul sunt obligatorii', 400);
-            }
-            
-            // Validate ID format
-            if (!preg_match('/^prog_[a-z0-9_]+$/', $id)) {
-                sendError('ID-ul trebuie să înceapă cu "prog_" și să conțină doar litere mici, cifre și underscore', 400);
-            }
-            
-            $stmt = $pdo->prepare("INSERT INTO programs (id, title, description) VALUES (?, ?, ?)");
-            $stmt->execute([$id, $title, $description]);
-            
-            debugLog("Program creat: $id - $title");
-            sendResponse(['success' => true, 'message' => 'Program creat cu succes', 'id' => $id]);
-            
-        } catch (PDOException $e) {
-            if ($e->getCode() == 23000) {
-                sendError('Un program cu acest ID există deja', 409);
-            } else {
-                debugLog("Eroare la crearea programului: " . $e->getMessage());
-                sendError('Nu s-a putut crea programul: ' . $e->getMessage());
-            }
-        }
-        
-    } elseif ($method === 'PUT') {
-        // Update program
-        try {
-            if ($input === null) {
-                sendError('Invalid JSON data', 400);
-            }
-            
-            $id = $input['id'] ?? null;
-            $title = $input['title'] ?? null;
-            $description = $input['description'] ?? '';
-            
-            if (!$id || !$title) {
-                sendError('ID și titlul sunt obligatorii', 400);
-            }
-            
-            $stmt = $pdo->prepare("UPDATE programs SET title = ?, description = ? WHERE id = ?");
-            $stmt->execute([$title, $description, $id]);
-            
-            if ($stmt->rowCount() === 0) {
-                sendError('Programul nu a fost găsit', 404);
-            }
-            
-            debugLog("Program actualizat: $id - $title");
-            sendResponse(['success' => true, 'message' => 'Program actualizat cu succes']);
-            
-        } catch (Exception $e) {
-            debugLog("Eroare la actualizarea programului: " . $e->getMessage());
-            sendError('Nu s-a putut actualiza programul: ' . $e->getMessage());
-        }
-        
-    } elseif ($method === 'DELETE') {
-        // Delete program
-        try {
-            $id = $_GET['id'] ?? null;
-            
-            if (!$id) {
-                sendError('ID-ul este obligatoriu', 400);
-            }
-            
-            // Check if any events use this program
-            $checkStmt = $pdo->prepare("SELECT COUNT(*) as count FROM event_programs WHERE program_id = ?");
-            $checkStmt->execute([$id]);
-            $result = $checkStmt->fetch();
-            
-            if ($result['count'] > 0) {
-                sendError("Nu poți șterge acest program. Există {$result['count']} evenimente care îl folosesc.", 409);
-            }
-            
-            // Check if any program history uses this program
-            $checkHistoryStmt = $pdo->prepare("SELECT COUNT(*) as count FROM program_history WHERE program_id = ?");
-            $checkHistoryStmt->execute([$id]);
-            $historyResult = $checkHistoryStmt->fetch();
-            
-            if ($historyResult['count'] > 0) {
-                sendError("Nu poți șterge acest program. Există {$historyResult['count']} înregistrări în istoricul programelor.", 409);
-            }
-            
-            $stmt = $pdo->prepare("DELETE FROM programs WHERE id = ?");
-            $stmt->execute([$id]);
-            
-            if ($stmt->rowCount() === 0) {
-                sendError('Programul nu a fost găsit', 404);
-            }
-            
-            debugLog("Program șters: $id");
-            sendResponse(['success' => true, 'message' => 'Program șters cu succes']);
-            
-        } catch (Exception $e) {
-            debugLog("Eroare la ștergerea programului: " . $e->getMessage());
-            sendError('Nu s-a putut șterge programul: ' . $e->getMessage());
-        }
-    } else {
-        sendError('Metodă nepermisă pentru programs', 405);
-    }
-    break;
-        
         // ==========================================================
         // CAZUL 'evolution'
         // ==========================================================
