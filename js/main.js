@@ -1411,6 +1411,62 @@ async function init() {
     }
     
     console.log('Inițializare completă!');
+
+   // Înlocuiește întreaga funcție initOnboardingTour din main.js
+
+    function initOnboardingTour() {
+        // LINIA 1 CORECTATĂ: Verificăm atât obiectul, cât și funcția din interior
+        if (typeof window.driver === 'undefined' || typeof window.driver.driver === 'undefined') {
+            console.error('Driver.js nu este încărcat corect.');
+            return;
+        }
+
+        // Configurează pașii turului
+        // LINIA 2 CORECTATĂ: Apelul corect este window.driver.driver()
+        const driverObj = window.driver.driver({
+            showProgress: true,
+            popoverClass: 'tempo-driver-popover', // Clasă custom pentru stilizare
+            prevBtnText: 'Înapoi',
+            nextBtnText: 'Următorul',
+            doneBtnText: 'Terminat',
+            steps: [
+                { element: '.sidebar-menu', popover: { title: 'Meniul Principal', description: 'Navighează între secțiunile principale ale aplicației de aici: Dashboard, Calendar, Clienți, Echipă, Facturare și Servicii.' } },
+                { element: '.menu-item[data-view="dashboard"]', popover: { title: 'Dashboard (Panou de control)', description: 'Aici vezi un rezumat al zilei curente, programul tău și statisticile rapide.' } },
+                { element: '#dashboardTodaySchedule', popover: { title: 'Programul Zilei', description: 'Vezi toate sesiunile programate pentru astăzi. Apasă pe una pentru a vedea detalii.' } },
+                { element: '#addEventBtn', popover: { title: 'Acțiune Rapidă', description: 'Folosește acest buton pentru a adăuga rapid o nouă sesiune în calendar, indiferent în ce secțiune te afli.' } },
+                { element: '.menu-item[data-view="calendar"]', popover: { title: 'Calendar', description: 'Aici gestionezi toate evenimentele. Poți schimba vizualizarea (lună, săptămână, zi).' } },
+                { element: '#filters', popover: { title: 'Filtre Terapeut', description: 'Selectează ce terapeuți vrei să vezi în calendar.', side: "bottom" } },
+                { element: '#calendarClientFilter', popover: { title: 'Filtru Client', description: 'Filtrează calendarul pentru a vedea programul unui singur client.', side: "bottom" } },
+                { element: '.menu-item[data-view="client"]', popover: { title: 'Secțiunea Clienți', description: 'Gestionează baza de date a clienților. Poți adăuga, edita sau șterge clienți.' } },
+                { element: '#clientsList', popover: { title: 'Acțiuni Client', description: 'De pe cardul unui client poți accesa Evoluția (grafice, evaluări), poți descărca Rapoarte sau edita profilul.', side: "top" } },
+                { element: '.menu-item[data-view="billing"]', popover: { title: 'Facturare', description: 'Gestionează plățile și vezi balanța financiară pentru fiecare client, pe fiecare lună.' } },
+                { element: '#sidebarUserBadgeContainer', popover: { title: 'Contul Tău', description: 'Vezi contul pe care ești logat. Poți ieși din cont folosind butonul de "Deconectare" de sub acesta.' } }
+            ]
+        });
+
+        // Adaugă event listener pe butonul de tur
+        const startTourBtn = document.getElementById('startTourBtn');
+        if (startTourBtn) {
+            startTourBtn.addEventListener('click', () => {
+                // Asigură-te că turul începe din dashboard
+                document.querySelector('.menu-item[data-view="dashboard"]').click();
+                
+                // Așteaptă puțin ca secțiunea să se randeze
+                setTimeout(() => driverObj.drive(), 250); 
+            });
+        }
+
+        // Bonus: Pornește turul automat la prima vizită
+        if (!localStorage.getItem('tempoTourCompleted')) {
+            setTimeout(() => {
+                driverObj.drive();
+                localStorage.setItem('tempoTourCompleted', 'true');
+            }, 1500); // Pornește automat după 1.5 secunde
+        }
+    }
+    
+    // Apelăm noua funcție
+    initOnboardingTour();
 }
 
 // --- Pornirea Aplicației ---

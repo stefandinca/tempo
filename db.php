@@ -4,9 +4,9 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 $host = '127.0.0.1'; // sau 'localhost'
-$db   = 'stefand1_tempo_db'; // Numele bazei de date create în cPanel
-$user = 'stefand1_tempo'; // Utilizatorul creat în cPanel
-$pass = 'livebetterlife'; // Parola pe care ai salvat-o
+$db   = 'incjzljm_tempo_demo'; // Numele bazei de date create în cPanel
+$user = 'incjzljm_tempo_demo'; // Utilizatorul creat în cPanel
+$pass = 'tempodemopass'; // Parola pe care ai salvat-o
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";

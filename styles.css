@@ -806,7 +806,7 @@ body.public-view {
   font-weight: 500;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  
 }
 
 .event-clients {
@@ -2555,6 +2555,74 @@ textarea.form-input {
 .score-btn[data-score="-"] { background-color: #f59e0b; } /* Portocaliu */
 .score-btn[data-score="P"] { background-color: #3b82f6; } /* Albastru */
 .score-btn[data-score="+"] { background-color: #10b981; } /* Verde */
+
+/* ==========================================================
+   14. STILURI ONBOARDING (DRIVER.JS)
+   ========================================================== */
+
+/* Setăm variabilele CSS pentru Driver.js pentru a se potrivi cu tema ta */
+:root {
+    --driver-border-radius: 0.5rem; /* Colțuri rotunjite standard */
+    --driver-popover-border-radius: 0.75rem; /* Colțuri rotunjite pentru pop-up */
+    --driver-popover-padding: 1.5rem;
+    --driver-z-index: 10001; /* Peste modalele tale (care sunt 1000) */
+}
+
+/* Clasa custom pe care am setat-o în JS */
+.driver-popover.tempo-driver-popover {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.driver-popover-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--accent-primary); /* Folosește culoarea ta accent */
+}
+
+.driver-popover-description {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.driver-popover-progress-text {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.driver-popover-navigation-btns .driver-popover-btn {
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.625rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.driver-popover-navigation-btns .driver-popover-prev-btn {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+.driver-popover-navigation-btns .driver-popover-prev-btn:hover {
+    background-color: var(--border-color);
+}
+
+.driver-popover-navigation-btns .driver-popover-next-btn,
+.driver-popover-navigation-btns .driver-popover-done-btn {
+    background: var(--accent-primary);
+    color: white;
+    border-color: var(--accent-primary);
+}
+.driver-popover-navigation-btns .driver-popover-next-btn:hover,
+.driver-popover-navigation-btns .driver-popover-done-btn:hover {
+    background-color: #3b82f6; /* Un albastru puțin mai închis */
+    border-color: #3b82f6;
+}
 
 /* ==========================================================
    12. RESPONSIVE MEDIA QUERIES (CONSOLIDATED)
