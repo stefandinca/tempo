@@ -2565,7 +2565,7 @@ textarea.form-input {
     --driver-border-radius: 0.5rem; /* Colțuri rotunjite standard */
     --driver-popover-border-radius: 0.75rem; /* Colțuri rotunjite pentru pop-up */
     --driver-popover-padding: 1.5rem;
-    --driver-z-index: 10001; /* Peste modalele tale (care sunt 1000) */
+     /* --driver-z-index: 10001; Peste modalele tale (care sunt 1000) */
 }
 
 /* Clasa custom pe care am setat-o în JS */
@@ -2575,6 +2575,7 @@ textarea.form-input {
     color: var(--text-primary);
     border: 1px solid var(--border-color);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    
 }
 
 .driver-popover-title {
@@ -2601,12 +2602,17 @@ textarea.form-input {
     border-radius: 0.5rem;
     transition: all 0.2s ease;
     border: 1px solid transparent;
+    
+    
 }
+
+
 
 .driver-popover-navigation-btns .driver-popover-prev-btn {
     background: var(--bg-hover);
     color: var(--text-primary);
     border-color: var(--border-color);
+    margin: 4px;
 }
 .driver-popover-navigation-btns .driver-popover-prev-btn:hover {
     background-color: var(--border-color);
@@ -2617,6 +2623,7 @@ textarea.form-input {
     background: var(--accent-primary);
     color: white;
     border-color: var(--accent-primary);
+    margin: 4px;
 }
 .driver-popover-navigation-btns .driver-popover-next-btn:hover,
 .driver-popover-navigation-btns .driver-popover-done-btn:hover {

@@ -1413,57 +1413,263 @@ async function init() {
     console.log('Inițializare completă!');
 
    // Înlocuiește întreaga funcție initOnboardingTour din main.js
-
-    function initOnboardingTour() {
-        // LINIA 1 CORECTATĂ: Verificăm atât obiectul, cât și funcția din interior
-        if (typeof window.driver === 'undefined' || typeof window.driver.driver === 'undefined') {
+function initOnboardingTour() {
+    // Wait a bit for driver to load
+    setTimeout(() => {
+        // The driver library exposes itself as window.driver.js
+        const driverLib = window.driver?.js || window.driver;
+        
+        if (!driverLib || typeof driverLib.driver !== 'function') {
             console.error('Driver.js nu este încărcat corect.');
+            console.log('window.driver:', window.driver);
+            console.log('window.driver.js:', window.driver?.js);
             return;
         }
 
-        // Configurează pașii turului
-        // LINIA 2 CORECTATĂ: Apelul corect este window.driver.driver()
-        const driverObj = window.driver.driver({
-            showProgress: true,
-            popoverClass: 'tempo-driver-popover', // Clasă custom pentru stilizare
-            prevBtnText: 'Înapoi',
-            nextBtnText: 'Următorul',
-            doneBtnText: 'Terminat',
+        console.log('Driver.js încărcat cu succes!');
+
+        // Create driver instance - use window.driver.js.driver()
+       const driverObj = driverLib.driver({
+    showProgress: true,
+    popoverClass: 'tempo-driver-popover',
+    prevBtnText: '← Înapoi',
+    nextBtnText: 'Următorul →',
+    doneBtnText: '✓ Terminat',
+    allowClose: true,
+    smoothScroll: true,
+    overlayOpacity: 0.75,
+    stagePadding: 10,
+    stageRadius: 8,
+    popoverOffset: 10,
+    animate: true,
+    overlayColor: '#000',
+    
+    // Global callback that runs before each step
+    onHighlightStarted: (element, step, options) => {
+        // Check which section this step needs
+        const elementStr = step.element;
+        
+        if (elementStr.includes('[data-view="calendar"]') || 
+            elementStr.includes('#filters') || 
+            elementStr.includes('#calendarClientFilter')) {
+            document.querySelector('.menu-item[data-view="calendar"]')?.click();
+        } 
+        else if (elementStr.includes('[data-view="client"]') || 
+                 elementStr.includes('#clientsList')) {
+            document.querySelector('.menu-item[data-view="client"]')?.click();
+        }
+        else if (elementStr.includes('[data-view="team"]')) {
+            document.querySelector('.menu-item[data-view="team"]')?.click();
+        }
+        else if (elementStr.includes('[data-view="billing"]')) {
+            const billingLink = document.querySelector('.menu-item[data-view="billing"]');
+            if (billingLink && billingLink.style.display !== 'none') {
+                billingLink.click();
+            }
+        }
+        else if (elementStr.includes('[data-view="dashboard"]') || 
+                 elementStr.includes('#dashboardTodaySchedule') ||
+                 elementStr.includes('#sidebarUserBadgeContainer')) {
+            document.querySelector('.menu-item[data-view="dashboard"]')?.click();
+        }
+    },
             steps: [
-                { element: '.sidebar-menu', popover: { title: 'Meniul Principal', description: 'Navighează între secțiunile principale ale aplicației de aici: Dashboard, Calendar, Clienți, Echipă, Facturare și Servicii.' } },
-                { element: '.menu-item[data-view="dashboard"]', popover: { title: 'Dashboard (Panou de control)', description: 'Aici vezi un rezumat al zilei curente, programul tău și statisticile rapide.' } },
-                { element: '#dashboardTodaySchedule', popover: { title: 'Programul Zilei', description: 'Vezi toate sesiunile programate pentru astăzi. Apasă pe una pentru a vedea detalii.' } },
-                { element: '#addEventBtn', popover: { title: 'Acțiune Rapidă', description: 'Folosește acest buton pentru a adăuga rapid o nouă sesiune în calendar, indiferent în ce secțiune te afli.' } },
-                { element: '.menu-item[data-view="calendar"]', popover: { title: 'Calendar', description: 'Aici gestionezi toate evenimentele. Poți schimba vizualizarea (lună, săptămână, zi).' } },
-                { element: '#filters', popover: { title: 'Filtre Terapeut', description: 'Selectează ce terapeuți vrei să vezi în calendar.', side: "bottom" } },
-                { element: '#calendarClientFilter', popover: { title: 'Filtru Client', description: 'Filtrează calendarul pentru a vedea programul unui singur client.', side: "bottom" } },
-                { element: '.menu-item[data-view="client"]', popover: { title: 'Secțiunea Clienți', description: 'Gestionează baza de date a clienților. Poți adăuga, edita sau șterge clienți.' } },
-                { element: '#clientsList', popover: { title: 'Acțiuni Client', description: 'De pe cardul unui client poți accesa Evoluția (grafice, evaluări), poți descărca Rapoarte sau edita profilul.', side: "top" } },
-                { element: '.menu-item[data-view="billing"]', popover: { title: 'Facturare', description: 'Gestionează plățile și vezi balanța financiară pentru fiecare client, pe fiecare lună.' } },
-                { element: '#sidebarUserBadgeContainer', popover: { title: 'Contul Tău', description: 'Vezi contul pe care ești logat. Poți ieși din cont folosind butonul de "Deconectare" de sub acesta.' } }
-            ]
+    {
+        element: '.sidebar-menu',
+        popover: {
+            title: '👋 Bun venit la Tempo!',
+            description: 'Hai să facem un tur rapid al aplicației pentru a-ți arăta cele mai importante funcții.',
+            side: 'right',
+            align: 'start',
+            showButtons: ['next', 'close'],
+            nextBtnText: 'Hai să începem! →'
+        }
+    },
+    {
+        element: '.menu-item[data-view="dashboard"]',
+        popover: {
+            title: '📊 Dashboard',
+            description: 'Aici vezi rezumatul zilei: programul tău, statistici rapide și activități recente.',
+            side: 'right',
+            showButtons: ['next', 'previous', 'close'],
+            onPopoverRender: () => {
+                // Switch to dashboard section
+                document.querySelector('.menu-item[data-view="dashboard"]')?.click();
+            }
+        }
+    },
+    {
+        element: '#dashboardTodaySchedule',
+        popover: {
+            title: '📅 Programul Zilei',
+            description: 'Vezi toate sesiunile programate pentru astăzi. Click pe o sesiune pentru a vedea detalii complete.',
+            side: 'bottom',
+            showButtons: ['next', 'previous', 'close']
+        }
+    },
+    {
+        element: '#addEventBtn',
+        popover: {
+            title: '➕ Adaugă Sesiune Rapid',
+            description: 'Acest buton este disponibil în toate secțiunile pentru a adăuga rapid o sesiune nouă.',
+            side: 'left',
+            showButtons: ['next', 'previous', 'close']
+        }
+    },
+    {
+        element: '.menu-item[data-view="calendar"]',
+        popover: {
+            title: '📆 Calendar',
+            description: 'Gestionează toate evenimentele într-o vedere de calendar.Poți vedea programul pe lună, săptămână sau zi.',
+            side: 'right',
+            showButtons: ['next', 'previous', 'close'],
+            onPopoverRender: () => {
+                // Switch to calendar section
+                document.querySelector('.menu-item[data-view="calendar"]')?.click();
+            }
+        }
+    },
+    {
+        element: '.view-toggle',
+        popover: {
+            title: '📆 Calendar',
+            description: 'Poți vedea programul pe lună, săptămână sau zi.',
+            side: 'right',
+            showButtons: ['next', 'previous', 'close'],
+            onPopoverRender: () => {
+                // Switch to calendar section
+                document.querySelector('.menu-item[data-view="calendar"]')?.click();
+            }
+        }
+    },
+    {
+        element: '#filters',
+        popover: {
+            title: '🎨 Filtre Terapeut',
+            description: 'Filtrează calendarul pentru a vedea doar evenimentele anumitor terapeuți.',
+            side: 'bottom',
+            showButtons: ['next', 'previous', 'close']
+        }
+    },
+    {
+        element: '#calendarClientFilter',
+        popover: {
+            title: '👤 Filtru Client',
+            description: 'Vezi programul complet al unui singur client pentru a urmări progresul individual.',
+            side: 'bottom',
+            showButtons: ['next', 'previous', 'close']
+        }
+    },
+    {
+        element: '.menu-item[data-view="client"]',
+        popover: {
+            title: '👥 Gestionare Clienți',
+            description: 'Baza de date cu toți clienții. Poți adăuga, edita sau șterge clienți.',
+            side: 'right',
+            showButtons: ['next', 'previous', 'close'],
+            onPopoverRender: () => {
+                // Switch to clients section
+                document.querySelector('.menu-item[data-view="client"]')?.click();
+            }
+        }
+    },
+    {
+        element: '#clientsList',
+        popover: {
+            title: '🎯 Acțiuni Client',
+            description: 'De pe cardul unui client poți accesa Evoluția (grafice, evaluări), poți descărca Rapoarte sau edita profilul.',
+            side: 'top',
+            showButtons: ['next', 'previous', 'close']
+        }
+    },
+    {
+        element: '.menu-item[data-view="team"]',
+        popover: {
+            title: '👨‍⚕️ Echipa',
+            description: 'Gestionează membrii echipei de terapeuți. Adaugă, editează sau șterge membri.',
+            side: 'right',
+            showButtons: ['next', 'previous', 'close'],
+            onPopoverRender: () => {
+                // Switch to team section
+                document.querySelector('.menu-item[data-view="team"]')?.click();
+            }
+        }
+    },
+    {
+        element: '.menu-item[data-view="billing"]',
+        popover: {
+            title: '💰 Facturare',
+            description: 'Gestionează plățile și vezi balanța financiară pentru fiecare client, pe fiecare lună.',
+            side: 'right',
+            showButtons: ['next', 'previous', 'close'],
+            onPopoverRender: () => {
+                // Switch to billing section (if admin)
+                const billingLink = document.querySelector('.menu-item[data-view="billing"]');
+                if (billingLink && billingLink.style.display !== 'none') {
+                    billingLink.click();
+                }
+            }
+        }
+    },
+    {
+        element: '#startTourBtn',
+        popover: {
+            title: '✅ Gata!',
+            description: 'Asta e! Dacă ai nevoie de ajutor, <br/>apasă butonul cu "(i)" din josul meniului pentru a revedea turul.',
+            side: 'top',
+            align: 'center',
+             showButtons: ['next'],  // Show next button (becomes "Done" on last step)
+        doneBtnText: 'Am înțeles! ✓',
+        
+        onNextClick: (element, step, options) => {
+            // This fires when "Done" is clicked on the last step
+            document.querySelector('.menu-item[data-view="dashboard"]')?.click();
+            // Let the tour close naturally
+        }
+        }
+    }
+]
         });
 
-        // Adaugă event listener pe butonul de tur
+        // Add event listener on tour button
         const startTourBtn = document.getElementById('startTourBtn');
         if (startTourBtn) {
             startTourBtn.addEventListener('click', () => {
-                // Asigură-te că turul începe din dashboard
-                document.querySelector('.menu-item[data-view="dashboard"]').click();
+                // Ensure we start from dashboard
+                const dashboardLink = document.querySelector('.menu-item[data-view="dashboard"]');
+                if (dashboardLink) dashboardLink.click();
                 
-                // Așteaptă puțin ca secțiunea să se randeze
+                // Wait for section to render
                 setTimeout(() => driverObj.drive(), 250); 
             });
         }
 
-        // Bonus: Pornește turul automat la prima vizită
+        // Auto-start on first visit
         if (!localStorage.getItem('tempoTourCompleted')) {
             setTimeout(() => {
                 driverObj.drive();
                 localStorage.setItem('tempoTourCompleted', 'true');
-            }, 1500); // Pornește automat după 1.5 secunde
+            }, 1500);
         }
+    }, 500);
+}
+// Helper functions to control tour
+window.startTour = () => {
+    if (globalDriverObj) {
+        globalDriverObj.drive();
     }
+};
+
+window.stopTour = () => {
+    if (globalDriverObj) {
+        globalDriverObj.destroy();
+    }
+};
+
+window.resetTour = () => {
+    localStorage.removeItem('tempoTourCompleted');
+    alert('Turul a fost resetat. Reîmprospătează pagina pentru a-l revedea.');
+};
     
     // Apelăm noua funcție
     initOnboardingTour();
