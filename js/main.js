@@ -632,11 +632,12 @@ async function forceRefreshData() {
 
     try {
         // 1. Reîncarcă toate datele în paralel
-        const [data, programsData, evolutionData, billingsData] = await Promise.all([
+        const [data, programsData, evolutionData, billingsData, discountThresholds] = await Promise.all([
             api.loadData(),
             api.loadPrograms(),
             api.loadEvolutionData(),
-            api.loadBillingsData()
+            api.loadBillingsData(),
+            api.loadDiscountThresholds()
         ]);
 
         // 2. Actualizează starea (state) cu noile date
@@ -644,6 +645,7 @@ async function forceRefreshData() {
         calendarState.setPrograms(programsData.programs);
         calendarState.setEvolutionData(evolutionData);
         calendarState.setBillingsData(billingsData);
+        calendarState.setDiscountThresholds(discountThresholds);
 
         // 3. Re-randează complet UI-ul
         
@@ -1307,6 +1309,14 @@ async function init() {
         calendarState.setBillingsData({}); // Inițializează ca gol
     }
 
+    // Încărcare praguri de discount
+    try {
+        const discountThresholds = await api.loadDiscountThresholds();
+        calendarState.setDiscountThresholds(discountThresholds);
+    } catch (e) {
+        console.warn('Nu s-au putut încărca pragurile de discount.', e);
+        calendarState.setDiscountThresholds([]); // Inițializează ca array gol
+    }
 
 
     } catch (error) {

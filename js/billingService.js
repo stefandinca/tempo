@@ -24,7 +24,12 @@ const dom = {
     nextBtn: $('billingNextMonth'),
     currentMonthLabel: $('billingCurrentMonth'),
     billingSearchBar: $('billingSearchBar'),
-    
+
+    // Discount Thresholds
+    discountThresholdsList: $('discountThresholdsList'),
+    addDiscountThresholdBtn: $('addDiscountThresholdBtn'),
+    saveDiscountThresholdsBtn: $('saveDiscountThresholdsBtn'),
+
     // Modal Plată
     paymentModal: $('paymentModal'),
     paymentForm: $('paymentForm'),
@@ -48,6 +53,13 @@ export function init() {
     dom.prevBtn.addEventListener('click', () => navigateBillingMonth(-1));
     dom.nextBtn.addEventListener('click', () => navigateBillingMonth(1));
     dom.billingSearchBar.addEventListener('input', () => renderBillingView());
+
+    // Discount thresholds listeners
+    dom.addDiscountThresholdBtn.addEventListener('click', handleAddThreshold);
+    dom.saveDiscountThresholdsBtn.addEventListener('click', handleSaveThresholds);
+
+    // Render initial discount thresholds
+    renderDiscountThresholds();
 
     // Ascultători pentru modalul de plată
     dom.closePaymentModalBtn.addEventListener('click', closePaymentModal);
@@ -118,7 +130,10 @@ export function renderBillingView() {
 
     filteredClients.forEach(client => {
         const hoursData = calculateClientHoursForMonth(client.id, year, month, events);
-        const totalDue = hoursData.totalDue;
+        const totalBeforeDiscount = hoursData.totalDue;
+        const discountPercent = calculateDiscount(hoursData.billableHours);
+        const discountAmount = totalBeforeDiscount * (discountPercent / 100);
+        const totalDue = totalBeforeDiscount - discountAmount;
         
         const card = document.createElement('div');
         card.className = 'billing-card';
@@ -131,7 +146,7 @@ export function renderBillingView() {
                 <span class="client-hours">${hoursData.billableHours.toFixed(1)} ore</span>
             </div>
             <div class="billing-body">
-                ${generatePaymentSummary(client.id, monthKey, totalDue)}
+                ${generatePaymentSummary(client.id, monthKey, totalDue, totalBeforeDiscount, discountPercent, discountAmount)}
             </div>
             <div class="billing-actions">
                 <button class="btn btn-primary btn-sm" data-action="add-payment">
@@ -152,10 +167,10 @@ export function renderBillingView() {
 /**
  * Generează HTML pentru rezumatul financiar (Total, Achitat, Restant) și lista plăților.
  */
-function generatePaymentSummary(clientId, monthKey, totalDue) {
+function generatePaymentSummary(clientId, monthKey, totalDue, totalBeforeDiscount = totalDue, discountPercent = 0, discountAmount = 0) {
     const { billingsData } = calendarState.getState();
     const payments = billingsData[clientId]?.[monthKey] || [];
-    
+
     const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
     const balance = totalDue - totalPaid;
 
@@ -173,8 +188,26 @@ function generatePaymentSummary(clientId, monthKey, totalDue) {
         `).join('');
     }
 
+    // Show discount info if applicable
+    let discountHtml = '';
+    if (discountPercent > 0) {
+        discountHtml = `
+            <div class="summary-item" style="background: #dcfce7; border-left: 3px solid #16a34a;">
+                <span class="label" style="color: #15803d;">💰 Discount Aplicat (${discountPercent}%)</span>
+                <span class="value" style="color: #15803d;">-${discountAmount.toFixed(2)} RON</span>
+            </div>
+        `;
+    }
+
     return `
         <div class="financial-summary">
+            ${discountPercent > 0 ? `
+                <div class="summary-item" style="opacity: 0.7;">
+                    <span class="label">Subtotal (înainte de discount)</span>
+                    <span class="value" style="text-decoration: line-through;">${totalBeforeDiscount.toFixed(2)} RON</span>
+                </div>
+            ` : ''}
+            ${discountHtml}
             <div class="summary-item total-due">
                 <span class="label">Total de Plată</span>
                 <span class="value">${totalDue.toFixed(2)} RON</span>
@@ -333,4 +366,171 @@ async function handleDeletePayment(clientId, monthKey, paymentId) {
         console.error('Eroare la ștergerea încasării:', err);
         showCustomAlert('Nu s-a putut șterge încasarea.', 'Eroare API');
     }
+}
+
+// --- Discount Thresholds Management ---
+
+/**
+ * Randează lista de praguri de discount
+ */
+function renderDiscountThresholds() {
+    const { discountThresholds } = calendarState.getState();
+
+    if (!dom.discountThresholdsList) return;
+
+    dom.discountThresholdsList.innerHTML = '';
+
+    // Sort thresholds by hours ascending
+    const sortedThresholds = [...discountThresholds].sort((a, b) => a.hours - b.hours);
+
+    sortedThresholds.forEach((threshold, index) => {
+        const thresholdItem = document.createElement('div');
+        thresholdItem.style.cssText = 'display: flex; align-items: center; gap: 1rem; background: var(--bg-hover); padding: 0.75rem; border-radius: 0.5rem;';
+        thresholdItem.innerHTML = `
+            <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+                <label style="font-size: 0.9rem; color: var(--text-secondary); white-space: nowrap;">Ore minime:</label>
+                <input type="number"
+                    class="form-input"
+                    style="width: 80px; padding: 0.4rem;"
+                    value="${threshold.hours}"
+                    data-index="${index}"
+                    data-field="hours"
+                    min="1"
+                    step="1">
+            </div>
+            <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
+                <label style="font-size: 0.9rem; color: var(--text-secondary); white-space: nowrap;">Discount (%):</label>
+                <input type="number"
+                    class="form-input"
+                    style="width: 80px; padding: 0.4rem;"
+                    value="${threshold.discount}"
+                    data-index="${index}"
+                    data-field="discount"
+                    min="0"
+                    max="100"
+                    step="1">
+            </div>
+            <button class="btn-icon btn-delete-payment" data-action="delete-threshold" data-index="${index}" title="Șterge prag">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg>
+            </button>
+        `;
+        dom.discountThresholdsList.appendChild(thresholdItem);
+    });
+
+    // Add event listeners for threshold input changes
+    dom.discountThresholdsList.querySelectorAll('input').forEach(input => {
+        input.addEventListener('change', handleThresholdChange);
+    });
+
+    // Add event listeners for delete buttons
+    dom.discountThresholdsList.querySelectorAll('[data-action="delete-threshold"]').forEach(btn => {
+        btn.addEventListener('click', handleDeleteThreshold);
+    });
+}
+
+/**
+ * Modifică un prag existent
+ */
+function handleThresholdChange(e) {
+    const index = parseInt(e.target.dataset.index);
+    const field = e.target.dataset.field;
+    const value = parseFloat(e.target.value);
+
+    const { discountThresholds } = calendarState.getState();
+
+    if (field === 'hours') {
+        discountThresholds[index].hours = Math.max(1, value);
+    } else if (field === 'discount') {
+        discountThresholds[index].discount = Math.max(0, Math.min(100, value));
+    }
+
+    calendarState.setDiscountThresholds(discountThresholds);
+}
+
+/**
+ * Adaugă un prag nou
+ */
+function handleAddThreshold() {
+    const { discountThresholds } = calendarState.getState();
+
+    // Find the next logical threshold
+    let nextHours = 10;
+    let nextDiscount = 10;
+
+    if (discountThresholds.length > 0) {
+        const maxHours = Math.max(...discountThresholds.map(t => t.hours));
+        const maxDiscount = Math.max(...discountThresholds.map(t => t.discount));
+        nextHours = maxHours + 10;
+        nextDiscount = Math.min(maxDiscount + 5, 100);
+    }
+
+    discountThresholds.push({
+        hours: nextHours,
+        discount: nextDiscount
+    });
+
+    calendarState.setDiscountThresholds(discountThresholds);
+    renderDiscountThresholds();
+}
+
+/**
+ * Șterge un prag
+ */
+async function handleDeleteThreshold(e) {
+    const index = parseInt(e.currentTarget.dataset.index);
+
+    const confirmed = await showCustomConfirm('Sigur doriți să ștergeți acest prag de discount?', 'Confirmare Ștergere');
+    if (!confirmed) return;
+
+    const { discountThresholds } = calendarState.getState();
+    discountThresholds.splice(index, 1);
+
+    calendarState.setDiscountThresholds(discountThresholds);
+    renderDiscountThresholds();
+}
+
+/**
+ * Salvează pragurile de discount
+ */
+async function handleSaveThresholds() {
+    const { discountThresholds } = calendarState.getState();
+
+    // Validate thresholds
+    for (const threshold of discountThresholds) {
+        if (!threshold.hours || threshold.hours < 1) {
+            showCustomAlert('Orele minime trebuie să fie cel puțin 1.', 'Date Invalide');
+            return;
+        }
+        if (threshold.discount < 0 || threshold.discount > 100) {
+            showCustomAlert('Discountul trebuie să fie între 0 și 100%.', 'Date Invalide');
+            return;
+        }
+    }
+
+    try {
+        await api.saveDiscountThresholds(discountThresholds);
+        showCustomAlert('Pragurile de discount au fost salvate cu succes!', 'Succes');
+        renderBillingView(); // Re-render to apply new discounts
+    } catch (err) {
+        console.error('Eroare la salvarea pragurilor de discount:', err);
+        showCustomAlert('Nu s-au putut salva pragurile de discount.', 'Eroare API');
+    }
+}
+
+/**
+ * Calculează discountul pentru un număr de ore
+ */
+function calculateDiscount(hours) {
+    const { discountThresholds } = calendarState.getState();
+
+    // Sort thresholds by hours descending to find the highest applicable discount
+    const sortedThresholds = [...discountThresholds].sort((a, b) => b.hours - a.hours);
+
+    for (const threshold of sortedThresholds) {
+        if (hours >= threshold.hours) {
+            return threshold.discount;
+        }
+    }
+
+    return 0; // No discount
 }
