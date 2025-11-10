@@ -318,3 +318,18 @@ export async function saveData(data) {
     };
     return apiFetch('data', options);
 }
+
+/**
+ * Clonează programul unei luni în alta.
+ * Apel POST la api.php?path=clone-schedule
+ * @param {string} sourceMonth - Luna sursă (format: YYYY-MM)
+ * @param {string} targetMonth - Luna țintă (format: YYYY-MM)
+ */
+export async function cloneMonthSchedule(sourceMonth, targetMonth) {
+    const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sourceMonth, targetMonth })
+    };
+    return apiFetch('clone-schedule', options);
+}

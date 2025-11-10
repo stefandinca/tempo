@@ -286,6 +286,10 @@
                                 <button class="view-btn px-3 py-1.5 rounded text-sm" data-view="week">Saptamana</button>
                                 <button class="view-btn px-3 py-1.5 rounded text-sm" data-view="day">Zi</button>
                             </div>
+                            <button id="cloneMonthBtn" class="btn btn-secondary flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors" title="Clonează programul unei luni în alta (doar admin)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                <span class="hidden sm:inline">Clonează Lună</span>
+                            </button>
                             <button id="addEventBtnCalendar" class="btn btn-primary flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                                 <span class="hidden sm:inline">Adauga</span>
@@ -1498,6 +1502,40 @@
                 <button id="recurringEditSingle" class="btn btn-primary">Doar acest eveniment</button>
                 <button id="recurringEditAll" class="btn btn-secondary">Toate evenimentele din serie</button>
                 <button id="recurringEditCancel" class="btn btn-secondary">Anulează</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Clone Month Modal -->
+    <div id="cloneMonthModal" class="modal-backdrop modal-small">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Clonează Program Lunar</h2>
+                <button id="closeCloneMonthModal" class="btn-icon btn-close" title="Închide">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="text-gray-600 dark:text-gray-400 mb-4">Selectează luna sursă și luna țintă pentru a clona programul.</p>
+                <div class="form-group mb-4">
+                    <label for="cloneSourceMonth" class="form-label">Luna Sursă:</label>
+                    <input type="month" id="cloneSourceMonth" class="form-input" required>
+                    <p class="text-sm text-gray-500 mt-1">Luna din care se va copia programul</p>
+                </div>
+                <div class="form-group mb-4">
+                    <label for="cloneTargetMonth" class="form-label">Luna Țintă:</label>
+                    <input type="month" id="cloneTargetMonth" class="form-input" required>
+                    <p class="text-sm text-gray-500 mt-1">Luna în care se va copia programul</p>
+                </div>
+                <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mt-4">
+                    <p class="text-sm text-yellow-800 dark:text-yellow-200">
+                        <strong>Atenție:</strong> Această acțiune va copia toate evenimentele din luna sursă în luna țintă. Comentariile și prezența vor fi resetate pentru evenimentele clonate.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cloneMonthCancel" class="btn btn-secondary">Anulează</button>
+                <button id="cloneMonthConfirm" class="btn btn-primary">Clonează</button>
             </div>
         </div>
     </div>

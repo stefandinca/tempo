@@ -42,6 +42,15 @@ const dom = {
     addEventBtn: $('addEventBtn'),
     addEventBtnCalendar: $('addEventBtnCalendar'),
     calendarClientFilter: $('calendarClientFilter'), // Filtru client
+    cloneMonthBtn: $('cloneMonthBtn'),
+
+    // Clone Month Modal
+    cloneMonthModal: $('cloneMonthModal'),
+    closeCloneMonthModal: $('closeCloneMonthModal'),
+    cloneSourceMonth: $('cloneSourceMonth'),
+    cloneTargetMonth: $('cloneTargetMonth'),
+    cloneMonthCancel: $('cloneMonthCancel'),
+    cloneMonthConfirm: $('cloneMonthConfirm'),
     
     // Modal Evenimente (Adăugare/Editare)
     closeModalBtn: $('closeModal'),
@@ -215,6 +224,14 @@ function handleMainViewNavigation(e) {
  * NOU: Setează permisiunile la nivel de UI în funcție de rol
  */
 function setupRolePermissions() {
+    // Restricții specifice pentru non-admini
+    if (!auth.isAdmin()) {
+        // Hide clone month button for non-admin users
+        if (dom.cloneMonthBtn) {
+            dom.cloneMonthBtn.style.display = 'none';
+        }
+    }
+
     // Dacă utilizatorul este Admin sau Coordonator, nu se aplică restricții
     if (auth.isAdmin() || auth.isCoordinator()) {
         return;
@@ -1349,6 +1366,97 @@ async function init() {
             const clientId = e.target.value;
             calendarState.setClientFilter(clientId); // Setează filtrul în state
             render(); // Re-randează calendarul
+        });
+    }
+
+    // Clone Month functionality
+    if (dom.cloneMonthBtn) {
+        dom.cloneMonthBtn.addEventListener('click', () => {
+            // Check if user is admin
+            if (!auth.isAdmin()) {
+                ui.showCustomAlert('Doar administratorii pot clona programe lunare.', 'Acces Restricționat');
+                return;
+            }
+
+            // Show the clone modal
+            if (dom.cloneMonthModal) {
+                // Set default values (current month as source)
+                const { currentDate } = calendarState.getState();
+                const year = currentDate.getFullYear();
+                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                dom.cloneSourceMonth.value = `${year}-${month}`;
+
+                dom.cloneMonthModal.classList.add('active');
+            }
+        });
+    }
+
+    // Close clone month modal
+    if (dom.closeCloneMonthModal) {
+        dom.closeCloneMonthModal.addEventListener('click', () => {
+            if (dom.cloneMonthModal) dom.cloneMonthModal.classList.remove('active');
+        });
+    }
+
+    // Cancel clone month
+    if (dom.cloneMonthCancel) {
+        dom.cloneMonthCancel.addEventListener('click', () => {
+            if (dom.cloneMonthModal) dom.cloneMonthModal.classList.remove('active');
+        });
+    }
+
+    // Confirm clone month
+    if (dom.cloneMonthConfirm) {
+        dom.cloneMonthConfirm.addEventListener('click', async () => {
+            const sourceMonth = dom.cloneSourceMonth.value;
+            const targetMonth = dom.cloneTargetMonth.value;
+
+            // Validation
+            if (!sourceMonth || !targetMonth) {
+                ui.showCustomAlert('Te rog selectează ambele luni.', 'Date Incomplete');
+                return;
+            }
+
+            if (sourceMonth === targetMonth) {
+                ui.showCustomAlert('Luna sursă și luna țintă trebuie să fie diferite.', 'Date Invalide');
+                return;
+            }
+
+            // Confirm action
+            const confirmMessage = `Vrei să clonezi programul din ${sourceMonth} în ${targetMonth}?\n\nAceastă acțiune va copia toate evenimentele din luna sursă în luna țintă.`;
+
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+
+            try {
+                // Call the API
+                const result = await api.cloneMonthSchedule(sourceMonth, targetMonth);
+
+                if (result.success) {
+                    // Close modal
+                    if (dom.cloneMonthModal) dom.cloneMonthModal.classList.remove('active');
+
+                    // Show success message
+                    ui.showCustomAlert(
+                        `Programul a fost clonat cu succes!\n\n${result.clonedCount} evenimente au fost copiate din ${sourceMonth} în ${targetMonth}.`,
+                        'Succes'
+                    );
+
+                    // Reload data and refresh view
+                    const data = await api.loadData();
+                    calendarState.initializeData(data);
+                    render();
+                } else {
+                    ui.showCustomAlert('Eroare la clonarea programului: ' + (result.message || 'Eroare necunoscută'), 'Eroare');
+                }
+            } catch (error) {
+                console.error('Eroare la clonarea programului:', error);
+                ui.showCustomAlert(
+                    'Eroare la clonarea programului: ' + (error.message || 'Eroare necunoscută'),
+                    'Eroare'
+                );
+            }
         });
     }
 

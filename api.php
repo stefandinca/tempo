@@ -1000,6 +1000,164 @@ try {
             break;
 
         // ==========================================================
+        // CAZUL 'clone-schedule' - Clonează programul unei luni în alta
+        // ==========================================================
+        case 'clone-schedule':
+            if ($method === 'POST') {
+                try {
+                    if ($input === null) {
+                        sendError('Invalid JSON data', 400);
+                    }
+
+                    $sourceMonth = $input['sourceMonth'] ?? null; // Format: YYYY-MM
+                    $targetMonth = $input['targetMonth'] ?? null; // Format: YYYY-MM
+
+                    if (!$sourceMonth || !$targetMonth) {
+                        sendError('Source month and target month are required (format: YYYY-MM)', 400);
+                    }
+
+                    // Validare format lună
+                    if (!preg_match('/^\d{4}-\d{2}$/', $sourceMonth) || !preg_match('/^\d{4}-\d{2}$/', $targetMonth)) {
+                        sendError('Invalid month format. Use YYYY-MM', 400);
+                    }
+
+                    debugLog("Clonare program: $sourceMonth -> $targetMonth");
+
+                    // Obține toate evenimentele din luna sursă
+                    $stmt = $pdo->prepare("
+                        SELECT
+                            e.*,
+                            GROUP_CONCAT(DISTINCT etm.team_member_id) as teamMemberIds,
+                            GROUP_CONCAT(DISTINCT ec.client_id) as clientIds,
+                            GROUP_CONCAT(DISTINCT ep.program_id) as programIds
+                        FROM events e
+                        LEFT JOIN event_team_members etm ON e.id = etm.event_id
+                        LEFT JOIN event_clients ec ON e.id = ec.event_id
+                        LEFT JOIN event_programs ep ON e.id = ep.event_id
+                        WHERE DATE_FORMAT(e.date, '%Y-%m') = ?
+                        GROUP BY e.id
+                    ");
+                    $stmt->execute([$sourceMonth]);
+                    $sourceEvents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    if (count($sourceEvents) === 0) {
+                        sendError("No events found in source month: $sourceMonth", 404);
+                    }
+
+                    debugLog("Găsite " . count($sourceEvents) . " evenimente în luna sursă");
+
+                    // Calculează diferența în luni
+                    $sourceDate = new DateTime($sourceMonth . '-01');
+                    $targetDate = new DateTime($targetMonth . '-01');
+                    $monthDiff = ($targetDate->format('Y') - $sourceDate->format('Y')) * 12 +
+                                 ($targetDate->format('m') - $sourceDate->format('m'));
+
+                    debugLog("Diferență în luni: $monthDiff");
+
+                    // Pregătește statement-urile pentru inserare
+                    $pdo->beginTransaction();
+
+                    $stmt_evt = $pdo->prepare("
+                        INSERT INTO events (id, name, details, type, date, startTime, duration, isPublic, isBillable, repeating_json, comments, attendance)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ");
+                    $stmt_evt_team = $pdo->prepare("INSERT INTO event_team_members (event_id, team_member_id) VALUES (?, ?)");
+                    $stmt_evt_client = $pdo->prepare("INSERT INTO event_clients (event_id, client_id) VALUES (?, ?)");
+                    $stmt_evt_prog = $pdo->prepare("INSERT INTO event_programs (event_id, program_id) VALUES (?, ?)");
+
+                    $clonedCount = 0;
+
+                    // Clonează fiecare eveniment
+                    foreach ($sourceEvents as $event) {
+                        // Generează un nou ID unic
+                        $newId = 'evt' . (int)(microtime(true) * 1000) . substr(md5(uniqid()), 0, 9);
+
+                        // Calculează noua dată (păstrează ziua săptămânii când e posibil)
+                        $oldDate = new DateTime($event['date']);
+                        $newDate = clone $oldDate;
+                        $newDate->modify("$monthDiff months");
+
+                        // Verifică dacă ziua lunii există în luna țintă
+                        $oldDay = (int)$oldDate->format('d');
+                        $targetMonthDays = (int)$targetDate->format('t');
+
+                        if ($oldDay > $targetMonthDays) {
+                            // Dacă ziua nu există în luna țintă (ex: 31 în februarie), folosește ultima zi
+                            $newDate->setDate(
+                                (int)$targetDate->format('Y'),
+                                (int)$targetDate->format('m'),
+                                $targetMonthDays
+                            );
+                        }
+
+                        $newDateStr = $newDate->format('Y-m-d');
+
+                        // Inserează evenimentul
+                        $stmt_evt->execute([
+                            $newId,
+                            $event['name'],
+                            $event['details'],
+                            $event['type'],
+                            $newDateStr,
+                            $event['startTime'],
+                            $event['duration'],
+                            $event['isPublic'],
+                            $event['isBillable'],
+                            $event['repeating_json'],
+                            '', // Reset comments pentru evenimentele clonate
+                            '{}' // Reset attendance pentru evenimentele clonate
+                        ]);
+
+                        // Clonează legăturile cu membrii echipei
+                        if (!empty($event['teamMemberIds'])) {
+                            $teamMemberIds = explode(',', $event['teamMemberIds']);
+                            foreach ($teamMemberIds as $teamMemberId) {
+                                $stmt_evt_team->execute([$newId, trim($teamMemberId)]);
+                            }
+                        }
+
+                        // Clonează legăturile cu clienții
+                        if (!empty($event['clientIds'])) {
+                            $clientIds = explode(',', $event['clientIds']);
+                            foreach ($clientIds as $clientId) {
+                                $stmt_evt_client->execute([$newId, trim($clientId)]);
+                            }
+                        }
+
+                        // Clonează legăturile cu programele
+                        if (!empty($event['programIds'])) {
+                            $programIds = explode(',', $event['programIds']);
+                            foreach ($programIds as $programId) {
+                                $stmt_evt_prog->execute([$newId, trim($programId)]);
+                            }
+                        }
+
+                        $clonedCount++;
+                    }
+
+                    $pdo->commit();
+
+                    debugLog("Clonare reușită: $clonedCount evenimente");
+
+                    sendResponse([
+                        'success' => true,
+                        'message' => "Successfully cloned $clonedCount events from $sourceMonth to $targetMonth",
+                        'clonedCount' => $clonedCount
+                    ]);
+
+                } catch (Exception $e) {
+                    if ($pdo->inTransaction()) {
+                        $pdo->rollBack();
+                    }
+                    debugLog("Eroare la clonarea programului: " . $e->getMessage());
+                    sendError('Failed to clone schedule: ' . $e->getMessage());
+                }
+            } else {
+                sendError('Only POST method is supported for clone-schedule', 405);
+            }
+            break;
+
+        // ==========================================================
         // DEFAULT
         // ==========================================================
         default:
