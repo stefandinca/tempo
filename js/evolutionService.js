@@ -14,6 +14,33 @@ import { showCustomAlert, showCustomConfirm } from './uiService.js';
 
 let portrigeData = null; // Cache pentru datele Portage
 let currentClientId = null; // Clientul selectat curent
+
+// Queue to prevent race conditions when saving evolution data
+let saveQueue = Promise.resolve();
+let pendingSaveTimeout = null;
+
+/**
+ * Queued save wrapper to prevent race conditions
+ */
+async function queuedSaveEvolutionData(evolutionData) {
+    // Clear any pending debounced save
+    if (pendingSaveTimeout) {
+        clearTimeout(pendingSaveTimeout);
+    }
+    
+    // Add to queue
+    saveQueue = saveQueue.then(async () => {
+        try {
+            await api.saveEvolutionData(evolutionData);
+        } catch (err) {
+            console.error('Error in queued save:', err);
+            throw err; // Re-throw so caller can handle
+        }
+    });
+    
+    return saveQueue;
+}
+
 let evolutionChartInstance = null; // Instanța graficului Chart.js
 
 // --- Elemente DOM ---
@@ -1168,29 +1195,22 @@ async function saveMonthlyTheme() {
     // Actualizează starea locală
     calendarState.setEvolutionData(evolutionData);
 
-    try {
-        // Salvează pe server (în evolution.json)
-        await api.saveEvolutionData(evolutionData);
-        showCustomAlert('Tema lunară a fost salvată cu succes!', 'Succes');
+   try {
+    await queuedSaveEvolutionData(evolutionData);
+    showCustomAlert('Tema lunară a fost salvată cu succes!', 'Succes');
 
-        // Re-randează istoricul pentru a reflecta noua adăugare
-        renderMonthlyThemeHistory(evolutionData[currentClientId]);
-        
-        // Golește câmpul de text după salvare
-        $('monthlyThemeText').value = '';
-        
-        // Resetează la luna curentă (în caz că editam o lună veche)
-        setupMonthlyThemeTab();
+    renderMonthlyThemeHistory(evolutionData[currentClientId]);
+    $('monthlyThemeText').value = '';
+    setupMonthlyThemeTab();
 
-        // Opcțional: înregistrează activitatea
-        if (window.logActivity) {
-            window.logActivity("Temă lunară salvată", client.name, 'evaluation', currentClientId);
-        }
-
-    } catch (err) {
-        console.error('Eroare la salvarea temei lunare:', err);
-        showCustomAlert('Nu s-a putut salva tema lunară pe server.', 'Eroare');
+    if (window.logActivity) {
+        window.logActivity("Temă lunară salvată", client.name, 'evaluation', currentClientId);
     }
+
+} catch (err) {
+    console.error('Eroare la salvarea temei lunare:', err);
+    showCustomAlert('Nu s-a putut salva tema lunară pe server.', 'Eroare');
+}
 }
 
 // --- Secțiunea Evaluare (Portage) ---
@@ -1581,23 +1601,21 @@ async function savePortageEvaluation() {
     // --- SFÂRȘIT CORECȚIE BUG SUPRASCRIERE ---
     
     // Salvează pe server
-    try {
-        await api.saveEvolutionData(evolutionData);
-        showCustomAlert('Evaluarea Portage a fost salvată cu succes!', 'Succes');
-
-        if (window.logActivity) {
-            window.logActivity("Evaluare salvată", client.name, 'evaluation', currentClientId);
-        }
-        
-        // Folosim variabila 'client' deja definită la începutul funcției.
-        renderEvaluationReportsList(evolutionData[currentClientId], client);
-        
-        activateTab('tabGrafice');
-
-    } catch (err) {
-        console.error('Eroare la salvarea evaluării:', err);
-        showCustomAlert('Nu s-a putut salva evaluarea pe server.', 'Eroare');
+   try {
+    await queuedSaveEvolutionData(evolutionData);
+    showCustomAlert('Evaluarea Portage a fost salvată cu succes!', 'Succes');
+    
+    if (window.logActivity) {
+        window.logActivity("Evaluare salvată", client.name, 'evaluation', currentClientId);
     }
+    
+    renderEvaluationReportsList(evolutionData[currentClientId], client);
+    activateTab('tabGrafice');
+
+} catch (err) {
+    console.error('Eroare la salvarea evaluării:', err);
+    showCustomAlert('Nu s-a putut salva evaluarea pe server.', 'Eroare');
+}
 }
 
 /**
@@ -1656,21 +1674,20 @@ async function saveLogopedicaEvaluation() {
     
     // 7. Salvează pe server
     try {
-        await api.saveEvolutionData(evolutionData);
-        showCustomAlert('Evaluarea logopedică a fost salvată cu succes!', 'Succes');
+    await queuedSaveEvolutionData(evolutionData);
+    showCustomAlert('Evaluarea logopedică a fost salvată cu succes!', 'Succes');
 
-        if (window.logActivity) {
-            window.logActivity("Evaluare Logopedică salvată", client.name, 'evaluation', currentClientId);
-        }
-        
-        // (MODIFICAT) Actualizăm și lista de rapoarte după salvarea evaluării logopedice
-        renderEvaluationReportsList(evolutionData[currentClientId], client);
-        activateTab('tabGrafice');
-
-    } catch (err) {
-        console.error('Eroare la salvarea evaluării logopedice:', err);
-        showCustomAlert('Nu s-a putut salva evaluarea logopedică pe server.', 'Eroare');
+    if (window.logActivity) {
+        window.logActivity("Evaluare Logopedică salvată", client.name, 'evaluation', currentClientId);
     }
+    
+    renderEvaluationReportsList(evolutionData[currentClientId], client);
+    activateTab('tabGrafice');
+
+} catch (err) {
+    console.error('Eroare la salvarea evaluării logopedice:', err);
+    showCustomAlert('Nu s-a putut salva evaluarea logopedică pe server.', 'Eroare');
+}
 }
 
 
