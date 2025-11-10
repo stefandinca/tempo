@@ -1072,22 +1072,37 @@ try {
                         // Generează un nou ID unic
                         $newId = 'evt' . (int)(microtime(true) * 1000) . substr(md5(uniqid()), 0, 9);
 
-                        // Calculează noua dată (păstrează ziua săptămânii când e posibil)
+                        // Calculează noua dată bazat pe ziua săptămânii (weekday-based)
                         $oldDate = new DateTime($event['date']);
-                        $newDate = clone $oldDate;
-                        $newDate->modify("$monthDiff months");
 
-                        // Verifică dacă ziua lunii există în luna țintă
-                        $oldDay = (int)$oldDate->format('d');
-                        $targetMonthDays = (int)$targetDate->format('t');
+                        // Obține ziua săptămânii (0=Duminică, 1=Luni, etc.)
+                        $dayOfWeek = (int)$oldDate->format('w');
 
-                        if ($oldDay > $targetMonthDays) {
-                            // Dacă ziua nu există în luna țintă (ex: 31 în februarie), folosește ultima zi
-                            $newDate->setDate(
-                                (int)$targetDate->format('Y'),
-                                (int)$targetDate->format('m'),
-                                $targetMonthDays
-                            );
+                        // Calculează a câta apariție a acestei zile este în lună (1=prima, 2=a doua, etc.)
+                        $dayOfMonth = (int)$oldDate->format('d');
+                        $weekOccurrence = ceil($dayOfMonth / 7);
+
+                        // Găsește aceeași zi a săptămânii în luna țintă
+                        // Începe cu prima zi din luna țintă
+                        $newDate = clone $targetDate;
+                        $newDate->setDate(
+                            (int)$targetDate->format('Y'),
+                            (int)$targetDate->format('m'),
+                            1
+                        );
+
+                        // Găsește prima apariție a aceleiași zile din săptămână
+                        $targetDayOfWeek = (int)$newDate->format('w');
+                        $daysToAdd = ($dayOfWeek - $targetDayOfWeek + 7) % 7;
+                        $newDate->modify("+$daysToAdd days");
+
+                        // Adaugă săptămâni pentru a ajunge la aceeași apariție (1=prima, 2=a doua, etc.)
+                        $newDate->modify("+" . ($weekOccurrence - 1) . " weeks");
+
+                        // Verifică dacă data calculată este încă în luna țintă
+                        if ((int)$newDate->format('m') != (int)$targetDate->format('m')) {
+                            // Dacă am depășit luna (ex: a 5-a luni nu există), folosește ultima apariție
+                            $newDate->modify("-1 week");
                         }
 
                         $newDateStr = $newDate->format('Y-m-d');
@@ -1103,7 +1118,7 @@ try {
                             $event['duration'],
                             $event['isPublic'],
                             $event['isBillable'],
-                            $event['repeating_json'],
+                            null, // Clear repeating_json - fiecare eveniment clonat devine independent
                             '', // Reset comments pentru evenimentele clonate
                             '{}' // Reset attendance pentru evenimentele clonate
                         ]);
