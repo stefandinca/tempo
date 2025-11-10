@@ -1424,6 +1424,21 @@ async function init() {
                 return;
             }
 
+            // Check if target month already has events
+            const { events } = calendarState.getState();
+            const targetMonthEvents = events.filter(event => {
+                // event.date format is YYYY-MM-DD, targetMonth is YYYY-MM
+                return event.date && event.date.startsWith(targetMonth + '-');
+            });
+
+            if (targetMonthEvents.length > 0) {
+                const warningMessage = `⚠️ ATENȚIE!\n\nLuna ${targetMonth} conține deja ${targetMonthEvents.length} eveniment(e).\n\nClonarea va adăuga evenimente noi peste cele existente.\n\nVrei să continui?`;
+
+                if (!confirm(warningMessage)) {
+                    return;
+                }
+            }
+
             // Confirm action
             const confirmMessage = `Vrei să clonezi programul din ${sourceMonth} în ${targetMonth}?\n\nAceastă acțiune va copia toate evenimentele din luna sursă în luna țintă.`;
 
