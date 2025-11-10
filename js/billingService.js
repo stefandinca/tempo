@@ -26,6 +26,9 @@ const dom = {
     billingSearchBar: $('billingSearchBar'),
 
     // Discount Thresholds
+    discountThresholdsHeader: $('discountThresholdsHeader'),
+    discountThresholdsContent: $('discountThresholdsContent'),
+    discountThresholdsToggleIcon: $('discountThresholdsToggleIcon'),
     discountThresholdsList: $('discountThresholdsList'),
     addDiscountThresholdBtn: $('addDiscountThresholdBtn'),
     saveDiscountThresholdsBtn: $('saveDiscountThresholdsBtn'),
@@ -55,6 +58,7 @@ export function init() {
     dom.billingSearchBar.addEventListener('input', () => renderBillingView());
 
     // Discount thresholds listeners
+    dom.discountThresholdsHeader.addEventListener('click', toggleDiscountThresholdsSection);
     dom.addDiscountThresholdBtn.addEventListener('click', handleAddThreshold);
     dom.saveDiscountThresholdsBtn.addEventListener('click', handleSaveThresholds);
 
@@ -369,6 +373,25 @@ async function handleDeletePayment(clientId, monthKey, paymentId) {
 }
 
 // --- Discount Thresholds Management ---
+
+/**
+ * Toggle discount thresholds section visibility
+ */
+function toggleDiscountThresholdsSection() {
+    const content = dom.discountThresholdsContent;
+    const icon = dom.discountThresholdsToggleIcon;
+    const saveBtn = dom.saveDiscountThresholdsBtn;
+
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        icon.style.transform = 'rotate(90deg)';
+        saveBtn.style.display = 'inline-flex';
+    } else {
+        content.style.display = 'none';
+        icon.style.transform = 'rotate(0deg)';
+        saveBtn.style.display = 'none';
+    }
+}
 
 /**
  * Randează lista de praguri de discount
