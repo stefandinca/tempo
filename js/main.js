@@ -574,21 +574,24 @@ async function handleDeleteEvent() {
             teamMemberIds: event.teamMemberIds || [event.teamMemberId],
             startTime: event.startTime,
             duration: event.duration,
-            repeating: event.repeating
+            repeating: event.repeating,
+            month: event.date ? event.date.substring(0, 7) : null // YYYY-MM - doar evenimentele din aceeași lună
         };
 
-        // Get all matching event IDs before deleting
+        // Get all matching event IDs before deleting (only from same month)
         const matchingEvents = calendarState.getState().events.filter(e => {
             const eventTeamIds = e.teamMemberIds || (e.teamMemberId ? [e.teamMemberId] : []);
             const eventRepeating = (e.repeating || []).map(d => parseInt(d));
             const criteriaTeamIds = JSON.stringify((criteria.teamMemberIds || []).sort());
             const criteriaRepeating = JSON.stringify((criteria.repeating || []).map(d => parseInt(d)).sort());
+            const eventMonth = e.date ? e.date.substring(0, 7) : null;
 
             return e.name === criteria.name &&
                    JSON.stringify(eventTeamIds.sort()) === criteriaTeamIds &&
                    e.startTime === criteria.startTime &&
                    e.duration === criteria.duration &&
-                   JSON.stringify(eventRepeating.sort()) === criteriaRepeating;
+                   JSON.stringify(eventRepeating.sort()) === criteriaRepeating &&
+                   eventMonth === criteria.month; // Doar evenimentele din aceeași lună
         });
 
         // Delete from state
