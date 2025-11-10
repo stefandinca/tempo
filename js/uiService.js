@@ -8,6 +8,7 @@
 import * as auth from './authService.js';
 import { calendarState } from './calendarState.js';
 import * as api from './apiService.js';
+import { saveData } from './apiService.js';
 import * as evolutionService from './evolutionService.js';
 import * as reportService from './reportService.js';
 
@@ -513,7 +514,7 @@ function addAttendanceListeners(eventId, canModify = true) {
             // --- END BUG FIX ---
             
             calendarState.saveEvent(event);
-            await api.saveData(calendarState.getState());
+            await api.updateEvent(event);
 
             toggle.querySelectorAll('.attendance-btn').forEach(b => b.classList.remove('active'));
             button.classList.add('active');

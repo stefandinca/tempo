@@ -304,3 +304,17 @@ export async function deleteProgram(id) {
     };
     return apiFetch(`programs&id=${id}`, options);
 }
+
+/**
+ * Salvează datele generale (teams, clients, events).
+ * Apel POST la api.php?path=data
+ * @param {object} data - Obiectul cu datele de salvat
+ */
+export async function saveData(data) {
+    const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    };
+    return apiFetch('data', options);
+}
