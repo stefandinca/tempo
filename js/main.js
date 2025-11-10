@@ -1412,6 +1412,8 @@ async function init() {
     
     console.log('Inițializare completă!');
 
+    let driverObj = null;
+
    // Înlocuiește întreaga funcție initOnboardingTour din main.js
 function initOnboardingTour() {
     // Wait a bit for driver to load
@@ -1443,6 +1445,14 @@ function initOnboardingTour() {
     popoverOffset: 10,
     animate: true,
     overlayColor: '#000',
+
+    // This runs when tour ends (any way)
+    onDestroyed: (element, step, options) => {
+        console.log('Tour ended - returning to dashboard');
+        setTimeout(() => {
+            document.querySelector('.menu-item[data-view="dashboard"]')?.click();
+        }, 200);
+    },
     
     // Global callback that runs before each step
     onHighlightStarted: (element, step, options) => {
@@ -1624,6 +1634,7 @@ function initOnboardingTour() {
         onNextClick: (element, step, options) => {
             // This fires when "Done" is clicked on the last step
             document.querySelector('.menu-item[data-view="dashboard"]')?.click();
+            driverObj.destroy();
             // Let the tour close naturally
         }
         }
