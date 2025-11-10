@@ -478,7 +478,7 @@ try {
                     }
                     
                     // Validate ID format (lowercase, numbers, hyphens only)
-                    if (!preg_match('/^[a-z0-9\]+$/', $id)) {
+                    if (!preg_match('/^[a-z0-9-]+$/', $id)) {
                         sendError('ID must contain only lowercase letters, numbers', 400);
                     }
                     
