@@ -1508,7 +1508,8 @@ async function init() {
 
                     warningMessage += `\nClonarea va adăuga evenimente duplicate.\n\nVrei să continui oricum?`;
 
-                    if (!confirm(warningMessage)) {
+                    const continueWithOverlap = await ui.showCustomConfirm(warningMessage, 'Conflict de Evenimente');
+                    if (!continueWithOverlap) {
                         return;
                     }
                 }
@@ -1517,7 +1518,8 @@ async function init() {
             // Confirm action
             const confirmMessage = `Vrei să clonezi programul din ${sourceMonth} în ${targetMonth}?\n\nAceastă acțiune va copia toate evenimentele din luna sursă în luna țintă.`;
 
-            if (!confirm(confirmMessage)) {
+            const confirmed = await ui.showCustomConfirm(confirmMessage, 'Confirmare Clonare');
+            if (!confirmed) {
                 return;
             }
 
@@ -1583,12 +1585,13 @@ async function init() {
             // Double confirmation for destructive action
             const confirmMessage = `⚠️ ATENȚIE! ACȚIUNE IREVERSIBILĂ!\n\nEști pe cale să ștergi TOATE cele ${monthEvents.length} evenimente din ${month}.\n\nAceastă acțiune NU poate fi anulată!\n\nEști absolut sigur că vrei să continui?`;
 
-            if (!confirm(confirmMessage)) {
+            const firstConfirm = await ui.showCustomConfirm(confirmMessage, 'Atenție: Acțiune Ireversibilă');
+            if (!firstConfirm) {
                 return;
             }
 
             // Second confirmation
-            const finalConfirm = confirm('Ultima confirmare: Ștergi toate evenimentele?');
+            const finalConfirm = await ui.showCustomConfirm('Ultima confirmare: Ștergi toate evenimentele?', 'Confirmare Finală');
             if (!finalConfirm) {
                 return;
             }
