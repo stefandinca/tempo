@@ -1424,18 +1424,88 @@ async function init() {
                 return;
             }
 
-            // Check if target month already has events
+            // Check for overlapping events using the same weekday-based logic
             const { events } = calendarState.getState();
+
+            // Get source month events
+            const sourceMonthEvents = events.filter(event => {
+                return event.date && event.date.startsWith(sourceMonth + '-');
+            });
+
+            // Get target month events
             const targetMonthEvents = events.filter(event => {
-                // event.date format is YYYY-MM-DD, targetMonth is YYYY-MM
                 return event.date && event.date.startsWith(targetMonth + '-');
             });
 
-            if (targetMonthEvents.length > 0) {
-                const warningMessage = `⚠️ ATENȚIE!\n\nLuna ${targetMonth} conține deja ${targetMonthEvents.length} eveniment(e).\n\nClonarea va adăuga evenimente noi peste cele existente.\n\nVrei să continui?`;
+            if (targetMonthEvents.length > 0 && sourceMonthEvents.length > 0) {
+                // Calculate where source events would be copied to
+                const [sourceYear, sourceMonthNum] = sourceMonth.split('-').map(Number);
+                const [targetYear, targetMonthNum] = targetMonth.split('-').map(Number);
 
-                if (!confirm(warningMessage)) {
-                    return;
+                const sourceDate = new Date(sourceYear, sourceMonthNum - 1, 1);
+                const targetDate = new Date(targetYear, targetMonthNum - 1, 1);
+
+                let overlappingCount = 0;
+                const overlappingDetails = [];
+
+                for (const sourceEvent of sourceMonthEvents) {
+                    // Calculate target date using same logic as backend
+                    const oldDate = new Date(sourceEvent.date);
+                    const dayOfWeek = oldDate.getDay();
+                    const dayOfMonth = oldDate.getDate();
+                    const weekOccurrence = Math.ceil(dayOfMonth / 7);
+
+                    // Find same weekday occurrence in target month
+                    let newDate = new Date(targetYear, targetMonthNum - 1, 1);
+                    const targetDayOfWeek = newDate.getDay();
+                    const daysToAdd = (dayOfWeek - targetDayOfWeek + 7) % 7;
+                    newDate.setDate(newDate.getDate() + daysToAdd);
+                    newDate.setDate(newDate.getDate() + (weekOccurrence - 1) * 7);
+
+                    // Check if we're still in target month
+                    if (newDate.getMonth() !== targetMonthNum - 1) {
+                        newDate.setDate(newDate.getDate() - 7);
+                    }
+
+                    const targetDateStr = newDate.toISOString().split('T')[0];
+
+                    // Check if any event exists at this date/time in target month
+                    const conflictingEvent = targetMonthEvents.find(e =>
+                        e.date === targetDateStr &&
+                        e.startTime === sourceEvent.startTime
+                    );
+
+                    if (conflictingEvent) {
+                        overlappingCount++;
+                        if (overlappingDetails.length < 5) { // Show max 5 examples
+                            overlappingDetails.push({
+                                date: targetDateStr,
+                                time: sourceEvent.startTime,
+                                sourceName: sourceEvent.name,
+                                targetName: conflictingEvent.name
+                            });
+                        }
+                    }
+                }
+
+                if (overlappingCount > 0) {
+                    let warningMessage = `⚠️ ATENȚIE! Conflict de evenimente!\n\n`;
+                    warningMessage += `Găsite ${overlappingCount} suprapuneri de evenimente între ${sourceMonth} și ${targetMonth}.\n\n`;
+                    warningMessage += `Exemple de conflicte:\n`;
+
+                    overlappingDetails.forEach(detail => {
+                        warningMessage += `• ${detail.date} la ${detail.time}: "${detail.sourceName}" → "${detail.targetName}" (existent)\n`;
+                    });
+
+                    if (overlappingCount > overlappingDetails.length) {
+                        warningMessage += `... și încă ${overlappingCount - overlappingDetails.length} suprapuneri.\n`;
+                    }
+
+                    warningMessage += `\nClonarea va adăuga evenimente duplicate.\n\nVrei să continui oricum?`;
+
+                    if (!confirm(warningMessage)) {
+                        return;
+                    }
                 }
             }
 
