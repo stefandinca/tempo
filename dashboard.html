@@ -1510,30 +1510,55 @@
     <div id="cloneMonthModal" class="modal-backdrop modal-small">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Clonează Program Lunar</h2>
+                <h2 class="modal-title">Gestionare Program Lunar</h2>
                 <button id="closeCloneMonthModal" class="btn-icon btn-close" title="Închide">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                 </button>
             </div>
             <div class="modal-body">
-                <p class="text-gray-600 dark:text-gray-400 mb-4">Selectează luna sursă și luna țintă pentru a clona programul.</p>
-                <div class="form-group mb-4">
-                    <label for="cloneSourceMonth" class="form-label">Luna Sursă:</label>
-                    <input type="month" id="cloneSourceMonth" class="form-input" required>
-                    <p class="text-sm text-gray-500 mt-1">Luna din care se va copia programul</p>
+                <!-- Clone Section -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Clonează Program</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">Selectează luna sursă și luna țintă pentru a clona programul.</p>
+                    <div class="form-group mb-4">
+                        <label for="cloneSourceMonth" class="form-label">Luna Sursă:</label>
+                        <input type="month" id="cloneSourceMonth" class="form-input" required>
+                        <p class="text-sm text-gray-500 mt-1">Luna din care se va copia programul</p>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="cloneTargetMonth" class="form-label">Luna Țintă:</label>
+                        <input type="month" id="cloneTargetMonth" class="form-input" required>
+                        <p class="text-sm text-gray-500 mt-1">Luna în care se va copia programul</p>
+                    </div>
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                        <p class="text-sm text-yellow-800 dark:text-yellow-200">
+                            <strong>Atenție:</strong> Evenimentele clonate vor păstra setările de recurență și vor fi copiate pe zilele corespunzătoare (ex: prima Luni → prima Luni).
+                        </p>
+                    </div>
                 </div>
-                <div class="form-group mb-4">
-                    <label for="cloneTargetMonth" class="form-label">Luna Țintă:</label>
-                    <input type="month" id="cloneTargetMonth" class="form-input" required>
-                    <p class="text-sm text-gray-500 mt-1">Luna în care se va copia programul</p>
-                </div>
-                <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3 mt-4">
-                    <p class="text-sm text-yellow-800 dark:text-yellow-200">
-                        <strong>Atenție:</strong> Această acțiune va copia toate evenimentele din luna sursă în luna țintă. Comentariile și prezența vor fi resetate pentru evenimentele clonate.
-                    </p>
+
+                <!-- Divider -->
+                <div class="border-t border-gray-200 dark:border-gray-700 my-6"></div>
+
+                <!-- Clear Section -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Șterge Toate Evenimentele</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">Șterge toate evenimentele dintr-o lună selectată.</p>
+                    <div class="form-group mb-4">
+                        <label for="clearMonth" class="form-label">Luna de șters:</label>
+                        <input type="month" id="clearMonth" class="form-input" required>
+                        <p class="text-sm text-gray-500 mt-1">Toate evenimentele din această lună vor fi șterse</p>
+                    </div>
+                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                        <p class="text-sm text-red-800 dark:text-red-200">
+                            <strong>⚠️ Atenție:</strong> Această acțiune este permanentă și nu poate fi anulată!
+                        </p>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
+                <button id="clearMonthBtn" class="btn btn-danger">Șterge Luna</button>
+                <div style="flex: 1;"></div>
                 <button id="cloneMonthCancel" class="btn btn-secondary">Anulează</button>
                 <button id="cloneMonthConfirm" class="btn btn-primary">Clonează</button>
             </div>

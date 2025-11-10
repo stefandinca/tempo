@@ -51,6 +51,8 @@ const dom = {
     cloneTargetMonth: $('cloneTargetMonth'),
     cloneMonthCancel: $('cloneMonthCancel'),
     cloneMonthConfirm: $('cloneMonthConfirm'),
+    clearMonth: $('clearMonth'),
+    clearMonthBtn: $('clearMonthBtn'),
     
     // Modal Evenimente (Adăugare/Editare)
     closeModalBtn: $('closeModal'),
@@ -1541,6 +1543,78 @@ async function init() {
                 console.error('Eroare la clonarea programului:', error);
                 ui.showCustomAlert(
                     'Eroare la clonarea programului: ' + (error.message || 'Eroare necunoscută'),
+                    'Eroare'
+                );
+            }
+        });
+    }
+
+    // Clear month button
+    if (dom.clearMonthBtn) {
+        dom.clearMonthBtn.addEventListener('click', async () => {
+            const month = dom.clearMonth.value;
+
+            // Validation
+            if (!month) {
+                ui.showCustomAlert('Te rog selectează o lună.', 'Date Incomplete');
+                return;
+            }
+
+            // Check if user is admin
+            if (!auth.isAdmin()) {
+                ui.showCustomAlert('Doar administratorii pot șterge luni întregi.', 'Acces Restricționat');
+                return;
+            }
+
+            // Count events in the month
+            const { events } = calendarState.getState();
+            const monthEvents = events.filter(event => {
+                return event.date && event.date.startsWith(month + '-');
+            });
+
+            if (monthEvents.length === 0) {
+                ui.showCustomAlert(`Luna ${month} nu conține evenimente.`, 'Informație');
+                return;
+            }
+
+            // Double confirmation for destructive action
+            const confirmMessage = `⚠️ ATENȚIE! ACȚIUNE IREVERSIBILĂ!\n\nEști pe cale să ștergi TOATE cele ${monthEvents.length} evenimente din ${month}.\n\nAceastă acțiune NU poate fi anulată!\n\nEști absolut sigur că vrei să continui?`;
+
+            if (!confirm(confirmMessage)) {
+                return;
+            }
+
+            // Second confirmation
+            const finalConfirm = confirm('Ultima confirmare: Ștergi toate evenimentele?');
+            if (!finalConfirm) {
+                return;
+            }
+
+            try {
+                // Call the API
+                const result = await api.clearMonth(month);
+
+                if (result.success) {
+                    // Close modal
+                    if (dom.cloneMonthModal) dom.cloneMonthModal.classList.remove('active');
+
+                    // Show success message
+                    ui.showCustomAlert(
+                        `Luna ${month} a fost ștearsă cu succes!\n\n${result.deletedCount} evenimente au fost eliminate.`,
+                        'Succes'
+                    );
+
+                    // Reload data and refresh view
+                    const data = await api.loadData();
+                    calendarState.initializeData(data);
+                    render();
+                } else {
+                    ui.showCustomAlert('Eroare la ștergerea lunii: ' + (result.message || 'Eroare necunoscută'), 'Eroare');
+                }
+            } catch (error) {
+                console.error('Eroare la ștergerea lunii:', error);
+                ui.showCustomAlert(
+                    'Eroare la ștergerea lunii: ' + (error.message || 'Eroare necunoscută'),
                     'Eroare'
                 );
             }

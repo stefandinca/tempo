@@ -333,3 +333,17 @@ export async function cloneMonthSchedule(sourceMonth, targetMonth) {
     };
     return apiFetch('clone-schedule', options);
 }
+
+/**
+ * Șterge toate evenimentele dintr-o lună.
+ * Apel POST la api.php?path=clear-month
+ * @param {string} month - Luna de șters (format: YYYY-MM)
+ */
+export async function clearMonth(month) {
+    const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ month })
+    };
+    return apiFetch('clear-month', options);
+}

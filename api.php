@@ -1118,7 +1118,7 @@ try {
                             $event['duration'],
                             $event['isPublic'],
                             $event['isBillable'],
-                            null, // Clear repeating_json - fiecare eveniment clonat devine independent
+                            $event['repeating_json'], // Păstrează setările de recurență
                             '', // Reset comments pentru evenimentele clonate
                             '{}' // Reset attendance pentru evenimentele clonate
                         ]);
@@ -1169,6 +1169,81 @@ try {
                 }
             } else {
                 sendError('Only POST method is supported for clone-schedule', 405);
+            }
+            break;
+
+        // ==========================================================
+        // CAZUL 'clear-month' - Șterge toate evenimentele dintr-o lună
+        // ==========================================================
+        case 'clear-month':
+            if ($method === 'POST') {
+                try {
+                    if ($input === null) {
+                        sendError('Invalid JSON data', 400);
+                    }
+
+                    $month = $input['month'] ?? null; // Format: YYYY-MM
+
+                    if (!$month) {
+                        sendError('Month is required (format: YYYY-MM)', 400);
+                    }
+
+                    // Validare format lună
+                    if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
+                        sendError('Invalid month format. Use YYYY-MM', 400);
+                    }
+
+                    debugLog("Ștergere evenimente pentru luna: $month");
+
+                    // Obține toate evenimentele din luna specificată
+                    $stmt = $pdo->prepare("
+                        SELECT id
+                        FROM events
+                        WHERE DATE_FORMAT(date, '%Y-%m') = ?
+                    ");
+                    $stmt->execute([$month]);
+                    $eventIds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+                    if (count($eventIds) === 0) {
+                        sendError("No events found in month: $month", 404);
+                    }
+
+                    debugLog("Găsite " . count($eventIds) . " evenimente pentru ștergere");
+
+                    // Începe tranzacția
+                    $pdo->beginTransaction();
+
+                    // Șterge relațiile pentru fiecare eveniment
+                    foreach ($eventIds as $eventId) {
+                        $pdo->prepare("DELETE FROM event_team_members WHERE event_id = ?")->execute([$eventId]);
+                        $pdo->prepare("DELETE FROM event_clients WHERE event_id = ?")->execute([$eventId]);
+                        $pdo->prepare("DELETE FROM event_programs WHERE event_id = ?")->execute([$eventId]);
+                    }
+
+                    // Șterge evenimentele
+                    $stmt = $pdo->prepare("DELETE FROM events WHERE DATE_FORMAT(date, '%Y-%m') = ?");
+                    $stmt->execute([$month]);
+                    $deletedCount = $stmt->rowCount();
+
+                    $pdo->commit();
+
+                    debugLog("Ștergere reușită: $deletedCount evenimente");
+
+                    sendResponse([
+                        'success' => true,
+                        'message' => "Successfully deleted $deletedCount events from $month",
+                        'deletedCount' => $deletedCount
+                    ]);
+
+                } catch (Exception $e) {
+                    if ($pdo->inTransaction()) {
+                        $pdo->rollBack();
+                    }
+                    debugLog("Eroare la ștergerea evenimentelor: " . $e->getMessage());
+                    sendError('Failed to clear month: ' . $e->getMessage());
+                }
+            } else {
+                sendError('Only POST method is supported for clear-month', 405);
             }
             break;
 
