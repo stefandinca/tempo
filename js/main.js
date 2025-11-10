@@ -512,12 +512,33 @@ console.log('===========================');
     }
     // --- END NEW RECURRENCE EDIT LOGIC ---
     
-    await api.saveData(calendarState.getState());
+    if (existingEvent && existingEvent.repeating && existingEvent.repeating.length > 0) {
+    // ... existing recurring event logic ...
+} else {
+    if (eventBase.repeating.length > 0) {
+        // New recurring events
+        const newEvents = createRecurringEvents(eventBase, defaultAttendance);
+        calendarState.saveEvent(newEvents);
+        await api.createEvent(newEvents); // CREATE multiple
+    } else if (editingEventId) {
+        // Update existing single event
+        const updatedEvent = { ...eventBase, id: editingEventId };
+        calendarState.saveEvent(updatedEvent);
+        await api.updateEvent(updatedEvent); // UPDATE
+    } else {
+        // Create new single event
+        const newEvent = { ...eventBase, id: generateEventId(), attendance: defaultAttendance };
+        calendarState.saveEvent(newEvent);
+        await api.createEvent(newEvent); // CREATE
+    }
+}
     // logs saving activity
     window.logActivity(editingEventId ? "Eveniment actualizat" : "Eveniment adăugat", eventBase.name, 'event', eventBase.date);
     ui.closeEventModal();
     render();
 }
+
+
 
 async function handleDeleteEvent() {
     const { editingEventId } = calendarState.getState();
@@ -555,7 +576,16 @@ async function handleDeleteEvent() {
         calendarState.deleteEvent(editingEventId);
     }
 
+    if (choice === 'all') {
+    // For recurring events, you'll need a bulk delete endpoint or loop
+    const criteria = { /* ... */ };
+    calendarState.deleteRecurringEvents(criteria);
+    // Temporary: still use saveData for bulk operations
     await api.saveData(calendarState.getState());
+} else {
+    calendarState.deleteEvent(editingEventId);
+    await api.deleteEvent(editingEventId); // DELETE single
+}
     
     ui.closeEventModal();
     ui.closeEventDetailsModal();
@@ -692,7 +722,11 @@ async function handleSaveClient(e) {
     // (MODIFICAT) Salvează TOATE datele dacă ID-ul s-a schimbat
     try {
         // Salvează datele principale (clients, events, etc.)
-        await api.saveData(calendarState.getState());
+        if (editingClientId) {
+    await api.updateClient(clientData);
+} else {
+    await api.createClient(clientData);
+}
 
         // DACĂ ID-ul s-a schimbat, salvează și celelalte fișiere
         // care au fost migrate în state
@@ -728,7 +762,7 @@ async function handleDeleteClient() {
         // (MODIFICAT) Salvăm toate cele 3 fișiere pentru a reflecta ștergerea
         try {
             const { evolutionData, billingsData } = calendarState.getState();
-            await api.saveData(calendarState.getState()); // Salvează clients/events
+            await api.deleteClient(editingClientId); // Salvează clients/events
             await api.saveEvolutionData(evolutionData); // Salvează evolution
             await api.saveBillingsData(billingsData); // Salvează billings
             

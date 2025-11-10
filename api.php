@@ -298,6 +298,145 @@ try {
             }
             break;
 
+            // ==========================================================
+            // CAZUL 'events/:id' - Operații CRUD granulare pentru evenimente
+            // ==========================================================
+            case (preg_match('/^events\/(.+)$/', $path, $matches) ? true : false):
+                $eventId = $matches[1];
+                
+                if ($method === 'PUT') {
+                    // Update single event
+                    try {
+                        if ($input === null) {
+                            sendError('Invalid JSON data', 400);
+                        }
+                        
+                        // Update event in database
+                        $stmt = $pdo->prepare("UPDATE events SET name=?, details=?, type=?, date=?, startTime=?, duration=?, isPublic=?, isBillable=?, repeating_json=?, comments=?, attendance=? WHERE id=?");
+                        $stmt->execute([
+                            $input['name'] ?? null,
+                            $input['details'] ?? null,
+                            $input['type'] ?? 'therapy',
+                            $input['date'],
+                            $input['startTime'],
+                            $input['duration'] ?? null,
+                            isset($input['isPublic']) ? (int)$input['isPublic'] : 0,
+                            isset($input['isBillable']) ? (int)$input['isBillable'] : 1,
+                            json_encode($input['repeating'] ?? []),
+                            $input['comments'] ?? null,
+                            json_encode($input['attendance'] ?? new stdClass()),
+                            $eventId
+                        ]);
+                        
+                        // Update team members (delete old, insert new)
+                        $pdo->prepare("DELETE FROM event_team_members WHERE event_id=?")->execute([$eventId]);
+                        $stmt_team = $pdo->prepare("INSERT INTO event_team_members (event_id, team_member_id) VALUES (?, ?)");
+                        foreach ($input['teamMemberIds'] ?? [] as $id) {
+                            $stmt_team->execute([$eventId, $id]);
+                        }
+                        
+                        // Update clients
+                        $pdo->prepare("DELETE FROM event_clients WHERE event_id=?")->execute([$eventId]);
+                        $stmt_client = $pdo->prepare("INSERT INTO event_clients (event_id, client_id) VALUES (?, ?)");
+                        foreach ($input['clientIds'] ?? [] as $id) {
+                            $stmt_client->execute([$eventId, $id]);
+                        }
+                        
+                        // Update programs
+                        $pdo->prepare("DELETE FROM event_programs WHERE event_id=?")->execute([$eventId]);
+                        $stmt_prog = $pdo->prepare("INSERT INTO event_programs (event_id, program_id) VALUES (?, ?)");
+                        foreach ($input['programIds'] ?? [] as $id) {
+                            $stmt_prog->execute([$eventId, $id]);
+                        }
+                        
+                        debugLog("Eveniment actualizat: $eventId");
+                        sendResponse(['success' => true, 'message' => 'Event updated successfully']);
+                        
+                    } catch (Exception $e) {
+                        debugLog("Eroare la actualizarea evenimentului: " . $e->getMessage());
+                        sendError('Failed to update event: ' . $e->getMessage());
+                    }
+                    
+                } elseif ($method === 'DELETE') {
+                    // Delete single event
+                    try {
+                        $stmt = $pdo->prepare("DELETE FROM events WHERE id=?");
+                        $stmt->execute([$eventId]);
+                        
+                        if ($stmt->rowCount() === 0) {
+                            sendError('Event not found', 404);
+                        }
+                        
+                        debugLog("Eveniment șters: $eventId");
+                        sendResponse(['success' => true, 'message' => 'Event deleted successfully']);
+                        
+                    } catch (Exception $e) {
+                        debugLog("Eroare la ștergerea evenimentului: " . $e->getMessage());
+                        sendError('Failed to delete event: ' . $e->getMessage());
+                    }
+                } else {
+                    sendError('Unsupported method for events/:id', 405);
+                }
+                break;
+
+            case 'events':
+                if ($method === 'POST') {
+                    // Create new event(s)
+                    try {
+                        if ($input === null) {
+                            sendError('Invalid JSON data', 400);
+                        }
+                        
+                        // Support both single event and array of events
+                        $events = isset($input[0]) ? $input : [$input];
+                        
+                        $stmt_evt = $pdo->prepare("INSERT INTO events (id, name, details, type, date, startTime, duration, isPublic, isBillable, repeating_json, comments, attendance) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        $stmt_evt_team = $pdo->prepare("INSERT INTO event_team_members (event_id, team_member_id) VALUES (?, ?)");
+                        $stmt_evt_client = $pdo->prepare("INSERT INTO event_clients (event_id, client_id) VALUES (?, ?)");
+                        $stmt_evt_prog = $pdo->prepare("INSERT INTO event_programs (event_id, program_id) VALUES (?, ?)");
+                        
+                        $pdo->beginTransaction();
+                        
+                        foreach ($events as $e) {
+                            $startTime = $e['startTime'] ?? null;
+                            if ($startTime && strlen($startTime) > 5) {
+                                $startTime = substr($startTime, 0, 5);
+                            }
+                            
+                            $stmt_evt->execute([
+                                $e['id'],
+                                $e['name'] ?? null,
+                                $e['details'] ?? null,
+                                $e['type'] ?? 'therapy',
+                                $e['date'],
+                                $startTime,
+                                $e['duration'] ?? null,
+                                isset($e['isPublic']) ? (int)$e['isPublic'] : 0,
+                                isset($e['isBillable']) ? (int)$e['isBillable'] : 1,
+                                json_encode($e['repeating'] ?? []),
+                                $e['comments'] ?? null,
+                                json_encode($e['attendance'] ?? new stdClass())
+                            ]);
+                            
+                            foreach ($e['teamMemberIds'] ?? [] as $id) { $stmt_evt_team->execute([$e['id'], $id]); }
+                            foreach ($e['clientIds'] ?? [] as $id) { $stmt_evt_client->execute([$e['id'], $id]); }
+                            foreach ($e['programIds'] ?? [] as $id) { $stmt_evt_prog->execute([$e['id'], $id]); }
+                        }
+                        
+                        $pdo->commit();
+                        debugLog("Eveniment(e) creat(e): " . count($events));
+                        sendResponse(['success' => true, 'message' => 'Event(s) created successfully']);
+                        
+                    } catch (Exception $e) {
+                        $pdo->rollBack();
+                        debugLog("Eroare la crearea evenimentului: " . $e->getMessage());
+                        sendError('Failed to create event: ' . $e->getMessage());
+                    }
+                } else {
+                    sendError('Unsupported method for events', 405);
+                }
+                break;
+
         // ==========================================================
         // CAZUL 'event_types' - Gestionează tipurile de evenimente din DB
         // ==========================================================
@@ -427,6 +566,94 @@ try {
                 sendError('Unsupported method for event_types', 405);
             }
             break; // <-- Make sure to copy down to the break;
+
+            // ==========================================================
+            // CAZUL 'clients/:id' - Operații CRUD pentru clienți
+            // ==========================================================
+            case (preg_match('/^clients\/(.+)$/', $path, $matches) ? true : false):
+                $clientId = $matches[1];
+                
+                if ($method === 'PUT') {
+                    try {
+                        if ($input === null) {
+                            sendError('Invalid JSON data', 400);
+                        }
+                        
+                        $stmt = $pdo->prepare("UPDATE clients SET name=?, email=?, phone=?, birthDate=?, medical=? WHERE id=?");
+                        $stmt->execute([
+                            $input['name'],
+                            $input['email'],
+                            $input['phone'],
+                            $input['birthDate'] ?: null,
+                            $input['medical'] ?? '',
+                            $clientId
+                        ]);
+                        
+                        if ($stmt->rowCount() === 0) {
+                            sendError('Client not found', 404);
+                        }
+                        
+                        debugLog("Client actualizat: $clientId");
+                        sendResponse(['success' => true, 'message' => 'Client updated successfully']);
+                        
+                    } catch (Exception $e) {
+                        debugLog("Eroare la actualizarea clientului: " . $e->getMessage());
+                        sendError('Failed to update client: ' . $e->getMessage());
+                    }
+                    
+                } elseif ($method === 'DELETE') {
+                    try {
+                        $stmt = $pdo->prepare("DELETE FROM clients WHERE id=?");
+                        $stmt->execute([$clientId]);
+                        
+                        if ($stmt->rowCount() === 0) {
+                            sendError('Client not found', 404);
+                        }
+                        
+                        debugLog("Client șters: $clientId");
+                        sendResponse(['success' => true, 'message' => 'Client deleted successfully']);
+                        
+                    } catch (Exception $e) {
+                        debugLog("Eroare la ștergerea clientului: " . $e->getMessage());
+                        sendError('Failed to delete client: ' . $e->getMessage());
+                    }
+                } else {
+                    sendError('Unsupported method for clients/:id', 405);
+                }
+                break;
+
+            case 'clients':
+                if ($method === 'POST') {
+                    try {
+                        if ($input === null) {
+                            sendError('Invalid JSON data', 400);
+                        }
+                        
+                        $stmt = $pdo->prepare("INSERT INTO clients (id, name, email, phone, birthDate, medical) VALUES (?, ?, ?, ?, ?, ?)");
+                        $stmt->execute([
+                            $input['id'],
+                            $input['name'],
+                            $input['email'],
+                            $input['phone'],
+                            $input['birthDate'] ?: null,
+                            $input['medical'] ?? ''
+                        ]);
+                        
+                        debugLog("Client creat: " . $input['id']);
+                        sendResponse(['success' => true, 'message' => 'Client created successfully', 'id' => $input['id']]);
+                        
+                    } catch (PDOException $e) {
+                        if ($e->getCode() == 23000) {
+                            sendError('Un client cu acest ID există deja', 409);
+                        } else {
+                            debugLog("Eroare la crearea clientului: " . $e->getMessage());
+                            sendError('Failed to create client: ' . $e->getMessage());
+                        }
+                    }
+                } else {
+                    sendError('Unsupported method for clients', 405);
+                }
+                break;
 
         // ==========================================================
         // CAZUL 'programs'
