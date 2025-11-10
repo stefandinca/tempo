@@ -566,6 +566,7 @@ async function handleDeleteEvent() {
     if (choice === 'cancel') return;
 
     if (choice === 'all') {
+        // Delete all recurring events matching the criteria
         const criteria = {
             name: event.name,
             teamMemberIds: event.teamMemberIds || [event.teamMemberId],
@@ -573,22 +574,38 @@ async function handleDeleteEvent() {
             duration: event.duration,
             repeating: event.repeating
         };
+
+        // Get all matching event IDs before deleting
+        const matchingEvents = calendarState.getState().events.filter(e => {
+            const eventTeamIds = e.teamMemberIds || (e.teamMemberId ? [e.teamMemberId] : []);
+            const eventRepeating = (e.repeating || []).map(d => parseInt(d));
+            const criteriaTeamIds = JSON.stringify((criteria.teamMemberIds || []).sort());
+            const criteriaRepeating = JSON.stringify((criteria.repeating || []).map(d => parseInt(d)).sort());
+
+            return e.name === criteria.name &&
+                   JSON.stringify(eventTeamIds.sort()) === criteriaTeamIds &&
+                   e.startTime === criteria.startTime &&
+                   e.duration === criteria.duration &&
+                   JSON.stringify(eventRepeating.sort()) === criteriaRepeating;
+        });
+
+        // Delete from state
         calendarState.deleteRecurringEvents(criteria);
+
+        // Delete each event from the API
+        for (const evt of matchingEvents) {
+            try {
+                await api.deleteEvent(evt.id);
+            } catch (error) {
+                console.error(`Failed to delete event ${evt.id}:`, error);
+            }
+        }
     } else {
+        // Delete single event
         calendarState.deleteEvent(editingEventId);
+        await api.deleteEvent(editingEventId);
     }
 
-    if (choice === 'all') {
-    // For recurring events, you'll need a bulk delete endpoint or loop
-    const criteria = { /* ... */ };
-    calendarState.deleteRecurringEvents(criteria);
-    // Temporary: still use saveData for bulk operations
-    await api.saveData(calendarState.getState());
-} else {
-    calendarState.deleteEvent(editingEventId);
-    await api.deleteEvent(editingEventId); // DELETE single
-}
-    
     ui.closeEventModal();
     ui.closeEventDetailsModal();
     render();
