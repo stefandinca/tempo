@@ -506,49 +506,34 @@ console.log('===========================');
     } else {
         // This is a simple edit OR a new event
         const defaultAttendance = {};
-            if (clientIds.length > 0) {
-                clientIds.forEach(clientId => {
-                    defaultAttendance[clientId] = 'present';
-                });
-            }
-            
-            if (eventBase.repeating.length > 0) {
-                // New recurring event
-                // Pass defaultAttendance to the create function
-                const newEvents = createRecurringEvents(eventBase, defaultAttendance); 
-                calendarState.saveEvent(newEvents);
-            } else {
-                // New single event
-                const newEvent = { 
-                    ...eventBase, 
-                    id: generateEventId(),
-                    attendance: defaultAttendance // Add the new attendance object
-                };
-                calendarState.saveEvent(newEvent);
-            }
+        if (clientIds.length > 0) {
+            clientIds.forEach(clientId => {
+                defaultAttendance[clientId] = 'present';
+            });
+        }
+
+        if (eventBase.repeating.length > 0) {
+            // New recurring event
+            const newEvents = createRecurringEvents(eventBase, defaultAttendance);
+            calendarState.saveEvent(newEvents);
+            await api.createEvent(newEvents); // CREATE multiple
+        } else if (editingEventId) {
+            // Update existing single event
+            const updatedEvent = { ...eventBase, id: editingEventId };
+            calendarState.saveEvent(updatedEvent);
+            await api.updateEvent(updatedEvent); // UPDATE
+        } else {
+            // Create new single event
+            const newEvent = {
+                ...eventBase,
+                id: generateEventId(),
+                attendance: defaultAttendance
+            };
+            calendarState.saveEvent(newEvent);
+            await api.createEvent(newEvent); // CREATE
+        }
     }
     // --- END NEW RECURRENCE EDIT LOGIC ---
-    
-    if (existingEvent && existingEvent.repeating && existingEvent.repeating.length > 0) {
-    // ... existing recurring event logic ...
-} else {
-    if (eventBase.repeating.length > 0) {
-        // New recurring events
-        const newEvents = createRecurringEvents(eventBase, defaultAttendance);
-        calendarState.saveEvent(newEvents);
-        await api.createEvent(newEvents); // CREATE multiple
-    } else if (editingEventId) {
-        // Update existing single event
-        const updatedEvent = { ...eventBase, id: editingEventId };
-        calendarState.saveEvent(updatedEvent);
-        await api.updateEvent(updatedEvent); // UPDATE
-    } else {
-        // Create new single event
-        const newEvent = { ...eventBase, id: generateEventId(), attendance: defaultAttendance };
-        calendarState.saveEvent(newEvent);
-        await api.createEvent(newEvent); // CREATE
-    }
-}
     // logs saving activity
     window.logActivity(editingEventId ? "Eveniment actualizat" : "Eveniment adăugat", eventBase.name, 'event', eventBase.date);
     ui.closeEventModal();
