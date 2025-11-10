@@ -196,9 +196,9 @@ function generatePaymentSummary(clientId, monthKey, totalDue, totalBeforeDiscoun
     let discountHtml = '';
     if (discountPercent > 0) {
         discountHtml = `
-            <div class="summary-item" style="background: #dcfce7; border-left: 3px solid #16a34a;">
-                <span class="label" style="color: #15803d;">💰 Discount Aplicat (${discountPercent}%)</span>
-                <span class="value" style="color: #15803d;">-${discountAmount.toFixed(2)} RON</span>
+            <div class="summary-item bg-green-50 dark:bg-green-900/20 border-l-4 border-green-600">
+                <span class="label text-green-800 dark:text-green-300">💰 Discount Aplicat (${discountPercent}%)</span>
+                <span class="value text-green-800 dark:text-green-300">-${discountAmount.toFixed(2)} RON</span>
             </div>
         `;
     }
@@ -206,9 +206,9 @@ function generatePaymentSummary(clientId, monthKey, totalDue, totalBeforeDiscoun
     return `
         <div class="financial-summary">
             ${discountPercent > 0 ? `
-                <div class="summary-item" style="opacity: 0.7;">
+                <div class="summary-item opacity-70">
                     <span class="label">Subtotal (înainte de discount)</span>
-                    <span class="value" style="text-decoration: line-through;">${totalBeforeDiscount.toFixed(2)} RON</span>
+                    <span class="value line-through">${totalBeforeDiscount.toFixed(2)} RON</span>
                 </div>
             ` : ''}
             ${discountHtml}
@@ -382,14 +382,14 @@ function toggleDiscountThresholdsSection() {
     const icon = dom.discountThresholdsToggleIcon;
     const saveBtn = dom.saveDiscountThresholdsBtn;
 
-    if (content.style.display === 'none') {
-        content.style.display = 'block';
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
         icon.style.transform = 'rotate(90deg)';
-        saveBtn.style.display = 'inline-flex';
+        saveBtn.classList.remove('hidden');
     } else {
-        content.style.display = 'none';
+        content.classList.add('hidden');
         icon.style.transform = 'rotate(0deg)';
-        saveBtn.style.display = 'none';
+        saveBtn.classList.add('hidden');
     }
 }
 
@@ -408,24 +408,22 @@ function renderDiscountThresholds() {
 
     sortedThresholds.forEach((threshold, index) => {
         const thresholdItem = document.createElement('div');
-        thresholdItem.style.cssText = 'display: flex; align-items: center; gap: 1rem; background: var(--bg-hover); padding: 0.75rem; border-radius: 0.5rem;';
+        thresholdItem.className = 'flex items-center gap-4 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg';
         thresholdItem.innerHTML = `
-            <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
-                <label style="font-size: 0.9rem; color: var(--text-secondary); white-space: nowrap;">Ore minime:</label>
+            <div class="flex-1 flex items-center gap-2">
+                <label class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">Ore minime:</label>
                 <input type="number"
-                    class="form-input"
-                    style="width: 80px; padding: 0.4rem;"
+                    class="form-input w-20 py-1.5 px-2"
                     value="${threshold.hours}"
                     data-index="${index}"
                     data-field="hours"
                     min="1"
                     step="1">
             </div>
-            <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
-                <label style="font-size: 0.9rem; color: var(--text-secondary); white-space: nowrap;">Discount (%):</label>
+            <div class="flex-1 flex items-center gap-2">
+                <label class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">Discount (%):</label>
                 <input type="number"
-                    class="form-input"
-                    style="width: 80px; padding: 0.4rem;"
+                    class="form-input w-20 py-1.5 px-2"
                     value="${threshold.discount}"
                     data-index="${index}"
                     data-field="discount"
