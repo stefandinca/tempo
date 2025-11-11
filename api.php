@@ -1117,85 +1117,126 @@ try {
 
                     // Clonează fiecare eveniment
                     foreach ($sourceEvents as $event) {
-                        // Generează un nou ID unic
-                        $newId = 'evt' . (int)(microtime(true) * 1000) . substr(md5(uniqid()), 0, 9);
-
-                        // Calculează noua dată bazat pe ziua săptămânii (weekday-based)
-                        $oldDate = new DateTime($event['date']);
-
-                        // Obține ziua săptămânii (0=Duminică, 1=Luni, etc.)
-                        $dayOfWeek = (int)$oldDate->format('w');
-
-                        // Calculează a câta apariție a acestei zile este în lună (1=prima, 2=a doua, etc.)
-                        $dayOfMonth = (int)$oldDate->format('d');
-                        $weekOccurrence = ceil($dayOfMonth / 7);
-
-                        // Găsește aceeași zi a săptămânii în luna țintă
-                        // Începe cu prima zi din luna țintă
-                        $newDate = clone $targetDate;
-                        $newDate->setDate(
-                            (int)$targetDate->format('Y'),
-                            (int)$targetDate->format('m'),
-                            1
-                        );
-
-                        // Găsește prima apariție a aceleiași zile din săptămână
-                        $targetDayOfWeek = (int)$newDate->format('w');
-                        $daysToAdd = ($dayOfWeek - $targetDayOfWeek + 7) % 7;
-                        $newDate->modify("+$daysToAdd days");
-
-                        // Adaugă săptămâni pentru a ajunge la aceeași apariție (1=prima, 2=a doua, etc.)
-                        $newDate->modify("+" . ($weekOccurrence - 1) . " weeks");
-
-                        // Verifică dacă data calculată este încă în luna țintă
-                        if ((int)$newDate->format('m') != (int)$targetDate->format('m')) {
-                            // Dacă am depășit luna (ex: a 5-a luni nu există), folosește ultima apariție
-                            $newDate->modify("-1 week");
+                        // Check if this is a recurring event
+                        $repeatingData = null;
+                        if (!empty($event['repeating_json'])) {
+                            $repeatingData = json_decode($event['repeating_json'], true);
                         }
 
-                        $newDateStr = $newDate->format('Y-m-d');
+                        // Array to store all target dates for this event
+                        $targetDates = [];
 
-                        // Inserează evenimentul
-                        $stmt_evt->execute([
-                            $newId,
-                            $event['name'],
-                            $event['details'],
-                            $event['type'],
-                            $newDateStr,
-                            $event['startTime'],
-                            $event['duration'],
-                            $event['isPublic'],
-                            $event['isBillable'],
-                            $event['repeating_json'], // Păstrează setările de recurență
-                            '', // Reset comments pentru evenimentele clonate
-                            '{}' // Reset attendance pentru evenimentele clonate
-                        ]);
+                        if (!empty($repeatingData) && is_array($repeatingData)) {
+                            // This is a recurring event - clone it to ALL occurrences of the repeating days in target month
+                            debugLog("Eveniment recurent găsit: " . $event['name'] . " cu zile: " . implode(',', $repeatingData));
 
-                        // Clonează legăturile cu membrii echipei
-                        if (!empty($event['teamMemberIds'])) {
-                            $teamMemberIds = explode(',', $event['teamMemberIds']);
-                            foreach ($teamMemberIds as $teamMemberId) {
-                                $stmt_evt_team->execute([$newId, trim($teamMemberId)]);
+                            foreach ($repeatingData as $dayOfWeek) {
+                                // dayOfWeek: 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat, 7=Sun
+                                // Convert to PHP's w format: 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+                                $phpDayOfWeek = $dayOfWeek % 7; // 7 becomes 0 (Sunday)
+
+                                // Find all occurrences of this day in the target month
+                                $currentDate = clone $targetDate;
+                                $currentDate->setDate(
+                                    (int)$targetDate->format('Y'),
+                                    (int)$targetDate->format('m'),
+                                    1
+                                );
+
+                                // Move to the first occurrence of this day of week
+                                $currentDayOfWeek = (int)$currentDate->format('w');
+                                $daysToAdd = ($phpDayOfWeek - $currentDayOfWeek + 7) % 7;
+                                $currentDate->modify("+$daysToAdd days");
+
+                                // Add all occurrences of this day in the target month
+                                while ((int)$currentDate->format('m') == (int)$targetDate->format('m')) {
+                                    $targetDates[] = $currentDate->format('Y-m-d');
+                                    $currentDate->modify("+1 week");
+                                }
                             }
-                        }
+                        } else {
+                            // Non-recurring event - use the original logic (map by week occurrence)
+                            $oldDate = new DateTime($event['date']);
 
-                        // Clonează legăturile cu clienții
-                        if (!empty($event['clientIds'])) {
-                            $clientIds = explode(',', $event['clientIds']);
-                            foreach ($clientIds as $clientId) {
-                                $stmt_evt_client->execute([$newId, trim($clientId)]);
+                            // Obține ziua săptămânii (0=Duminică, 1=Luni, etc.)
+                            $dayOfWeek = (int)$oldDate->format('w');
+
+                            // Calculează a câta apariție a acestei zile este în lună (1=prima, 2=a doua, etc.)
+                            $dayOfMonth = (int)$oldDate->format('d');
+                            $weekOccurrence = ceil($dayOfMonth / 7);
+
+                            // Găsește aceeași zi a săptămânii în luna țintă
+                            $newDate = clone $targetDate;
+                            $newDate->setDate(
+                                (int)$targetDate->format('Y'),
+                                (int)$targetDate->format('m'),
+                                1
+                            );
+
+                            // Găsește prima apariție a aceleiași zile din săptămână
+                            $targetDayOfWeek = (int)$newDate->format('w');
+                            $daysToAdd = ($dayOfWeek - $targetDayOfWeek + 7) % 7;
+                            $newDate->modify("+$daysToAdd days");
+
+                            // Adaugă săptămâni pentru a ajunge la aceeași apariție (1=prima, 2=a doua, etc.)
+                            $newDate->modify("+" . ($weekOccurrence - 1) . " weeks");
+
+                            // Verifică dacă data calculată este încă în luna țintă
+                            if ((int)$newDate->format('m') != (int)$targetDate->format('m')) {
+                                // Dacă am depășit luna (ex: a 5-a luni nu există), folosește ultima apariție
+                                $newDate->modify("-1 week");
                             }
+
+                            $targetDates[] = $newDate->format('Y-m-d');
                         }
 
-                        // Clonează legăturile cu programele
-                        if (!empty($event['programIds'])) {
-                            $programIds = explode(',', $event['programIds']);
-                            foreach ($programIds as $programId) {
-                                $stmt_evt_prog->execute([$newId, trim($programId)]);
+                        // Clone the event to all target dates
+                        foreach ($targetDates as $newDateStr) {
+                            // Generează un nou ID unic pentru fiecare clonă
+                            $newId = 'evt' . (int)(microtime(true) * 1000) . substr(md5(uniqid()), 0, 9);
+
+                            // Inserează evenimentul
+                            $stmt_evt->execute([
+                                $newId,
+                                $event['name'],
+                                $event['details'],
+                                $event['type'],
+                                $newDateStr,
+                                $event['startTime'],
+                                $event['duration'],
+                                $event['isPublic'],
+                                $event['isBillable'],
+                                $event['repeating_json'], // Păstrează setările de recurență
+                                '', // Reset comments pentru evenimentele clonate
+                                '{}' // Reset attendance pentru evenimentele clonate
+                            ]);
+
+                            // Clonează legăturile cu membrii echipei
+                            if (!empty($event['teamMemberIds'])) {
+                                $teamMemberIds = explode(',', $event['teamMemberIds']);
+                                foreach ($teamMemberIds as $teamMemberId) {
+                                    $stmt_evt_team->execute([$newId, trim($teamMemberId)]);
+                                }
                             }
-                        }
 
-                        $clonedCount++;
+                            // Clonează legăturile cu clienții
+                            if (!empty($event['clientIds'])) {
+                                $clientIds = explode(',', $event['clientIds']);
+                                foreach ($clientIds as $clientId) {
+                                    $stmt_evt_client->execute([$newId, trim($clientId)]);
+                                }
+                            }
+
+                            // Clonează legăturile cu programele
+                            if (!empty($event['programIds'])) {
+                                $programIds = explode(',', $event['programIds']);
+                                foreach ($programIds as $programId) {
+                                    $stmt_evt_prog->execute([$newId, trim($programId)]);
+                                }
+                            }
+
+                            $clonedCount++;
+                        }
                     }
 
                     $pdo->commit();
