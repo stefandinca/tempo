@@ -274,3 +274,32 @@ export async function deleteProgram(id) {
     };
     return apiFetch(`programs&id=${id}`, options);
 }
+
+/**
+ * Clonează programul unei luni în alta.
+ * Apel POST la api.php?path=clone-schedule
+ * @param {string} sourceMonth - Luna sursă (format: YYYY-MM)
+ * @param {string} targetMonth - Luna țintă (format: YYYY-MM)
+ */
+export async function cloneMonthSchedule(sourceMonth, targetMonth) {
+    const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sourceMonth, targetMonth })
+    };
+    return apiFetch('clone-schedule', options);
+}
+
+/**
+ * Șterge toate evenimentele dintr-o lună.
+ * Apel POST la api.php?path=clear-month
+ * @param {string} month - Luna de șters (format: YYYY-MM)
+ */
+export async function clearMonth(month) {
+    const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ month })
+    };
+    return apiFetch('clear-month', options);
+}
