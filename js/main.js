@@ -42,7 +42,16 @@ const dom = {
     addEventBtn: $('addEventBtn'),
     addEventBtnCalendar: $('addEventBtnCalendar'),
     calendarClientFilter: $('calendarClientFilter'), // Filtru client
-    
+    cloneMonthBtn: $('cloneMonthBtn'),
+
+    // Clone Month Modal
+    cloneMonthModal: $('cloneMonthModal'),
+    closeCloneMonthModal: $('closeCloneMonthModal'),
+    sourceMonth: $('sourceMonth'),
+    targetMonth: $('targetMonth'),
+    confirmCloneMonth: $('confirmCloneMonth'),
+    cancelCloneMonth: $('cancelCloneMonth'),
+
     // Modal Evenimente (Adăugare/Editare)
     closeModalBtn: $('closeModal'),
     cancelModalBtn: $('cancelBtn'),
@@ -378,6 +387,149 @@ function handleDayClick(date) {
 
 function handleEventClick(eventId) {
     ui.showEventDetails(eventId);
+}
+
+// --- Clone Month Functionality ---
+
+function openCloneMonthModal() {
+    const currentDate = calendarState.getState().currentDate;
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+
+    // Set source month to current month
+    dom.sourceMonth.value = `${year}-${month}`;
+
+    // Set target month to next month
+    const nextMonth = new Date(currentDate);
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    const targetYear = nextMonth.getFullYear();
+    const targetMonthNum = String(nextMonth.getMonth() + 1).padStart(2, '0');
+    dom.targetMonth.value = `${targetYear}-${targetMonthNum}`;
+
+    // Show the modal
+    dom.cloneMonthModal.classList.add('active');
+}
+
+function closeCloneMonthModal() {
+    dom.cloneMonthModal.classList.remove('active');
+}
+
+async function handleCloneMonth() {
+    const sourceValue = dom.sourceMonth.value;
+    const targetValue = dom.targetMonth.value;
+
+    if (!sourceValue || !targetValue) {
+        ui.showCustomAlert('Te rog selectează ambele luni.', 'Validare');
+        return;
+    }
+
+    if (sourceValue === targetValue) {
+        ui.showCustomAlert('Luna sursă și luna destinație trebuie să fie diferite.', 'Validare');
+        return;
+    }
+
+    const [sourceYear, sourceMonth] = sourceValue.split('-').map(Number);
+    const [targetYear, targetMonth] = targetValue.split('-').map(Number);
+
+    // Get all events from source month (excluding recurring events)
+    const { events } = calendarState.getState();
+    const sourceEvents = events.filter(event => {
+        const eventDate = new Date(event.date);
+        return eventDate.getFullYear() === sourceYear &&
+               eventDate.getMonth() + 1 === sourceMonth &&
+               (!event.repeating || event.repeating.length === 0); // Exclude recurring events
+    });
+
+    if (sourceEvents.length === 0) {
+        ui.showCustomAlert('Nu există evenimente în luna sursă.', 'Informație');
+        closeCloneMonthModal();
+        return;
+    }
+
+    // Clone events by mapping weekdays
+    const clonedEvents = [];
+    sourceEvents.forEach(sourceEvent => {
+        const sourceDate = new Date(sourceEvent.date);
+        const sourceDayOfWeek = sourceDate.getDay(); // 0-6 (Sunday-Saturday)
+        const sourceDayOfMonth = sourceDate.getDate();
+        const sourceWeekOfMonth = Math.ceil(sourceDayOfMonth / 7); // 1-5
+
+        // Find the same weekday occurrence in target month
+        const targetDate = findSameWeekdayInMonth(targetYear, targetMonth, sourceDayOfWeek, sourceWeekOfMonth);
+
+        if (targetDate) {
+            const clonedEvent = {
+                ...sourceEvent,
+                id: generateEventId(),
+                date: formatDate(targetDate),
+                attendance: sourceEvent.clientIds && sourceEvent.clientIds.length > 0
+                    ? Object.fromEntries(sourceEvent.clientIds.map(id => [id, 'present']))
+                    : {}
+            };
+            clonedEvents.push(clonedEvent);
+        }
+    });
+
+    if (clonedEvents.length === 0) {
+        ui.showCustomAlert('Nu s-au putut clona evenimentele.', 'Eroare');
+        return;
+    }
+
+    // Save the cloned events
+    clonedEvents.forEach(event => calendarState.saveEvent(event));
+    await api.saveData(calendarState.getState());
+
+    // Log activity
+    window.logActivity("Evenimente clonate", `${clonedEvents.length} evenimente de la ${sourceValue} la ${targetValue}`, 'event');
+
+    ui.showCustomAlert(`${clonedEvents.length} evenimente au fost clonate cu succes!`, 'Succes');
+    closeCloneMonthModal();
+
+    // Navigate to target month and render
+    calendarState.setCurrentDate(new Date(targetYear, targetMonth - 1, 1));
+    render();
+}
+
+/**
+ * Find the same weekday occurrence in a target month
+ * @param {number} year - Target year
+ * @param {number} month - Target month (1-12)
+ * @param {number} dayOfWeek - Day of week (0-6, Sunday-Saturday)
+ * @param {number} weekNum - Week number in month (1-5)
+ * @returns {Date|null} - The target date or null if not found
+ */
+function findSameWeekdayInMonth(year, month, dayOfWeek, weekNum) {
+    // Find first occurrence of the weekday in target month
+    const firstDay = new Date(year, month - 1, 1);
+    let targetDate = new Date(firstDay);
+
+    // Find first occurrence of this weekday
+    while (targetDate.getDay() !== dayOfWeek) {
+        targetDate.setDate(targetDate.getDate() + 1);
+    }
+
+    // Move to the correct week occurrence
+    targetDate.setDate(targetDate.getDate() + (weekNum - 1) * 7);
+
+    // Check if the date is still in the target month
+    if (targetDate.getMonth() + 1 !== month) {
+        // If we've gone into the next month, go back one week
+        targetDate.setDate(targetDate.getDate() - 7);
+    }
+
+    return targetDate;
+}
+
+/**
+ * Format date to YYYY-MM-DD
+ * @param {Date} date
+ * @returns {string}
+ */
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 // --- Handlers Modal Evenimente (Adăugare/Editare) ---
@@ -1318,6 +1470,12 @@ async function init() {
     dom.viewBtns.forEach(btn => btn.addEventListener('click', handleViewChange));
     if (dom.addEventBtn) dom.addEventBtn.addEventListener('click', () => ui.openEventModal(null));
     if (dom.addEventBtnCalendar) dom.addEventBtnCalendar.addEventListener('click', () => ui.openEventModal(null));
+
+    // Clone Month
+    if (dom.cloneMonthBtn) dom.cloneMonthBtn.addEventListener('click', openCloneMonthModal);
+    if (dom.closeCloneMonthModal) dom.closeCloneMonthModal.addEventListener('click', closeCloneMonthModal);
+    if (dom.cancelCloneMonth) dom.cancelCloneMonth.addEventListener('click', closeCloneMonthModal);
+    if (dom.confirmCloneMonth) dom.confirmCloneMonth.addEventListener('click', handleCloneMonth);
 
     // Listener pentru noul filtru de client
     if (dom.calendarClientFilter) {
