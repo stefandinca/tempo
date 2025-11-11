@@ -408,22 +408,22 @@ function renderDiscountThresholds() {
 
     sortedThresholds.forEach((threshold, index) => {
         const thresholdItem = document.createElement('div');
-        thresholdItem.className = 'flex items-center gap-4 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg';
+        thresholdItem.className = 'flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 bg-gray-50 dark:bg-gray-700 p-3 rounded-lg';
         thresholdItem.innerHTML = `
-            <div class="flex-1 flex items-center gap-2">
-                <label class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">Ore minime:</label>
+            <div class="flex-1 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+                <label class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap font-medium">Ore minime:</label>
                 <input type="number"
-                    class="form-input w-20 py-1.5 px-2"
+                    class="form-input w-full sm:w-20 py-1.5 px-2 text-sm"
                     value="${threshold.hours}"
                     data-index="${index}"
                     data-field="hours"
                     min="1"
                     step="1">
             </div>
-            <div class="flex-1 flex items-center gap-2">
-                <label class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">Discount (%):</label>
+            <div class="flex-1 flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2">
+                <label class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap font-medium">Discount (%):</label>
                 <input type="number"
-                    class="form-input w-20 py-1.5 px-2"
+                    class="form-input w-full sm:w-20 py-1.5 px-2 text-sm"
                     value="${threshold.discount}"
                     data-index="${index}"
                     data-field="discount"
@@ -431,7 +431,7 @@ function renderDiscountThresholds() {
                     max="100"
                     step="1">
             </div>
-            <button class="btn-icon btn-delete-payment" data-action="delete-threshold" data-index="${index}" title="Șterge prag">
+            <button class="btn-icon btn-delete-payment self-end sm:self-auto" data-action="delete-threshold" data-index="${index}" title="Șterge prag">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/><path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/></svg>
             </button>
         `;
