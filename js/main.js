@@ -49,6 +49,7 @@ const dom = {
     closeCloneMonthModal: $('closeCloneMonthModal'),
     sourceMonth: $('sourceMonth'),
     targetMonth: $('targetMonth'),
+    clearTargetMonth: $('clearTargetMonth'),
     confirmCloneMonth: $('confirmCloneMonth'),
     cancelCloneMonth: $('cancelCloneMonth'),
 
@@ -417,6 +418,7 @@ function closeCloneMonthModal() {
 async function handleCloneMonth() {
     const sourceValue = dom.sourceMonth.value;
     const targetValue = dom.targetMonth.value;
+    const shouldClearTarget = dom.clearTargetMonth.checked;
 
     if (!sourceValue || !targetValue) {
         ui.showCustomAlert('Te rog selectează ambele luni.', 'Validare');
@@ -434,7 +436,7 @@ async function handleCloneMonth() {
     // Get all events from source month (excluding recurring events)
     const { events } = calendarState.getState();
     const sourceEvents = events.filter(event => {
-        const eventDate = new Date(event.date);
+        const eventDate = new Date(event.date + 'T00:00:00');
         return eventDate.getFullYear() === sourceYear &&
                eventDate.getMonth() + 1 === sourceMonth &&
                (!event.repeating || event.repeating.length === 0); // Exclude recurring events
@@ -446,16 +448,44 @@ async function handleCloneMonth() {
         return;
     }
 
+    // Clear target month if checkbox is checked
+    let deletedCount = 0;
+    if (shouldClearTarget) {
+        const targetEvents = events.filter(event => {
+            const eventDate = new Date(event.date + 'T00:00:00');
+            return eventDate.getFullYear() === targetYear &&
+                   eventDate.getMonth() + 1 === targetMonth;
+        });
+
+        if (targetEvents.length > 0) {
+            const confirmed = await ui.showConfirmDialog(
+                `Ești sigur că vrei să ștergi ${targetEvents.length} evenimente din luna destinație?`,
+                'Confirmare Ștergere'
+            );
+
+            if (!confirmed) {
+                return; // User cancelled
+            }
+
+            // Delete all target month events
+            targetEvents.forEach(event => {
+                calendarState.deleteEvent(event.id);
+            });
+            deletedCount = targetEvents.length;
+        }
+    }
+
     // Clone events by mapping weekdays
     const clonedEvents = [];
     sourceEvents.forEach(sourceEvent => {
-        const sourceDate = new Date(sourceEvent.date);
+        const sourceDate = new Date(sourceEvent.date + 'T00:00:00'); // Add time to avoid timezone issues
         const sourceDayOfWeek = sourceDate.getDay(); // 0-6 (Sunday-Saturday)
-        const sourceDayOfMonth = sourceDate.getDate();
-        const sourceWeekOfMonth = Math.ceil(sourceDayOfMonth / 7); // 1-5
+
+        // Count which occurrence of this weekday it is in the source month
+        const occurrence = getWeekdayOccurrence(sourceDate);
 
         // Find the same weekday occurrence in target month
-        const targetDate = findSameWeekdayInMonth(targetYear, targetMonth, sourceDayOfWeek, sourceWeekOfMonth);
+        const targetDate = getNthWeekdayOfMonth(targetYear, targetMonth, sourceDayOfWeek, occurrence);
 
         if (targetDate) {
             const clonedEvent = {
@@ -480,9 +510,16 @@ async function handleCloneMonth() {
     await api.saveData(calendarState.getState());
 
     // Log activity
-    window.logActivity("Evenimente clonate", `${clonedEvents.length} evenimente de la ${sourceValue} la ${targetValue}`, 'event');
+    const activityMsg = deletedCount > 0
+        ? `Șters ${deletedCount}, clonat ${clonedEvents.length} evenimente de la ${sourceValue} la ${targetValue}`
+        : `${clonedEvents.length} evenimente de la ${sourceValue} la ${targetValue}`;
+    window.logActivity("Evenimente clonate", activityMsg, 'event');
 
-    ui.showCustomAlert(`${clonedEvents.length} evenimente au fost clonate cu succes!`, 'Succes');
+    // Success message
+    const successMsg = deletedCount > 0
+        ? `${deletedCount} evenimente au fost șterse și ${clonedEvents.length} evenimente au fost clonate cu succes!`
+        : `${clonedEvents.length} evenimente au fost clonate cu succes!`;
+    ui.showCustomAlert(successMsg, 'Succes');
     closeCloneMonthModal();
 
     // Navigate to target month and render
@@ -491,33 +528,47 @@ async function handleCloneMonth() {
 }
 
 /**
- * Find the same weekday occurrence in a target month
+ * Get which occurrence of a weekday this date is in its month
+ * @param {Date} date - The date to check
+ * @returns {number} - The occurrence number (1 = first Monday, 2 = second Monday, etc.)
+ */
+function getWeekdayOccurrence(date) {
+    const dayOfWeek = date.getDay();
+    const dayOfMonth = date.getDate();
+
+    // Count how many times this weekday has occurred up to this point in the month
+    let occurrence = 0;
+    for (let d = 1; d <= dayOfMonth; d++) {
+        const testDate = new Date(date.getFullYear(), date.getMonth(), d);
+        if (testDate.getDay() === dayOfWeek) {
+            occurrence++;
+        }
+    }
+    return occurrence;
+}
+
+/**
+ * Get the Nth occurrence of a specific weekday in a month
  * @param {number} year - Target year
  * @param {number} month - Target month (1-12)
  * @param {number} dayOfWeek - Day of week (0-6, Sunday-Saturday)
- * @param {number} weekNum - Week number in month (1-5)
+ * @param {number} occurrence - Which occurrence (1 = first, 2 = second, etc.)
  * @returns {Date|null} - The target date or null if not found
  */
-function findSameWeekdayInMonth(year, month, dayOfWeek, weekNum) {
-    // Find first occurrence of the weekday in target month
-    const firstDay = new Date(year, month - 1, 1);
-    let targetDate = new Date(firstDay);
+function getNthWeekdayOfMonth(year, month, dayOfWeek, occurrence) {
+    let count = 0;
+    const daysInMonth = new Date(year, month, 0).getDate();
 
-    // Find first occurrence of this weekday
-    while (targetDate.getDay() !== dayOfWeek) {
-        targetDate.setDate(targetDate.getDate() + 1);
+    for (let d = 1; d <= daysInMonth; d++) {
+        const testDate = new Date(year, month - 1, d);
+        if (testDate.getDay() === dayOfWeek) {
+            count++;
+            if (count === occurrence) {
+                return testDate;
+            }
+        }
     }
-
-    // Move to the correct week occurrence
-    targetDate.setDate(targetDate.getDate() + (weekNum - 1) * 7);
-
-    // Check if the date is still in the target month
-    if (targetDate.getMonth() + 1 !== month) {
-        // If we've gone into the next month, go back one week
-        targetDate.setDate(targetDate.getDate() - 7);
-    }
-
-    return targetDate;
+    return null; // This occurrence doesn't exist in this month (e.g., 5th Monday)
 }
 
 // --- Handlers Modal Evenimente (Adăugare/Editare) ---
