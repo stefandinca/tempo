@@ -1108,6 +1108,11 @@ body.public-view {
   display: flex;
 }
 
+/* Confirm modal needs higher z-index to appear above other modals */
+#confirmModal {
+  z-index: 200;
+}
+
 /* --- Modal Content (Admin) --- */
 .modal-content {
   width: 100%;
