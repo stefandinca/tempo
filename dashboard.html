@@ -485,8 +485,30 @@
 
     <div class="section-content-grid" style="grid-template-columns: 1fr; overflow-y: auto;">
         <div class="section-col-list" style="height: auto;">
-            <input type="search" id="billingSearchBar" class="form-input" placeholder="Caută client după nume..." style="margin-bottom: 1.5rem;">
-            <div id="billingClientList" class="modal-list" style="padding-right: 0;">
+            <!-- Discount Thresholds Section -->
+            <div id="discountThresholdsSection" class="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 mb-6 shadow-md">
+                <div id="discountThresholdsHeader" class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-0 cursor-pointer">
+                    <div class="flex items-center gap-2">
+                        <svg id="discountThresholdsToggleIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200 flex-shrink-0">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white m-0">Praguri de Discount Automat</h3>
+                    </div>
+                    <button id="saveDiscountThresholdsBtn" class="btn btn-primary btn-sm hidden self-end sm:self-auto" onclick="event.stopPropagation()">Salvează</button>
+                </div>
+                <div id="discountThresholdsContent" class="hidden mt-4">
+                    <div id="discountThresholdsList" class="flex flex-col gap-3">
+                        <!-- Threshold items will be rendered here -->
+                    </div>
+                    <button id="addDiscountThresholdBtn" class="btn btn-secondary btn-sm mt-3 w-full sm:w-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m-7-7h14"/></svg>
+                        Adaugă Prag
+                    </button>
+                </div>
+            </div>
+
+            <input type="search" id="billingSearchBar" class="form-input mb-6" placeholder="Caută client după nume...">
+            <div id="billingClientList" class="modal-list pr-0">
                 </div>
         </div>
     </div>

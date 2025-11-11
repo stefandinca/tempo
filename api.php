@@ -774,6 +774,54 @@ try {
             }
             break;
 
+        case 'discount-thresholds':
+            $file = __DIR__ . '/discount-thresholds.json';
+
+            if ($method === 'GET') {
+                if (file_exists($file)) {
+                    $content = file_get_contents($file);
+                    $data = json_decode($content, true);
+                    sendResponse($data);
+                } else {
+                    // Return default thresholds if file doesn't exist
+                    $defaultThresholds = [
+                        ['hours' => 10, 'discount' => 10],
+                        ['hours' => 20, 'discount' => 15],
+                        ['hours' => 30, 'discount' => 20]
+                    ];
+                    sendResponse($defaultThresholds);
+                }
+            } elseif ($method === 'POST') {
+                if ($input === null) {
+                    sendError('Invalid JSON data for discount thresholds', 400);
+                }
+
+                try {
+                    // Validate thresholds
+                    if (!is_array($input)) {
+                        sendError('Discount thresholds must be an array', 400);
+                    }
+
+                    foreach ($input as $threshold) {
+                        if (!isset($threshold['hours']) || !isset($threshold['discount'])) {
+                            sendError('Each threshold must have hours and discount properties', 400);
+                        }
+                        if (!is_numeric($threshold['hours']) || !is_numeric($threshold['discount'])) {
+                            sendError('Hours and discount must be numeric values', 400);
+                        }
+                    }
+
+                    // Save to file
+                    file_put_contents($file, json_encode($input, JSON_PRETTY_PRINT));
+                    debugLog("Discount thresholds saved successfully.");
+                    sendResponse(['success' => true, 'message' => 'Discount thresholds saved']);
+                } catch (Exception $e) {
+                    debugLog("ERROR saving discount thresholds: " . $e->getMessage());
+                    sendError('Failed to save discount thresholds: ' . $e->getMessage());
+                }
+            }
+            break;
+
         // ==========================================================
         // CAZURILE .json (programs, portrige)
         // ==========================================================

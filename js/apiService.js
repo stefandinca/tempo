@@ -169,6 +169,28 @@ export async function saveBillingsData(data) {
 }
 
 /**
+ * Încarcă pragurile de discount pentru facturare.
+ * Apel GET la api.php?path=discount-thresholds
+ */
+export async function loadDiscountThresholds() {
+    return apiFetch('discount-thresholds');
+}
+
+/**
+ * Salvează pragurile de discount pentru facturare.
+ * Apel POST la api.php?path=discount-thresholds
+ * @param {array} thresholds - Array de obiecte {hours, discount}
+ */
+export async function saveDiscountThresholds(thresholds) {
+    const options = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(thresholds)
+    };
+    return apiFetch('discount-thresholds', options);
+}
+
+/**
  * Încarcă tipurile de evenimente din baza de date.
  * Apel GET la api.php?path=event_types
  */

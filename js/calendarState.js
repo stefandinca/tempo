@@ -22,6 +22,7 @@ const state = {
     evolutionData: {},
     billingsData: {},
     eventTypes: [], // Tipuri de evenimente din baza de date
+    discountThresholds: [], // Praguri de discount pentru facturare
 
     // Starea filtrelor
     activeFilters: [], // O listă de ID-uri ale membrilor echipei
@@ -113,6 +114,14 @@ export const calendarState = {
         } else {
             state.billingsData = data || {};
         }
+    },
+
+    /**
+     * Setează pragurile de discount pentru facturare.
+     * @param {array} thresholds - Array de obiecte {hours, discount}
+     */
+    setDiscountThresholds: (thresholds) => {
+        state.discountThresholds = thresholds || [];
     },
 
     /**
