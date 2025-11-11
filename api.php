@@ -1378,6 +1378,137 @@ try {
             break;
 
         // ==========================================================
+        // APP ID MANAGEMENT
+        // ==========================================================
+        case 'app-id':
+            if ($method === 'GET') {
+                require_once 'appIdService.php';
+                $appIdService = new AppIdService($pdo);
+
+                try {
+                    $appId = $appIdService->getAppId();
+                    $counts = $appIdService->getCurrentCounts();
+
+                    sendResponse([
+                        'success' => true,
+                        'app_id' => $appId,
+                        'current_counts' => $counts
+                    ]);
+                } catch (Exception $e) {
+                    sendError('Failed to get app ID: ' . $e->getMessage());
+                }
+            } else {
+                sendError('Only GET method is supported for app-id', 405);
+            }
+            break;
+
+        case 'validate-app':
+            if ($method === 'POST' || $method === 'GET') {
+                require_once 'appIdService.php';
+                require_once 'remote_config.php';
+
+                $appIdService = new AppIdService($pdo);
+
+                // Check if remote validation is enabled
+                if (!isRemoteValidationEnabled()) {
+                    sendResponse([
+                        'valid' => true,
+                        'message' => 'Remote validation is disabled',
+                        'app_id' => $appIdService->getAppId(),
+                        'validation_enabled' => false
+                    ]);
+                    break;
+                }
+
+                try {
+                    // Choose validation mode
+                    $validationMode = defined('VALIDATION_MODE') ? VALIDATION_MODE : 'database';
+
+                    if ($validationMode === 'api' && defined('REMOTE_API_URL')) {
+                        $result = $appIdService->validateWithRemoteApi(REMOTE_API_URL);
+                    } else {
+                        $remoteConfig = getRemoteDbConfig();
+                        $result = $appIdService->validateWithRemoteDb(
+                            $remoteConfig['host'],
+                            $remoteConfig['name'],
+                            $remoteConfig['user'],
+                            $remoteConfig['pass']
+                        );
+                    }
+
+                    $result['validation_enabled'] = true;
+                    sendResponse($result);
+                } catch (Exception $e) {
+                    sendError('Validation failed: ' . $e->getMessage());
+                }
+            } else {
+                sendError('Only GET/POST methods are supported for validate-app', 405);
+            }
+            break;
+
+        case 'check-user-limit':
+            if ($method === 'GET') {
+                require_once 'appIdService.php';
+                require_once 'remote_config.php';
+
+                $appIdService = new AppIdService($pdo);
+
+                if (!isRemoteValidationEnabled()) {
+                    sendResponse([
+                        'can_add' => true,
+                        'message' => 'Remote validation is disabled'
+                    ]);
+                    break;
+                }
+
+                try {
+                    $remoteConfig = getRemoteDbConfig();
+                    $canAdd = $appIdService->canAddUser($remoteConfig);
+
+                    sendResponse([
+                        'can_add' => $canAdd,
+                        'message' => $canAdd ? 'User can be added' : 'User limit exceeded'
+                    ]);
+                } catch (Exception $e) {
+                    sendError('Failed to check user limit: ' . $e->getMessage());
+                }
+            } else {
+                sendError('Only GET method is supported for check-user-limit', 405);
+            }
+            break;
+
+        case 'check-client-limit':
+            if ($method === 'GET') {
+                require_once 'appIdService.php';
+                require_once 'remote_config.php';
+
+                $appIdService = new AppIdService($pdo);
+
+                if (!isRemoteValidationEnabled()) {
+                    sendResponse([
+                        'can_add' => true,
+                        'message' => 'Remote validation is disabled'
+                    ]);
+                    break;
+                }
+
+                try {
+                    $remoteConfig = getRemoteDbConfig();
+                    $canAdd = $appIdService->canAddClient($remoteConfig);
+
+                    sendResponse([
+                        'can_add' => $canAdd,
+                        'message' => $canAdd ? 'Client can be added' : 'Client limit exceeded'
+                    ]);
+                } catch (Exception $e) {
+                    sendError('Failed to check client limit: ' . $e->getMessage());
+                }
+            } else {
+                sendError('Only GET method is supported for check-client-limit', 405);
+            }
+            break;
+
+        // ==========================================================
         // DEFAULT
         // ==========================================================
         default:

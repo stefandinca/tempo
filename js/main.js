@@ -13,6 +13,7 @@ import * as reportService from './reportService.js';
 import * as evolutionService from './evolutionService.js';
 import * as billing from './billingService.js';
 import * as eventTypesService from './eventTypesService.js';
+import * as appIdService from './appIdService.js';
 
 // --- Variabile DOM Globale ---
 const $ = (id) => document.getElementById(id);
@@ -698,8 +699,18 @@ async function forceRefreshData() {
 async function handleSaveClient(e) {
     e.preventDefault();
     const { editingClientId } = calendarState.getState();
+
+    // === APP ID VALIDATION - Check client limit when adding new ===
+    if (!editingClientId) {
+        const canAdd = await appIdService.validateBeforeAddingClient();
+        if (!canAdd) {
+            return; // Stop if limit exceeded
+        }
+    }
+    // === END APP ID VALIDATION ===
+
     const formData = new FormData(e.target);
-    
+
     // Get manual ID or generate one
     let clientId;
     const manualId = formData.get('clientId')?.trim();
@@ -805,7 +816,16 @@ async function handleDeleteClient() {
 async function handleSaveTeamMember(e) {
     e.preventDefault();
     const { editingMemberId } = calendarState.getState();
-    
+
+    // === APP ID VALIDATION - Check user limit when adding new ===
+    if (!editingMemberId) {
+        const canAdd = await appIdService.validateBeforeAddingUser();
+        if (!canAdd) {
+            return; // Stop if limit exceeded
+        }
+    }
+    // === END APP ID VALIDATION ===
+
     // NOU: Verificare permisiuni
     if (!auth.isAdmin() && !auth.isCoordinator()) { // Dacă e Terapeut
         const formData = new FormData(e.target);
@@ -1156,16 +1176,88 @@ function updateDashboardSchedule() {
  */
 function updateDashboardStats() {
     const stats = auth.getUserStats();
-    
+
     const totalSessionsEl = $('statTotalSessions');
     const attendanceEl = $('statAttendance');
     const pendingReportsEl = $('statPendingReports');
-    
+
     if (totalSessionsEl) totalSessionsEl.textContent = stats.totalSessions;
     if (attendanceEl) attendanceEl.textContent = stats.attendance + '%';
     if (pendingReportsEl) pendingReportsEl.textContent = stats.pendingReports;
 }
 
+/**
+ * Update app license information display
+ */
+async function updateAppLicenseInfo() {
+    const appInfo = appIdService.getAppInfo();
+
+    // Update App ID
+    const appIdEl = $('displayAppId');
+    if (appIdEl && appInfo.appId) {
+        // Show abbreviated version
+        const shortId = appInfo.appId.length > 20
+            ? appInfo.appId.substring(0, 17) + '...'
+            : appInfo.appId;
+        appIdEl.textContent = shortId;
+        appIdEl.title = appInfo.appId; // Full ID on hover
+    }
+
+    // Update Status
+    const statusEl = $('displayAppStatus');
+    if (statusEl && appInfo.status) {
+        if (!appInfo.validationEnabled) {
+            statusEl.innerHTML = `
+                <span class="inline-flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+                    <span class="text-gray-600 dark:text-gray-400">Disabled</span>
+                </span>
+            `;
+        } else if (appInfo.isValid) {
+            statusEl.innerHTML = `
+                <span class="inline-flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <span class="text-green-600 dark:text-green-400">Valid</span>
+                </span>
+            `;
+        } else {
+            statusEl.innerHTML = `
+                <span class="inline-flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    <span class="text-red-600 dark:text-red-400">Invalid</span>
+                </span>
+            `;
+        }
+    }
+
+    // Update User Count
+    const userCountEl = $('displayUserCount');
+    if (userCountEl && appInfo.current && appInfo.limits) {
+        const current = appInfo.current.users || 0;
+        const max = appInfo.limits.max_users || '∞';
+        userCountEl.textContent = `${current}/${max}`;
+
+        // Add warning color if near limit
+        if (appInfo.limits.max_users && current >= appInfo.limits.max_users * 0.9) {
+            userCountEl.classList.add('text-yellow-600', 'dark:text-yellow-400');
+            userCountEl.classList.remove('text-primary');
+        }
+    }
+
+    // Update Client Count
+    const clientCountEl = $('displayClientCount');
+    if (clientCountEl && appInfo.current && appInfo.limits) {
+        const current = appInfo.current.clients || 0;
+        const max = appInfo.limits.max_clients || '∞';
+        clientCountEl.textContent = `${current}/${max}`;
+
+        // Add warning color if near limit
+        if (appInfo.limits.max_clients && current >= appInfo.limits.max_clients * 0.9) {
+            clientCountEl.classList.add('text-yellow-600', 'dark:text-yellow-400');
+            clientCountEl.classList.remove('text-primary');
+        }
+    }
+}
 
 /**
  * Adaugă informațiile despre utilizator în sidebar.
@@ -1233,6 +1325,20 @@ function calculateEndTime(startTime, durationMinutes) {
 
 async function init() {
     console.log('Inițializare aplicație Tempo (modular)...');
+
+    // === APP ID VALIDATION - Check license limits ===
+    try {
+        console.log('Validating app installation...');
+        await appIdService.performStartupValidation();
+        console.log('App validation completed');
+
+        // Update dashboard with license info
+        setTimeout(() => updateAppLicenseInfo(), 100);
+    } catch (error) {
+        console.warn('App validation failed (non-blocking):', error);
+        // Continue initialization even if validation fails
+    }
+    // === END APP ID VALIDATION ===
 
     // === AUTHENTICATION CHECK - ADD THIS BLOCK ===
     try {
