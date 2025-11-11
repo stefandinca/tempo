@@ -6,6 +6,22 @@
     <title>Tempo Admin - Calendar Terapie</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="tempo-logo-small.png" type="image/png">
+    <script>
+        // Authentication check - runs before page loads
+        (async function() {
+            try {
+                const response = await fetch('auth.php?action=check');
+                const data = await response.json();
+
+                if (!data.logged_in) {
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                window.location.href = 'login.html';
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="app-container" id="appContainer">
@@ -44,6 +60,9 @@
                 </button>
                 <button id="fullscreenToggle" class="btn-icon" title="Ecran complet">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                </button>
+                <button id="logoutBtn" class="btn-icon" title="Deconectare">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 </button>
             </div>
         </nav>

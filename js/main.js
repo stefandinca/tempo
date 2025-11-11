@@ -68,6 +68,7 @@ const dom = {
     // Butoane UI
     themeToggle: $('themeToggle'),
     fullscreenToggle: $('fullscreenToggle'),
+    logoutBtn: $('logoutBtn'),
 };
 
 // --- Navigare Principală (Tab-uri) ---
@@ -177,6 +178,29 @@ function initFullscreenToggle() {
             document.exitFullscreen();
         }
     });
+}
+
+// --- Logout Handler ---
+
+async function handleLogout() {
+    try {
+        const response = await fetch('auth.php?action=logout', {
+            method: 'POST'
+        });
+        const data = await response.json();
+
+        if (data.success) {
+            window.location.href = 'login.html';
+        } else {
+            console.error('Logout failed:', data.message);
+            // Redirect anyway for safety
+            window.location.href = 'login.html';
+        }
+    } catch (error) {
+        console.error('Logout error:', error);
+        // Redirect anyway for safety
+        window.location.href = 'login.html';
+    }
 }
 
 // --- Handlers Navigare Calendar ---
@@ -511,6 +535,11 @@ async function init() {
         dom.sidebarToggle.addEventListener('click', () => {
             dom.appContainer.classList.toggle('sidebar-collapsed');
         });
+    }
+
+    // Logout button
+    if (dom.logoutBtn) {
+        dom.logoutBtn.addEventListener('click', handleLogout);
     }
 
     // Navigare Calendar
