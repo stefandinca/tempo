@@ -461,7 +461,7 @@ async function handleCloneMonth() {
             const clonedEvent = {
                 ...sourceEvent,
                 id: generateEventId(),
-                date: formatDate(targetDate),
+                date: formatDate(targetDate, 'iso'),
                 attendance: sourceEvent.clientIds && sourceEvent.clientIds.length > 0
                     ? Object.fromEntries(sourceEvent.clientIds.map(id => [id, 'present']))
                     : {}
@@ -518,18 +518,6 @@ function findSameWeekdayInMonth(year, month, dayOfWeek, weekNum) {
     }
 
     return targetDate;
-}
-
-/**
- * Format date to YYYY-MM-DD
- * @param {Date} date
- * @returns {string}
- */
-function formatDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
 }
 
 // --- Handlers Modal Evenimente (Adăugare/Editare) ---
