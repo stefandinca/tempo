@@ -435,15 +435,38 @@ async function handleCloneMonth() {
 
     // Get all events from source month (excluding recurring events)
     const { events } = calendarState.getState();
-    const sourceEvents = events.filter(event => {
+
+    // Debug: Log total events
+    console.log('Total events in state:', events.length);
+
+    // First, find ALL events in source month (including recurring)
+    const allSourceEvents = events.filter(event => {
         const eventDate = new Date(event.date + 'T00:00:00');
         return eventDate.getFullYear() === sourceYear &&
-               eventDate.getMonth() + 1 === sourceMonth &&
-               (!event.repeating || event.repeating.length === 0); // Exclude recurring events
+               eventDate.getMonth() + 1 === sourceMonth;
     });
 
+    console.log('All events in source month:', allSourceEvents.length);
+
+    // Then filter out recurring events
+    const sourceEvents = allSourceEvents.filter(event =>
+        !event.repeating || event.repeating.length === 0
+    );
+
+    console.log('Non-recurring events in source month:', sourceEvents.length);
+
     if (sourceEvents.length === 0) {
-        ui.showCustomAlert('Nu există evenimente în luna sursă.', 'Informație');
+        if (allSourceEvents.length > 0) {
+            // There are events, but they're all recurring
+            ui.showCustomAlert(
+                `Luna sursă conține ${allSourceEvents.length} evenimente, dar toate sunt recurente. ` +
+                'Clonarea funcționează doar cu evenimente simple (non-recurente).',
+                'Informație'
+            );
+        } else {
+            // No events at all in source month
+            ui.showCustomAlert('Nu există evenimente în luna sursă.', 'Informație');
+        }
         closeCloneMonthModal();
         return;
     }
