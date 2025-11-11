@@ -1094,6 +1094,47 @@ try {
 
                     debugLog("Găsite " . count($sourceEvents) . " evenimente în luna sursă");
 
+                    // DEDUPLICATE RECURRING EVENTS
+                    // Recurring events are stored as multiple database entries (one per occurrence)
+                    // We need to keep only ONE representative from each recurring series
+                    $recurringSignatures = [];
+                    $deduplicatedEvents = [];
+
+                    foreach ($sourceEvents as $event) {
+                        $repeatingData = null;
+                        if (!empty($event['repeating_json'])) {
+                            $repeatingData = json_decode($event['repeating_json'], true);
+                        }
+
+                        if (!empty($repeatingData) && is_array($repeatingData)) {
+                            // This is a recurring event - create a signature to identify the series
+                            $signature = md5(
+                                $event['name'] . '|' .
+                                $event['type'] . '|' .
+                                $event['startTime'] . '|' .
+                                $event['duration'] . '|' .
+                                $event['teamMemberIds'] . '|' .
+                                $event['clientIds'] . '|' .
+                                $event['programIds'] . '|' .
+                                $event['repeating_json']
+                            );
+
+                            // Only keep the first occurrence of each recurring series
+                            if (!isset($recurringSignatures[$signature])) {
+                                $recurringSignatures[$signature] = true;
+                                $deduplicatedEvents[] = $event;
+                                debugLog("Păstrez eveniment recurent: " . $event['name'] . " (first occurrence)");
+                            } else {
+                                debugLog("Omit duplicat recurent: " . $event['name']);
+                            }
+                        } else {
+                            // Non-recurring event - keep it
+                            $deduplicatedEvents[] = $event;
+                        }
+                    }
+
+                    debugLog("După deduplicare: " . count($deduplicatedEvents) . " evenimente unice din " . count($sourceEvents) . " originale");
+
                     // Calculează diferența în luni
                     $sourceDate = new DateTime($sourceMonth . '-01');
                     $targetDate = new DateTime($targetMonth . '-01');
@@ -1115,8 +1156,8 @@ try {
 
                     $clonedCount = 0;
 
-                    // Clonează fiecare eveniment
-                    foreach ($sourceEvents as $event) {
+                    // Clonează fiecare eveniment (now using deduplicated list)
+                    foreach ($deduplicatedEvents as $event) {
                         // Check if this is a recurring event
                         $repeatingData = null;
                         if (!empty($event['repeating_json'])) {
