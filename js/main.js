@@ -42,6 +42,17 @@ const dom = {
     addEventBtn: $('addEventBtn'),
     addEventBtnCalendar: $('addEventBtnCalendar'),
     calendarClientFilter: $('calendarClientFilter'), // Filtru client
+    cloneMonthBtn: $('cloneMonthBtn'),
+
+    // Clone Month Modal
+    cloneMonthModal: $('cloneMonthModal'),
+    closeCloneMonthModal: $('closeCloneMonthModal'),
+    cloneSourceMonth: $('cloneSourceMonth'),
+    cloneTargetMonth: $('cloneTargetMonth'),
+    cloneMonthCancel: $('cloneMonthCancel'),
+    cloneMonthConfirm: $('cloneMonthConfirm'),
+    clearMonth: $('clearMonth'),
+    clearMonthBtn: $('clearMonthBtn'),
     
     // Modal Evenimente (Adăugare/Editare)
     closeModalBtn: $('closeModal'),
@@ -215,6 +226,14 @@ function handleMainViewNavigation(e) {
  * NOU: Setează permisiunile la nivel de UI în funcție de rol
  */
 function setupRolePermissions() {
+    // Restricții specifice pentru non-admini
+    if (!auth.isAdmin()) {
+        // Hide clone month button for non-admin users
+        if (dom.cloneMonthBtn) {
+            dom.cloneMonthBtn.style.display = 'none';
+        }
+    }
+
     // Dacă utilizatorul este Admin sau Coordonator, nu se aplică restricții
     if (auth.isAdmin() || auth.isCoordinator()) {
         return;
@@ -489,35 +508,41 @@ console.log('===========================');
     } else {
         // This is a simple edit OR a new event
         const defaultAttendance = {};
-            if (clientIds.length > 0) {
-                clientIds.forEach(clientId => {
-                    defaultAttendance[clientId] = 'present';
-                });
-            }
-            
-            if (eventBase.repeating.length > 0) {
-                // New recurring event
-                // Pass defaultAttendance to the create function
-                const newEvents = createRecurringEvents(eventBase, defaultAttendance); 
-                calendarState.saveEvent(newEvents);
-            } else {
-                // New single event
-                const newEvent = { 
-                    ...eventBase, 
-                    id: generateEventId(),
-                    attendance: defaultAttendance // Add the new attendance object
-                };
-                calendarState.saveEvent(newEvent);
-            }
+        if (clientIds.length > 0) {
+            clientIds.forEach(clientId => {
+                defaultAttendance[clientId] = 'present';
+            });
+        }
+
+        if (eventBase.repeating.length > 0) {
+            // New recurring event
+            const newEvents = createRecurringEvents(eventBase, defaultAttendance);
+            calendarState.saveEvent(newEvents);
+            await api.createEvent(newEvents); // CREATE multiple
+        } else if (editingEventId) {
+            // Update existing single event
+            const updatedEvent = { ...eventBase, id: editingEventId };
+            calendarState.saveEvent(updatedEvent);
+            await api.updateEvent(updatedEvent); // UPDATE
+        } else {
+            // Create new single event
+            const newEvent = {
+                ...eventBase,
+                id: generateEventId(),
+                attendance: defaultAttendance
+            };
+            calendarState.saveEvent(newEvent);
+            await api.createEvent(newEvent); // CREATE
+        }
     }
     // --- END NEW RECURRENCE EDIT LOGIC ---
-    
-    await api.saveData(calendarState.getState());
     // logs saving activity
     window.logActivity(editingEventId ? "Eveniment actualizat" : "Eveniment adăugat", eventBase.name, 'event', eventBase.date);
     ui.closeEventModal();
     render();
 }
+
+
 
 async function handleDeleteEvent() {
     const { editingEventId } = calendarState.getState();
@@ -543,20 +568,49 @@ async function handleDeleteEvent() {
     if (choice === 'cancel') return;
 
     if (choice === 'all') {
+        // Delete all recurring events matching the criteria
         const criteria = {
             name: event.name,
             teamMemberIds: event.teamMemberIds || [event.teamMemberId],
             startTime: event.startTime,
             duration: event.duration,
-            repeating: event.repeating
+            repeating: event.repeating,
+            month: event.date ? event.date.substring(0, 7) : null // YYYY-MM - doar evenimentele din aceeași lună
         };
+
+        // Get all matching event IDs before deleting (only from same month)
+        const matchingEvents = calendarState.getState().events.filter(e => {
+            const eventTeamIds = e.teamMemberIds || (e.teamMemberId ? [e.teamMemberId] : []);
+            const eventRepeating = (e.repeating || []).map(d => parseInt(d));
+            const criteriaTeamIds = JSON.stringify((criteria.teamMemberIds || []).sort());
+            const criteriaRepeating = JSON.stringify((criteria.repeating || []).map(d => parseInt(d)).sort());
+            const eventMonth = e.date ? e.date.substring(0, 7) : null;
+
+            return e.name === criteria.name &&
+                   JSON.stringify(eventTeamIds.sort()) === criteriaTeamIds &&
+                   e.startTime === criteria.startTime &&
+                   e.duration === criteria.duration &&
+                   JSON.stringify(eventRepeating.sort()) === criteriaRepeating &&
+                   eventMonth === criteria.month; // Doar evenimentele din aceeași lună
+        });
+
+        // Delete from state
         calendarState.deleteRecurringEvents(criteria);
+
+        // Delete each event from the API
+        for (const evt of matchingEvents) {
+            try {
+                await api.deleteEvent(evt.id);
+            } catch (error) {
+                console.error(`Failed to delete event ${evt.id}:`, error);
+            }
+        }
     } else {
+        // Delete single event
         calendarState.deleteEvent(editingEventId);
+        await api.deleteEvent(editingEventId);
     }
 
-    await api.saveData(calendarState.getState());
-    
     ui.closeEventModal();
     ui.closeEventDetailsModal();
     render();
@@ -578,11 +632,12 @@ async function forceRefreshData() {
 
     try {
         // 1. Reîncarcă toate datele în paralel
-        const [data, programsData, evolutionData, billingsData] = await Promise.all([
+        const [data, programsData, evolutionData, billingsData, discountThresholds] = await Promise.all([
             api.loadData(),
             api.loadPrograms(),
             api.loadEvolutionData(),
-            api.loadBillingsData()
+            api.loadBillingsData(),
+            api.loadDiscountThresholds()
         ]);
 
         // 2. Actualizează starea (state) cu noile date
@@ -590,6 +645,7 @@ async function forceRefreshData() {
         calendarState.setPrograms(programsData.programs);
         calendarState.setEvolutionData(evolutionData);
         calendarState.setBillingsData(billingsData);
+        calendarState.setDiscountThresholds(discountThresholds);
 
         // 3. Re-randează complet UI-ul
         
@@ -692,7 +748,11 @@ async function handleSaveClient(e) {
     // (MODIFICAT) Salvează TOATE datele dacă ID-ul s-a schimbat
     try {
         // Salvează datele principale (clients, events, etc.)
-        await api.saveData(calendarState.getState());
+        if (editingClientId) {
+    await api.updateClient(clientData);
+} else {
+    await api.createClient(clientData);
+}
 
         // DACĂ ID-ul s-a schimbat, salvează și celelalte fișiere
         // care au fost migrate în state
@@ -728,7 +788,7 @@ async function handleDeleteClient() {
         // (MODIFICAT) Salvăm toate cele 3 fișiere pentru a reflecta ștergerea
         try {
             const { evolutionData, billingsData } = calendarState.getState();
-            await api.saveData(calendarState.getState()); // Salvează clients/events
+            await api.deleteClient(editingClientId); // Salvează clients/events
             await api.saveEvolutionData(evolutionData); // Salvează evolution
             await api.saveBillingsData(billingsData); // Salvează billings
             
@@ -1249,6 +1309,14 @@ async function init() {
         calendarState.setBillingsData({}); // Inițializează ca gol
     }
 
+    // Încărcare praguri de discount
+    try {
+        const discountThresholds = await api.loadDiscountThresholds();
+        calendarState.setDiscountThresholds(discountThresholds);
+    } catch (e) {
+        console.warn('Nu s-au putut încărca pragurile de discount.', e);
+        calendarState.setDiscountThresholds([]); // Inițializează ca array gol
+    }
 
 
     } catch (error) {
@@ -1315,6 +1383,257 @@ async function init() {
             const clientId = e.target.value;
             calendarState.setClientFilter(clientId); // Setează filtrul în state
             render(); // Re-randează calendarul
+        });
+    }
+
+    // Clone Month functionality
+    if (dom.cloneMonthBtn) {
+        dom.cloneMonthBtn.addEventListener('click', () => {
+            // Check if user is admin
+            if (!auth.isAdmin()) {
+                ui.showCustomAlert('Doar administratorii pot clona programe lunare.', 'Acces Restricționat');
+                return;
+            }
+
+            // Show the clone modal
+            if (dom.cloneMonthModal) {
+                // Set default values (current month as source)
+                const { currentDate } = calendarState.getState();
+                const year = currentDate.getFullYear();
+                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                dom.cloneSourceMonth.value = `${year}-${month}`;
+
+                dom.cloneMonthModal.classList.add('active');
+            }
+        });
+    }
+
+    // Close clone month modal
+    if (dom.closeCloneMonthModal) {
+        dom.closeCloneMonthModal.addEventListener('click', () => {
+            if (dom.cloneMonthModal) dom.cloneMonthModal.classList.remove('active');
+        });
+    }
+
+    // Cancel clone month
+    if (dom.cloneMonthCancel) {
+        dom.cloneMonthCancel.addEventListener('click', () => {
+            if (dom.cloneMonthModal) dom.cloneMonthModal.classList.remove('active');
+        });
+    }
+
+    // Confirm clone month
+    if (dom.cloneMonthConfirm) {
+        dom.cloneMonthConfirm.addEventListener('click', async () => {
+            const sourceMonth = dom.cloneSourceMonth.value;
+            const targetMonth = dom.cloneTargetMonth.value;
+
+            // Validation
+            if (!sourceMonth || !targetMonth) {
+                ui.showCustomAlert('Te rog selectează ambele luni.', 'Date Incomplete');
+                return;
+            }
+
+            if (sourceMonth === targetMonth) {
+                ui.showCustomAlert('Luna sursă și luna țintă trebuie să fie diferite.', 'Date Invalide');
+                return;
+            }
+
+            // Check for overlapping events using the same weekday-based logic
+            const { events } = calendarState.getState();
+
+            // Get source month events
+            const sourceMonthEvents = events.filter(event => {
+                return event.date && event.date.startsWith(sourceMonth + '-');
+            });
+
+            // Get target month events
+            const targetMonthEvents = events.filter(event => {
+                return event.date && event.date.startsWith(targetMonth + '-');
+            });
+
+            if (targetMonthEvents.length > 0 && sourceMonthEvents.length > 0) {
+                // Calculate where source events would be copied to
+                const [sourceYear, sourceMonthNum] = sourceMonth.split('-').map(Number);
+                const [targetYear, targetMonthNum] = targetMonth.split('-').map(Number);
+
+                const sourceDate = new Date(sourceYear, sourceMonthNum - 1, 1);
+                const targetDate = new Date(targetYear, targetMonthNum - 1, 1);
+
+                let overlappingCount = 0;
+                const overlappingDetails = [];
+
+                for (const sourceEvent of sourceMonthEvents) {
+                    // Calculate target date using same logic as backend
+                    const oldDate = new Date(sourceEvent.date);
+                    const dayOfWeek = oldDate.getDay();
+                    const dayOfMonth = oldDate.getDate();
+                    const weekOccurrence = Math.ceil(dayOfMonth / 7);
+
+                    // Find same weekday occurrence in target month
+                    let newDate = new Date(targetYear, targetMonthNum - 1, 1);
+                    const targetDayOfWeek = newDate.getDay();
+                    const daysToAdd = (dayOfWeek - targetDayOfWeek + 7) % 7;
+                    newDate.setDate(newDate.getDate() + daysToAdd);
+                    newDate.setDate(newDate.getDate() + (weekOccurrence - 1) * 7);
+
+                    // Check if we're still in target month
+                    if (newDate.getMonth() !== targetMonthNum - 1) {
+                        newDate.setDate(newDate.getDate() - 7);
+                    }
+
+                    const targetDateStr = newDate.toISOString().split('T')[0];
+
+                    // Check if any event exists at this date/time in target month
+                    const conflictingEvent = targetMonthEvents.find(e =>
+                        e.date === targetDateStr &&
+                        e.startTime === sourceEvent.startTime
+                    );
+
+                    if (conflictingEvent) {
+                        overlappingCount++;
+                        if (overlappingDetails.length < 5) { // Show max 5 examples
+                            overlappingDetails.push({
+                                date: targetDateStr,
+                                time: sourceEvent.startTime,
+                                sourceName: sourceEvent.name,
+                                targetName: conflictingEvent.name
+                            });
+                        }
+                    }
+                }
+
+                if (overlappingCount > 0) {
+                    let warningMessage = `⚠️ ATENȚIE! Conflict de evenimente!\n\n`;
+                    warningMessage += `Găsite ${overlappingCount} suprapuneri de evenimente între ${sourceMonth} și ${targetMonth}.\n\n`;
+                    warningMessage += `Exemple de conflicte:\n`;
+
+                    overlappingDetails.forEach(detail => {
+                        warningMessage += `• ${detail.date} la ${detail.time}: "${detail.sourceName}" → "${detail.targetName}" (existent)\n`;
+                    });
+
+                    if (overlappingCount > overlappingDetails.length) {
+                        warningMessage += `... și încă ${overlappingCount - overlappingDetails.length} suprapuneri.\n`;
+                    }
+
+                    warningMessage += `\nClonarea va adăuga evenimente duplicate.\n\nVrei să continui oricum?`;
+
+                    const continueWithOverlap = await ui.showCustomConfirm(warningMessage, 'Conflict de Evenimente');
+                    if (!continueWithOverlap) {
+                        return;
+                    }
+                }
+            }
+
+            // Confirm action
+            const confirmMessage = `Vrei să clonezi programul din ${sourceMonth} în ${targetMonth}?\n\nAceastă acțiune va copia toate evenimentele din luna sursă în luna țintă.`;
+
+            const confirmed = await ui.showCustomConfirm(confirmMessage, 'Confirmare Clonare');
+            if (!confirmed) {
+                return;
+            }
+
+            try {
+                // Call the API
+                const result = await api.cloneMonthSchedule(sourceMonth, targetMonth);
+
+                if (result.success) {
+                    // Close modal
+                    if (dom.cloneMonthModal) dom.cloneMonthModal.classList.remove('active');
+
+                    // Show success message
+                    ui.showCustomAlert(
+                        `Programul a fost clonat cu succes!\n\n${result.clonedCount} evenimente au fost copiate din ${sourceMonth} în ${targetMonth}.`,
+                        'Succes'
+                    );
+
+                    // Reload data and refresh view
+                    const data = await api.loadData();
+                    calendarState.initializeData(data);
+                    render();
+                } else {
+                    ui.showCustomAlert('Eroare la clonarea programului: ' + (result.message || 'Eroare necunoscută'), 'Eroare');
+                }
+            } catch (error) {
+                console.error('Eroare la clonarea programului:', error);
+                ui.showCustomAlert(
+                    'Eroare la clonarea programului: ' + (error.message || 'Eroare necunoscută'),
+                    'Eroare'
+                );
+            }
+        });
+    }
+
+    // Clear month button
+    if (dom.clearMonthBtn) {
+        dom.clearMonthBtn.addEventListener('click', async () => {
+            const month = dom.clearMonth.value;
+
+            // Validation
+            if (!month) {
+                ui.showCustomAlert('Te rog selectează o lună.', 'Date Incomplete');
+                return;
+            }
+
+            // Check if user is admin
+            if (!auth.isAdmin()) {
+                ui.showCustomAlert('Doar administratorii pot șterge luni întregi.', 'Acces Restricționat');
+                return;
+            }
+
+            // Count events in the month
+            const { events } = calendarState.getState();
+            const monthEvents = events.filter(event => {
+                return event.date && event.date.startsWith(month + '-');
+            });
+
+            if (monthEvents.length === 0) {
+                ui.showCustomAlert(`Luna ${month} nu conține evenimente.`, 'Informație');
+                return;
+            }
+
+            // Double confirmation for destructive action
+            const confirmMessage = `⚠️ ATENȚIE! ACȚIUNE IREVERSIBILĂ!\n\nEști pe cale să ștergi TOATE cele ${monthEvents.length} evenimente din ${month}.\n\nAceastă acțiune NU poate fi anulată!\n\nEști absolut sigur că vrei să continui?`;
+
+            const firstConfirm = await ui.showCustomConfirm(confirmMessage, 'Atenție: Acțiune Ireversibilă');
+            if (!firstConfirm) {
+                return;
+            }
+
+            // Second confirmation
+            const finalConfirm = await ui.showCustomConfirm('Ultima confirmare: Ștergi toate evenimentele?', 'Confirmare Finală');
+            if (!finalConfirm) {
+                return;
+            }
+
+            try {
+                // Call the API
+                const result = await api.clearMonth(month);
+
+                if (result.success) {
+                    // Close modal
+                    if (dom.cloneMonthModal) dom.cloneMonthModal.classList.remove('active');
+
+                    // Show success message
+                    ui.showCustomAlert(
+                        `Luna ${month} a fost ștearsă cu succes!\n\n${result.deletedCount} evenimente au fost eliminate.`,
+                        'Succes'
+                    );
+
+                    // Reload data and refresh view
+                    const data = await api.loadData();
+                    calendarState.initializeData(data);
+                    render();
+                } else {
+                    ui.showCustomAlert('Eroare la ștergerea lunii: ' + (result.message || 'Eroare necunoscută'), 'Eroare');
+                }
+            } catch (error) {
+                console.error('Eroare la ștergerea lunii:', error);
+                ui.showCustomAlert(
+                    'Eroare la ștergerea lunii: ' + (error.message || 'Eroare necunoscută'),
+                    'Eroare'
+                );
+            }
         });
     }
 
@@ -1411,279 +1730,6 @@ async function init() {
     }
     
     console.log('Inițializare completă!');
-
-    let driverObj = null;
-
-   // Înlocuiește întreaga funcție initOnboardingTour din main.js
-function initOnboardingTour() {
-    // Wait a bit for driver to load
-    setTimeout(() => {
-        // The driver library exposes itself as window.driver.js
-        const driverLib = window.driver?.js || window.driver;
-        
-        if (!driverLib || typeof driverLib.driver !== 'function') {
-            console.error('Driver.js nu este încărcat corect.');
-            console.log('window.driver:', window.driver);
-            console.log('window.driver.js:', window.driver?.js);
-            return;
-        }
-
-        console.log('Driver.js încărcat cu succes!');
-
-        // Create driver instance - use window.driver.js.driver()
-       const driverObj = driverLib.driver({
-    showProgress: true,
-    popoverClass: 'tempo-driver-popover',
-    prevBtnText: '← Înapoi',
-    nextBtnText: 'Următorul →',
-    doneBtnText: '✓ Terminat',
-    allowClose: true,
-    smoothScroll: true,
-    overlayOpacity: 0.75,
-    stagePadding: 10,
-    stageRadius: 8,
-    popoverOffset: 10,
-    animate: true,
-    overlayColor: '#000',
-
-    // This runs when tour ends (any way)
-    onDestroyed: (element, step, options) => {
-        console.log('Tour ended - returning to dashboard');
-        setTimeout(() => {
-            document.querySelector('.menu-item[data-view="dashboard"]')?.click();
-        }, 200);
-    },
-    
-    // Global callback that runs before each step
-    onHighlightStarted: (element, step, options) => {
-        // Check which section this step needs
-        const elementStr = step.element;
-        
-        if (elementStr.includes('[data-view="calendar"]') || 
-            elementStr.includes('#filters') || 
-            elementStr.includes('#calendarClientFilter')) {
-            document.querySelector('.menu-item[data-view="calendar"]')?.click();
-        } 
-        else if (elementStr.includes('[data-view="client"]') || 
-                 elementStr.includes('#clientsList')) {
-            document.querySelector('.menu-item[data-view="client"]')?.click();
-        }
-        else if (elementStr.includes('[data-view="team"]')) {
-            document.querySelector('.menu-item[data-view="team"]')?.click();
-        }
-        else if (elementStr.includes('[data-view="billing"]')) {
-            const billingLink = document.querySelector('.menu-item[data-view="billing"]');
-            if (billingLink && billingLink.style.display !== 'none') {
-                billingLink.click();
-            }
-        }
-        else if (elementStr.includes('[data-view="dashboard"]') || 
-                 elementStr.includes('#dashboardTodaySchedule') ||
-                 elementStr.includes('#sidebarUserBadgeContainer')) {
-            document.querySelector('.menu-item[data-view="dashboard"]')?.click();
-        }
-    },
-            steps: [
-    {
-        element: '.sidebar-menu',
-        popover: {
-            title: '👋 Bun venit la Tempo!',
-            description: 'Hai să facem un tur rapid al aplicației pentru a-ți arăta cele mai importante funcții.',
-            side: 'right',
-            align: 'start',
-            showButtons: ['next', 'close'],
-            nextBtnText: 'Hai să începem! →'
-        }
-    },
-    {
-        element: '.menu-item[data-view="dashboard"]',
-        popover: {
-            title: '📊 Dashboard',
-            description: 'Aici vezi rezumatul zilei: programul tău, statistici rapide și activități recente.',
-            side: 'right',
-            showButtons: ['next', 'previous', 'close'],
-            onPopoverRender: () => {
-                // Switch to dashboard section
-                document.querySelector('.menu-item[data-view="dashboard"]')?.click();
-            }
-        }
-    },
-    {
-        element: '#dashboardTodaySchedule',
-        popover: {
-            title: '📅 Programul Zilei',
-            description: 'Vezi toate sesiunile programate pentru astăzi. Click pe o sesiune pentru a vedea detalii complete.',
-            side: 'bottom',
-            showButtons: ['next', 'previous', 'close']
-        }
-    },
-    {
-        element: '#addEventBtn',
-        popover: {
-            title: '➕ Adaugă Sesiune Rapid',
-            description: 'Acest buton este disponibil în toate secțiunile pentru a adăuga rapid o sesiune nouă.',
-            side: 'left',
-            showButtons: ['next', 'previous', 'close']
-        }
-    },
-    {
-        element: '.menu-item[data-view="calendar"]',
-        popover: {
-            title: '📆 Calendar',
-            description: 'Gestionează toate evenimentele într-o vedere de calendar.Poți vedea programul pe lună, săptămână sau zi.',
-            side: 'right',
-            showButtons: ['next', 'previous', 'close'],
-            onPopoverRender: () => {
-                // Switch to calendar section
-                document.querySelector('.menu-item[data-view="calendar"]')?.click();
-            }
-        }
-    },
-    {
-        element: '.view-toggle',
-        popover: {
-            title: '📆 Calendar',
-            description: 'Poți vedea programul pe lună, săptămână sau zi.',
-            side: 'right',
-            showButtons: ['next', 'previous', 'close'],
-            onPopoverRender: () => {
-                // Switch to calendar section
-                document.querySelector('.menu-item[data-view="calendar"]')?.click();
-            }
-        }
-    },
-    {
-        element: '#filters',
-        popover: {
-            title: '🎨 Filtre Terapeut',
-            description: 'Filtrează calendarul pentru a vedea doar evenimentele anumitor terapeuți.',
-            side: 'bottom',
-            showButtons: ['next', 'previous', 'close']
-        }
-    },
-    {
-        element: '#calendarClientFilter',
-        popover: {
-            title: '👤 Filtru Client',
-            description: 'Vezi programul complet al unui singur client pentru a urmări progresul individual.',
-            side: 'bottom',
-            showButtons: ['next', 'previous', 'close']
-        }
-    },
-    {
-        element: '.menu-item[data-view="client"]',
-        popover: {
-            title: '👥 Gestionare Clienți',
-            description: 'Baza de date cu toți clienții. Poți adăuga, edita sau șterge clienți.',
-            side: 'right',
-            showButtons: ['next', 'previous', 'close'],
-            onPopoverRender: () => {
-                // Switch to clients section
-                document.querySelector('.menu-item[data-view="client"]')?.click();
-            }
-        }
-    },
-    {
-        element: '#clientsList',
-        popover: {
-            title: '🎯 Acțiuni Client',
-            description: 'De pe cardul unui client poți accesa Evoluția (grafice, evaluări), poți descărca Rapoarte sau edita profilul.',
-            side: 'top',
-            showButtons: ['next', 'previous', 'close']
-        }
-    },
-    {
-        element: '.menu-item[data-view="team"]',
-        popover: {
-            title: '👨‍⚕️ Echipa',
-            description: 'Gestionează membrii echipei de terapeuți. Adaugă, editează sau șterge membri.',
-            side: 'right',
-            showButtons: ['next', 'previous', 'close'],
-            onPopoverRender: () => {
-                // Switch to team section
-                document.querySelector('.menu-item[data-view="team"]')?.click();
-            }
-        }
-    },
-    {
-        element: '.menu-item[data-view="billing"]',
-        popover: {
-            title: '💰 Facturare',
-            description: 'Gestionează plățile și vezi balanța financiară pentru fiecare client, pe fiecare lună.',
-            side: 'right',
-            showButtons: ['next', 'previous', 'close'],
-            onPopoverRender: () => {
-                // Switch to billing section (if admin)
-                const billingLink = document.querySelector('.menu-item[data-view="billing"]');
-                if (billingLink && billingLink.style.display !== 'none') {
-                    billingLink.click();
-                }
-            }
-        }
-    },
-    {
-        element: '#startTourBtn',
-        popover: {
-            title: '✅ Gata!',
-            description: 'Asta e! Dacă ai nevoie de ajutor, <br/>apasă butonul cu "(i)" din josul meniului pentru a revedea turul.',
-            side: 'top',
-            align: 'center',
-             showButtons: ['next'],  // Show next button (becomes "Done" on last step)
-        doneBtnText: 'Am înțeles! ✓',
-        
-        onNextClick: (element, step, options) => {
-            // This fires when "Done" is clicked on the last step
-            document.querySelector('.menu-item[data-view="dashboard"]')?.click();
-            driverObj.destroy();
-            // Let the tour close naturally
-        }
-        }
-    }
-]
-        });
-
-        // Add event listener on tour button
-        const startTourBtn = document.getElementById('startTourBtn');
-        if (startTourBtn) {
-            startTourBtn.addEventListener('click', () => {
-                // Ensure we start from dashboard
-                const dashboardLink = document.querySelector('.menu-item[data-view="dashboard"]');
-                if (dashboardLink) dashboardLink.click();
-                
-                // Wait for section to render
-                setTimeout(() => driverObj.drive(), 250); 
-            });
-        }
-
-        // Auto-start on first visit
-        if (!localStorage.getItem('tempoTourCompleted')) {
-            setTimeout(() => {
-                driverObj.drive();
-                localStorage.setItem('tempoTourCompleted', 'true');
-            }, 1500);
-        }
-    }, 500);
-}
-// Helper functions to control tour
-window.startTour = () => {
-    if (globalDriverObj) {
-        globalDriverObj.drive();
-    }
-};
-
-window.stopTour = () => {
-    if (globalDriverObj) {
-        globalDriverObj.destroy();
-    }
-};
-
-window.resetTour = () => {
-    localStorage.removeItem('tempoTourCompleted');
-    alert('Turul a fost resetat. Reîmprospătează pagina pentru a-l revedea.');
-};
-    
-    // Apelăm noua funcție
-    initOnboardingTour();
 }
 
 // --- Pornirea Aplicației ---

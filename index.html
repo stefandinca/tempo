@@ -23,61 +23,19 @@
     <link rel="icon" href="icon.png" type="image/png">
     <link rel="stylesheet" href="netflix-style.css">
 </head>
-<body class="bg-blue-100"> <!---bg-gradient-to-br from-[#0f172a]  to-[#334155]-->
-
-    <div id="demoRegisterModal" class="modal-backdrop modal-small" style="display: none; z-index: 9998;">
-        <div class="modal-content">
-            <form id="demoRegisterForm">
-                <div class="modal-header">
-                    <h2 class="modal-title">Register for Demo</h2>
-                    </div>
-                <div class="modal-body">
-                    <p style="font-size: 0.875rem; color: #6B7280; margin-bottom: 1.5rem;">
-                        Please provide your details to continue to the demo.
-                    </p>
-                    <div class="form-group">
-                        <label for="demoName">Nume</label>
-                        <input type="text" id="demoName" name="name" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="demoEmail">Adresă de Email</label>
-                        <input type="email" id="demoEmail" name="email" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="demoPhone">Telefon</label>
-                        <input type="tel" id="demoPhone" name="phone" class="form-input">
-                    </div>
-                    <div class="form-group">
-                        <label for="demoOrg">Organizație (Opțional)</label>
-                        <input type="text" id="demoOrg" name="organization" class="form-input">
-                    </div>
-                </div>
-                <div class="modal-footer justify-between">
-                    
-                    <button id="submitDemoBtn" type="submit" class="btn btn-primary">Înregistrează</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
+<body class="bg-gradient-to-br from-[#0f172a]  to-[#334155]">
     <div class="w-full max-w-7xl page-container">
         
         <div class="main-content">
             <div class="text-center mb-12">
-                <img src="placeholder-logo.png" alt="Tempo Logo" class="h-16 mx-auto mb-6">
-                <h1 class="text-4xl font-bold text-blue-900 mb-3">Bine ai venit!</h1>
-                <p class="text-xl text-blue-900 opacity-90">Selectează contul tău pentru a continua</p>
+                <img src="logo.png" alt="Tempo Logo" class="h-16 mx-auto mb-6">
+                <h1 class="text-4xl font-bold text-gray-200 mb-3">Bine ai venit!</h1>
+                <p class="text-xl text-gray-200 opacity-90">Selectează contul tău pentru a continua</p>
             </div>
     
             <div id="userCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 </div>
         </div>
-
-         <div class="text-center ">
-                    
-                    <p class="text-xl text-blue-900 opacity-90">Calendar centru:</p>
-                </div>
-
        
         <div class="public-calendar-container">
             <header class="public-calendar-header">
@@ -101,15 +59,13 @@
             </header>
             <div id="publicFilters" class="filters-container">
                 </div>
-
-               
             <div id="publicCalendarView" class="calendar-view">
                 </div>
         </div>
 
-    </div> <div class="powered-by-footer bg-gray-900 bg-opacity-50 rounded-lg px-3 py-2">
+    </div> <div class="powered-by-footer">
         <span class="text-gray-200 mr-2 opacity-70 text-xs">Powered by:</span>
-        <img class="w-24" src="tempo-logo-light.png"/>
+        <img class="w-24" src="tempo-logo-dark.png"/>
     </div>
 
     
@@ -128,73 +84,32 @@
     </div>
 
     <script type="module">
-
-        // --- Demo Registration Modal Logic ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const modal = document.getElementById('demoRegisterModal');
-            const form = document.getElementById('demoRegisterForm');
-            const submitBtn = document.getElementById('submitDemoBtn');
-            
-            const apiLoader = document.getElementById('globalLoader'); // Use the existing loader
-
-            const showLoader = (isLoading) => {
-                if (apiLoader) apiLoader.classList.toggle('active', isLoading);
-                if (submitBtn) submitBtn.disabled = isLoading;
-                
-            };
-
-            const closeModal = () => {
-                if (modal) modal.style.display = 'none';
-            };
-
-            const registerUser = async (isGuest) => {
-                showLoader(true);
-                
-                
-                // If registering, submit the form
-                try {
-                    const formData = new FormData(form);
-                    // We need to define API_BASE before this listener, so we'll use the hardcoded path.
-                    const response = await fetch(`api.php?action=register_demo`, {
-                        method: 'POST',
-                        body: formData
-                    });
-
-                    const result = await response.json();
-                    if (!response.ok) {
-                        throw new Error(result.message || 'A apărut o eroare.');
-                    }
-                    
-                    // Success
-                    localStorage.setItem('demoRegistered', 'true');
-                    showLoader(false);
-                    closeModal();
-
-                } catch (error) {
-                    alert(`Eroare la înregistrare: ${error.message}`);
-                    showLoader(false);
-                }
-            };
-
-            // Form submit listener
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
-                registerUser(false);
-            });
-            
-            
-
-            // Check if user is already registered
-            if (localStorage.getItem('demoRegistered') !== 'true') {
-                // Show the modal if not registered
-                if (modal) modal.style.display = 'flex';
-            }
-        });
-        // --- End Demo Registration Logic ---
         // API Configuration
         const API_BASE = 'api.php';
         
-        
+        // Function to verify password via API
+        async function verifyPassword(userId, password) {
+            try {
+                const formData = new FormData();
+                formData.append('username', userId);
+                formData.append('password', password);
+                
+                const response = await fetch(`${API_BASE}?action=login`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    return result.success;
+                }
+                return false;
+            } catch (error) {
+                console.error('Login error:', error);
+                return false;
+            }
+        }
+
         // Store current selected month for schedule viewing
         let currentScheduleDate = new Date();
 
@@ -314,7 +229,6 @@
             let cardsHTML = '';
 
             // Add team member cards
-            // Add team member cards
             teamMembers.forEach(member => {
                 cardsHTML += `
                     <div class="user-card bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-lg" data-user-id="${member.id}">
@@ -323,6 +237,18 @@
                         </div>
                         <h3 class="user-card-name">${member.name}</h3>
                         <span class="role-badge ${getRoleClass(member.role)}">${getRoleLabel(member.role)}</span>
+                        
+                        <div class="password-input-container">
+                            <input 
+                                type="password" 
+                                id="pass_${member.id}" 
+                                class="password-input" 
+                                placeholder="Parolă"
+                            />
+                            <button id="login_btn_${member.id}" class="login-btn" data-user-id="${member.id}">
+                                Intră în cont
+                            </button>
+                        </div>
                     </div>
                 `;
             });
@@ -340,7 +266,7 @@
                             type="text" 
                             id="clientCodeInput" 
                             class="client-code-input" 
-                            placeholder="ex: andrei0511"
+                            placeholder="ex: cezar_2102"
                         />
                         <button id="viewProfileBtn" class="view-profile-btn" disabled>
                             Vezi Profil
@@ -358,21 +284,68 @@
                 const card = e.target.closest('.user-card[data-user-id]');
                 
                 if (!card) {
-                    // Clicked outside a team member card, de-select
-                    container.classList.remove('selection-active');
-                    allCards.forEach(c => c.classList.remove('active'));
+                    if (!e.target.closest('.user-card')) {
+                        container.classList.remove('selection-active');
+                        allCards.forEach(c => c.classList.remove('active'));
+                    }
                     return; 
                 }
+                
+                const isAlreadyActive = card.classList.contains('active');
 
-                // User clicked a team member card, get the ID
-                const userId = card.dataset.userId;
-
-                // Immediately select the user and redirect
-                selectUser(userId);
+                container.classList.add('selection-active');
+                allCards.forEach(c => c.classList.remove('active'));
+                
+                if (!isAlreadyActive) {
+                    card.classList.add('active');
+                    card.querySelector('.password-input').focus();
+                } else {
+                    container.classList.remove('selection-active');
+                }
             });
 
             // --- Ascultători pentru submit-ul parolei ---
-            
+            teamMembers.forEach(member => {
+                const loginBtn = document.getElementById(`login_btn_${member.id}`);
+                const passInput = document.getElementById(`pass_${member.id}`);
+                
+                if (!loginBtn || !passInput) return;
+
+                const handleLogin = async () => {
+                    const userId = loginBtn.dataset.userId;
+                    const password = passInput.value;
+                    
+                    if (!password) {
+                        alert('Vă rugăm introduceți parola!');
+                        return;
+                    }
+                    
+                    // Disable button and show loading state
+                    loginBtn.disabled = true;
+                    const originalText = loginBtn.textContent;
+                    loginBtn.textContent = 'Se verifică...';
+                    
+                    const isValid = await verifyPassword(userId, password);
+                    
+                    if (isValid) {
+                        selectUser(userId);
+                    } else {
+                        alert('Parolă incorectă!');
+                        passInput.value = '';
+                        passInput.focus();
+                        loginBtn.disabled = false;
+                        loginBtn.textContent = originalText;
+                    }
+                };
+
+                loginBtn.addEventListener('click', handleLogin);
+                
+                passInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        handleLogin();
+                    }
+                });
+            });
 
             // Add parent card functionality
             setupParentCard();

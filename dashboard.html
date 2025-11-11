@@ -22,7 +22,6 @@
     <link rel="stylesheet" href="dashboard-styles.css">
     <link rel="stylesheet" href="tailwind-custom.css">
     <link rel="icon" href="icon.png" type="image/png">
-    <script src="js/driver.local.js?v=2"></script>
     
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
@@ -34,8 +33,8 @@
         <!-- Sidebar -->
         <nav class="sidebar bg-white dark:bg-gray-800 border-b md:border-r border-gray-200 dark:border-gray-700 flex md:flex-col w-full md:w-64 flex-shrink-0">
             <div class="sidebar-header flex items-center justify-center md:justify-center p-4 md:mb-8">
-                <img src="placeholder-logo-dashboard.png" alt="Tempo Logo" class="logo-full h-8 md:h-10">
-                <img src="placeholder-logo-dashboard.png" alt="Tempo Logo" class="logo-small h-8 hidden">
+                <img src="logo.png" alt="Tempo Logo" class="logo-full h-8 md:h-10">
+                <img src="logo.png" alt="Tempo Logo" class="logo-small h-8 hidden">
             </div>
             <ul class="sidebar-menu flex-col flex-1 overflow-y-auto p-2 md:p-4">
                 <li class="menu-item active" data-view="dashboard">
@@ -90,13 +89,7 @@
 
             <div class="sidebar-footer hidden md:flex justify-center gap-2 p-4 border-t border-gray-200 dark:border-gray-700">
                 
-                <button id="startTourBtn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="Începe Turul Ghidat">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 16v-4"/>
-                        <path d="M12 8h.01"/>
-                    </svg>
-                </button>
+                
                 <button id="fullscreenToggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700" title="Ecran complet">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
                 </button>
@@ -293,6 +286,10 @@
                                 <button class="view-btn px-3 py-1.5 rounded text-sm" data-view="week">Saptamana</button>
                                 <button class="view-btn px-3 py-1.5 rounded text-sm" data-view="day">Zi</button>
                             </div>
+                            <button id="cloneMonthBtn" class="btn btn-secondary flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-900 dark:text-white rounded-lg transition-colors" title="Clonează programul unei luni în alta (doar admin)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                                <span class="hidden sm:inline">Clonează Lună</span>
+                            </button>
                             <button id="addEventBtnCalendar" class="btn btn-primary flex items-center gap-2 px-4 py-2 bg-primary hover:bg-blue-600 text-white rounded-lg">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                                 <span class="hidden sm:inline">Adauga</span>
@@ -485,8 +482,30 @@
 
     <div class="section-content-grid" style="grid-template-columns: 1fr; overflow-y: auto;">
         <div class="section-col-list" style="height: auto;">
-            <input type="search" id="billingSearchBar" class="form-input" placeholder="Caută client după nume..." style="margin-bottom: 1.5rem;">
-            <div id="billingClientList" class="modal-list" style="padding-right: 0;">
+            <!-- Discount Thresholds Section -->
+            <div id="discountThresholdsSection" class="bg-white dark:bg-gray-800 rounded-xl p-4 md:p-6 mb-6 shadow-md">
+                <div id="discountThresholdsHeader" class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-0 cursor-pointer">
+                    <div class="flex items-center gap-2">
+                        <svg id="discountThresholdsToggleIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200 flex-shrink-0">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                        <h3 class="text-base sm:text-lg font-semibold text-gray-900 dark:text-white m-0">Praguri de Discount Automat</h3>
+                    </div>
+                    <button id="saveDiscountThresholdsBtn" class="btn btn-primary btn-sm hidden self-end sm:self-auto" onclick="event.stopPropagation()">Salvează</button>
+                </div>
+                <div id="discountThresholdsContent" class="hidden mt-4">
+                    <div id="discountThresholdsList" class="flex flex-col gap-3">
+                        <!-- Threshold items will be rendered here -->
+                    </div>
+                    <button id="addDiscountThresholdBtn" class="btn btn-secondary btn-sm mt-3 w-full sm:w-auto">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14m-7-7h14"/></svg>
+                        Adaugă Prag
+                    </button>
+                </div>
+            </div>
+
+            <input type="search" id="billingSearchBar" class="form-input mb-6" placeholder="Caută client după nume...">
+            <div id="billingClientList" class="modal-list pr-0">
                 </div>
         </div>
     </div>
@@ -572,7 +591,7 @@
                     
                     <div class="form-group">
                         <label for="eventTypeId">ID Tip <span class="text-red-500">*</span></label>
-                        <input type="text" id="eventTypeId" class="form-input" required pattern="[a-z0-9\]+" placeholder="ex: terapie-speciala" title="Doar litere mici, cifre și liniuță">
+                        <input type="text" id="eventTypeId" class="form-input" required pattern="[a-z0-9-]+" placeholder="ex: terapie-speciala" title="Doar litere mici, cifre și liniuță">
                         <small class="text-gray-500">Doar litere mici, cifre și liniuță (-). Nu se poate schimba după creare.</small>
                     </div>
 
@@ -1509,16 +1528,71 @@
         </div>
     </div>
 
+    <!-- Clone Month Modal -->
+    <div id="cloneMonthModal" class="modal-backdrop modal-small">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Gestionare Program Lunar</h2>
+                <button id="closeCloneMonthModal" class="btn-icon btn-close" title="Închide">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Clone Section -->
+                <div class="mb-6">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Clonează Program</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">Selectează luna sursă și luna țintă pentru a clona programul.</p>
+                    <div class="form-group mb-4">
+                        <label for="cloneSourceMonth" class="form-label">Luna Sursă:</label>
+                        <input type="month" id="cloneSourceMonth" class="form-input" required>
+                        <p class="text-sm text-gray-500 mt-1">Luna din care se va copia programul</p>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label for="cloneTargetMonth" class="form-label">Luna Țintă:</label>
+                        <input type="month" id="cloneTargetMonth" class="form-input" required>
+                        <p class="text-sm text-gray-500 mt-1">Luna în care se va copia programul</p>
+                    </div>
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-3">
+                        <p class="text-sm text-yellow-800 dark:text-yellow-200">
+                            <strong>Atenție:</strong> Evenimentele clonate vor fi copiate pe zilele corespunzătoare (ex: prima Luni → prima Luni) și vor păstra setările de recurență. Editarea sau ștergerea evenimentelor recurente va afecta doar luna curentă, nu și celelalte luni.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="border-t border-gray-200 dark:border-gray-700 my-6"></div>
+
+                <!-- Clear Section -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Șterge Toate Evenimentele</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">Șterge toate evenimentele dintr-o lună selectată.</p>
+                    <div class="form-group mb-4">
+                        <label for="clearMonth" class="form-label">Luna de șters:</label>
+                        <input type="month" id="clearMonth" class="form-input" required>
+                        <p class="text-sm text-gray-500 mt-1">Toate evenimentele din această lună vor fi șterse</p>
+                    </div>
+                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+                        <p class="text-sm text-red-800 dark:text-red-200">
+                            <strong>⚠️ Atenție:</strong> Această acțiune este permanentă și nu poate fi anulată!
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="clearMonthBtn" class="btn btn-danger">Șterge Luna</button>
+                <div style="flex: 1;"></div>
+                <button id="cloneMonthCancel" class="btn btn-secondary">Anulează</button>
+                <button id="cloneMonthConfirm" class="btn btn-primary">Clonează</button>
+            </div>
+        </div>
+    </div>
+
     <!-- (All modal HTML code from original dashboard.html should be included here) -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/driver.local.js?v=2"></script>
-
-<script type="module" src="js/main.js?v=2"></script>
-    
-    
+    <script type="module" src="js/main.js"></script>
     
     <script type="module">
         import { openEventModal } from './js/uiService.js';
@@ -1691,7 +1765,5 @@
     <div class="loader-spinner"></div>
     <span>Se încarcă...</span>
     </div>
-
-    
 </body>
 </html>
