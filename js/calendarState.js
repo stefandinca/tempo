@@ -312,19 +312,13 @@ export const calendarState = {
      */
     deleteRecurringEvents: (criteria) => {
         // Filtrează toate evenimentele care NU se potrivesc cu criteriile de ștergere
-        // IMPORTANT: Include verificarea lunii pentru a afecta doar evenimentele din aceeași lună
-        state.events = state.events.filter(e => {
-            // Extract month from event date (YYYY-MM)
-            const eventMonth = e.date ? e.date.substring(0, 7) : null;
-            const criteriaMonth = criteria.month || null;
-
-            return !(e.name === criteria.name &&
+        state.events = state.events.filter(e => 
+            !(e.name === criteria.name && 
               JSON.stringify(e.teamMemberIds || [e.teamMemberId]) === JSON.stringify(criteria.teamMemberIds || [criteria.teamMemberId]) &&
-              e.startTime === criteria.startTime &&
+              e.startTime === criteria.startTime && 
               e.duration === criteria.duration &&
-              JSON.stringify(e.repeating) === JSON.stringify(criteria.repeating) &&
-              eventMonth === criteriaMonth); // Doar evenimentele din aceeași lună
-        });
+              JSON.stringify(e.repeating) === JSON.stringify(criteria.repeating))
+        );
     },
 
     /**
@@ -340,8 +334,7 @@ export const calendarState = {
             teamMemberIds: originalEvent.teamMemberIds || (originalEvent.teamMemberId ? [originalEvent.teamMemberId] : []),
             startTime: originalEvent.startTime,
             duration: originalEvent.duration,
-            repeating: originalEvent.repeating,
-            month: originalEvent.date ? originalEvent.date.substring(0, 7) : null // YYYY-MM
+            repeating: originalEvent.repeating
         };
 
         // Normalize criteria teamMemberIds for comparison
@@ -352,15 +345,13 @@ export const calendarState = {
             // Check if this event matches the original criteria
             const eventTeamIds = event.teamMemberIds || (event.teamMemberId ? [event.teamMemberId] : []);
             const eventRepeating = (event.repeating || []).map(d => parseInt(d));
-            const eventMonth = event.date ? event.date.substring(0, 7) : null;
 
-            const matches =
+            const matches = 
                 event.name === criteria.name &&
                 event.startTime === criteria.startTime &&
                 event.duration === criteria.duration &&
                 JSON.stringify(eventTeamIds.sort()) === criteriaTeamIds &&
-                JSON.stringify(eventRepeating.sort()) === criteriaRepeating &&
-                eventMonth === criteria.month; // DOAR evenimentele din aceeași lună
+                JSON.stringify(eventRepeating.sort()) === criteriaRepeating;
 
             if (matches) {
                 // Found a matching event in the series. Update it.

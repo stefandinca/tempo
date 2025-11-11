@@ -90,70 +90,18 @@ export async function loadData() {
 }
 
 /**
- * Create a new event
- * @param {object|array} eventData - Single event or array of events
+ * Salvează datele principale (teamMembers, clients, events).
+ * Apel POST la api.php?path=data
+ * @param {object} data - Obiectul conținând { teamMembers, clients, events }
  */
-export async function createEvent(eventData) {
+export async function saveData(data) {
     const options = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(eventData)
+        body: JSON.stringify(data)
     };
-    return apiFetch('events', options);
-}
-
-/**
- * Update an existing event
- * @param {object} eventData - Event data with id
- */
-export async function updateEvent(eventData) {
-    const options = {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(eventData)
-    };
-    return apiFetch(`events/${eventData.id}`, options);
-}
-
-/**
- * Delete an event
- * @param {string} eventId - ID of the event
- */
-export async function deleteEvent(eventId) {
-    const options = { method: 'DELETE' };
-    return apiFetch(`events/${eventId}`, options);
-}
-
-/**
- * Create a new client
- */
-export async function createClient(clientData) {
-    const options = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(clientData)
-    };
-    return apiFetch('clients', options);
-}
-
-/**
- * Update a client
- */
-export async function updateClient(clientData) {
-    const options = {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(clientData)
-    };
-    return apiFetch(`clients/${clientData.id}`, options);
-}
-
-/**
- * Delete a client
- */
-export async function deleteClient(clientId) {
-    const options = { method: 'DELETE' };
-    return apiFetch(`clients/${clientId}`, options);
+    // Folosim endpoint-ul 'data' din api.php
+    return apiFetch('data', options);
 }
 
 /**
@@ -325,47 +273,4 @@ export async function deleteProgram(id) {
         method: 'DELETE'
     };
     return apiFetch(`programs&id=${id}`, options);
-}
-
-/**
- * Salvează datele generale (teams, clients, events).
- * Apel POST la api.php?path=data
- * @param {object} data - Obiectul cu datele de salvat
- */
-export async function saveData(data) {
-    const options = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    };
-    return apiFetch('data', options);
-}
-
-/**
- * Clonează programul unei luni în alta.
- * Apel POST la api.php?path=clone-schedule
- * @param {string} sourceMonth - Luna sursă (format: YYYY-MM)
- * @param {string} targetMonth - Luna țintă (format: YYYY-MM)
- */
-export async function cloneMonthSchedule(sourceMonth, targetMonth) {
-    const options = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sourceMonth, targetMonth })
-    };
-    return apiFetch('clone-schedule', options);
-}
-
-/**
- * Șterge toate evenimentele dintr-o lună.
- * Apel POST la api.php?path=clear-month
- * @param {string} month - Luna de șters (format: YYYY-MM)
- */
-export async function clearMonth(month) {
-    const options = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ month })
-    };
-    return apiFetch('clear-month', options);
 }

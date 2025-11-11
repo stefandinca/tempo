@@ -1,0 +1,518 @@
+{
+    "isAdminView": true,
+    "currentDate": "2025-11-03T15:32:39.861Z",
+    "currentView": "month",
+    "teamMembers": [
+        {
+            "id": "corina",
+            "name": "Corina",
+            "color": "#357cff",
+            "initials": "CG",
+            "role": "admin"
+        },
+        {
+            "id": "dana",
+            "name": "Dana G",
+            "color": "#FF6B6B",
+            "initials": "DG",
+            "role": "therapist"
+        },
+        {
+            "id": "daniela",
+            "name": "Dana P",
+            "color": "#12C4D9",
+            "initials": "DP",
+            "role": "therapist"
+        },
+        {
+            "id": "alexandra",
+            "name": "Alexandra",
+            "color": "#9B59B6",
+            "initials": "AP",
+            "role": "therapist"
+        },
+        {
+            "id": "stefan",
+            "name": "Stefan",
+            "initials": "S",
+            "role": "admin",
+            "color": "#4F46E5"
+        }
+    ],
+    "clients": [
+    {
+        "id": "adelina2511",
+        "name": "Adelina Maria Laura Letu",
+        "email": "",
+        "phone": "",
+        "birthDate": "2019-11-25",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "adina1739",
+        "name": "Adina",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "aurora2306",
+        "name": "Aurora Sophia Alexe",
+        "email": "",
+        "phone": "",
+        "birthDate": "2022-06-23",
+        "medical": "Alergie la fructe de mare"
+    },
+    {
+        "id": "ale4427",
+        "name": "Ale",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "alex6130",
+        "name": "Alex",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "amalia8204",
+        "name": "Amalia",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "ana2107",
+        "name": "Ana Maria Zamfir",
+        "email": "",
+        "phone": "",
+        "birthDate": "2019-07-21",
+        "medical": "Mentat (5mil), Pantoten (5ml), D3, Omega3"
+    },
+    {
+        "id": "colin1110",
+        "name": "Colin Andrei Dragan",
+        "email": "",
+        "phone": "",
+        "birthDate": "2018-10-11",
+        "medical": "Anafranil"
+    },
+    {
+        "id": "cezar1802",
+        "name": "Cezar Casian Dinca",
+        "email": "stefan.dinca07@gmail.com",
+        "phone": "0746 060 987",
+        "birthDate": "2021-02-18",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "clara2109",
+        "name": "Clara Medeea Postolache",
+        "email": "",
+        "phone": "",
+        "birthDate": "2022-09-21",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "david0610",
+        "name": "David Marian Burticel",
+        "email": "",
+        "phone": "",
+        "birthDate": "2018-10-06",
+        "medical": "Rispolept, Depakin"
+    },
+    {
+        "id": "denis1298",
+        "name": "Denis",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "dominic0307",
+        "name": "Dominic Mihail Georgescu",
+        "email": "",
+        "phone": "",
+        "birthDate": "2019-07-03",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "eduard3108",
+        "name": "Eduard Buja",
+        "email": "",
+        "phone": "",
+        "birthDate": "2020-08-31",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "efremia1701",
+        "name": "Efremia Niculescu",
+        "email": "",
+        "phone": "",
+        "birthDate": "2021-01-17",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "eliza9375",
+        "name": "Eliza",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "emilia1207",
+        "name": "Emilia Ioana Ipate",
+        "email": "",
+        "phone": "",
+        "birthDate": "2022-07-12",
+        "medical": "Alergie lapte de vaca si derivate (posibil)"
+    },
+    {
+        "id": "eric7712",
+        "name": "Eric",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "eve2345",
+        "name": "Eve",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "evelin2211",
+        "name": "Evelin Ioana Matache",
+        "email": "",
+        "phone": "",
+        "birthDate": "2018-11-22",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "fabi3219",
+        "name": "Fabi",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "gabriela0307",
+        "name": "Gabriela Cristiana Maria Cozma",
+        "email": "",
+        "phone": "",
+        "birthDate": "2021-07-03",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "rami1110",
+        "name": "Rami Kadour",
+        "email": "",
+        "phone": "",
+        "birthDate": "2020-10-11",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "maher1110",
+        "name": "Maher Kadour",
+        "email": "",
+        "phone": "",
+        "birthDate": "2020-10-11",
+        "medical": ""
+    },
+    {
+        "id": "ingrid6901",
+        "name": "Ingrid",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "irina4275",
+        "name": "Irina",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "joy4567",
+        "name": "Joy",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "Alergii la roșii, ananas, prune.\nIntoleranta la gluten si histamina."
+    },
+    {
+        "id": "maia2903",
+        "name": "Maia Berghian",
+        "email": "",
+        "phone": "",
+        "birthDate": "2023-03-29",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "maria1210",
+        "name": "Maria Ecaterina Lucaci",
+        "email": "",
+        "phone": "",
+        "birthDate": "2021-10-12",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "matei2709",
+        "name": "Matei Serban Curelea",
+        "email": "",
+        "phone": "",
+        "birthDate": "2019-09-27",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "mathias1501",
+        "name": "Mathias Alexandru Staicu",
+        "email": "",
+        "phone": "",
+        "birthDate": "2020-01-15",
+        "medical": "Vigantol"
+    },
+    {
+        "id": "medeea1611",
+        "name": "Medeea Ana Gabrielea Anghel",
+        "email": "",
+        "phone": "",
+        "birthDate": "2021-11-16",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "mirela1357",
+        "name": "Mirela",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "nectaria0401",
+        "name": "Nectaria Stefania Rusu",
+        "email": "",
+        "phone": "",
+        "birthDate": "2022-01-04",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "nichita9876",
+        "name": "Nichita",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "pavel1510",
+        "name": "Pavel Ilan Croitoru",
+        "email": "",
+        "phone": "",
+        "birthDate": "2021-10-15",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "petru2012",
+        "name": "Petru Eric Croitoru",
+        "email": "",
+        "phone": "",
+        "birthDate": "2019-12-20",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "rares3005",
+        "name": "Rares Alexandru Ghita",
+        "email": "",
+        "phone": "",
+        "birthDate": "2018-05-30",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "rory4432",
+        "name": "Rory",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "selin7002",
+        "name": "Selin",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "stefan6428",
+        "name": "Stefan Negru",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "teri8813",
+        "name": "Teri",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "tom0903",
+        "name": "Tom Andrei Potecaru",
+        "email": "",
+        "phone": "",
+        "birthDate": "2022-03-09",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "toni1505",
+        "name": "Toni (Antonie-Ioan) Dumitru",
+        "email": "",
+        "phone": "",
+        "birthDate": "2020-05-15",
+        "medical": "Rispolept"
+    },
+    {
+        "id": "tudor0107",
+        "name": "Tudor Condruc",
+        "email": "",
+        "phone": "",
+        "birthDate": "2020-07-01",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "valentin1611",
+        "name": "Valentin Alexandru Rimbu",
+        "email": "",
+        "phone": "",
+        "birthDate": "2021-11-16",
+        "medical": "Alergie la nuca de cocos!"
+    },
+    {
+        "id": "vic1589",
+        "name": "Vic mic",
+        "email": "",
+        "phone": "",
+        "birthDate": "",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "victor0405",
+        "name": "Victor Ioan Brinzea",
+        "email": "",
+        "phone": "",
+        "birthDate": "2019-05-04",
+        "medical": "fara alergii, fara medicatie"
+    },
+    {
+        "id": "zian2206",
+        "name": "Zian Matei Vlad",
+        "email": "",
+        "phone": "",
+        "birthDate": "2021-06-22",
+        "medical": "Alergie la vancomicina, tratament neuro"
+    }
+],
+    "events": [],
+    "programs": [
+        {
+            "id": "prog_1",
+            "title": "Imitare orala",
+            "description": "Reproduce miscarile gurii si sunetele produse de terapeut (ex: suflat, deschis gura, pronuntat silabe)."
+        },
+        {
+            "id": "prog_2",
+            "title": "Stimulare de limbaj",
+            "description": "Activitati pentru a creste dorinta si capacitatea copilului de a comunica verbal."
+        },
+        {
+            "id": "prog_3",
+            "title": "Instructiuni functionale",
+            "description": "Urmeaza comenzi simple din viata de zi cu zi („adu mingea”, „pune cana pe masa”)."
+        },
+        {
+            "id": "prog_4",
+            "title": "Imitare motorie cu si fara obiect",
+            "description": "Copiaza actiuni ale adultului care implica obiecte (ex: bate toba, impinge o masinuta)."
+        },
+        {
+            "id": "prog_5",
+            "title": "Receptiv obiecte",
+            "description": "Copilul invata sa recunoasca si sa indice obiecte atunci cand sunt denumite („arata scaunul”)."
+        },
+        {
+            "id": "prog_6",
+            "title": "Motricitate",
+            "description": "Exercitii pentru dezvoltarea miscarilor fine si grosiere (ex: apucare, sarituri, tras linii)."
+        },
+        {
+            "id": "prog_7",
+            "title": "Raspuns la nume",
+            "description": "invata sa se intoarca sau sa raspunda cand isi aude numele."
+        },
+        {
+            "id": "prog_8",
+            "title": "Asteapta",
+            "description": "invata sa astepte pe rand, sa amane o dorinta sau o actiune."
+        },
+        {
+            "id": "prog_9",
+            "title": "Joc social",
+            "description": "Exercitii de interactiune si schimb reciproc in joc (ex: „da-mi mingea”, „hai sa construim impreuna”)."
+        },
+        {
+            "id": "prog_10",
+            "title": "Gesturi si limbaj functional",
+            "description": "Copilul foloseste gesturi sau cuvinte pentru a cere, a refuza sau a comunica nevoi („vreau apa”, „gata”)."
+        },
+        {
+            "id": "prog_11",
+            "title": "Imitare verbala",
+            "description": "Repeta cuvinte sau propozitii dupa adult („spune mama”, „spune apa”)."
+        },
+        {
+            "id": "prog_12",
+            "title": "Joc si miscare",
+            "description": "Activitati care combina jocul cu exercitiile fizice pentru coordonare si socializare."
+        },
+        {
+            "id": "prog_13",
+            "title": "Atentie",
+            "description": "Exercitii pentru a creste capacitatea de concentrare pe o sarcina sau pe interlocutor."
+        }
+    ],
+    "evolutionData": {},
+    "billingsData": {},
+    "activeFilters": [
+        "corina",
+        "dana",
+        "daniela",
+        "alexandra",
+        "stefan"
+    ],
+    "editingEventId": null,
+    "editingMemberId": null,
+    "editingClientId": null,
+    "selectedClientIds": [],
+    "selectedProgramIds": []
+}

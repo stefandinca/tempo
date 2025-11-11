@@ -138,7 +138,7 @@ export function renderBillingView() {
         const discountPercent = calculateDiscount(hoursData.billableHours);
         const discountAmount = totalBeforeDiscount * (discountPercent / 100);
         const totalDue = totalBeforeDiscount - discountAmount;
-        
+
         const card = document.createElement('div');
         card.className = 'billing-card';
         card.dataset.clientId = client.id;
@@ -371,7 +371,6 @@ async function handleDeletePayment(clientId, monthKey, paymentId) {
         showCustomAlert('Nu s-a putut șterge încasarea.', 'Eroare API');
     }
 }
-
 // --- Discount Thresholds Management ---
 
 /**
